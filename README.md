@@ -4,9 +4,8 @@ LassiLAB Writer is planned as a mobile-first PWA authoring tool for poems, lyric
 voice sparks, ideas, images, fragments, melodies, and a future AI helper called
 Kováč.
 
-This repository is currently documentation-only. It is a clean foundation for
-planning the product before building the app, connecting services, or choosing
-implementation details that would be premature.
+This repository now contains the first minimal v0.1 app shell plus planning
+documents. The app is intentionally small: a local text spark loop only.
 
 ## Project Philosophy
 
@@ -20,13 +19,23 @@ implementation details that would be premature.
 
 ## Current Status
 
-This repo contains only planning documents:
+This repo contains the first minimal app shell and planning documents:
 
 - [Project Book](docs/PROJECT_BOOK.md)
 - [MVP Scope](docs/MVP_SCOPE.md)
 - [Data Model](docs/DATA_MODEL.md)
 - [UX Notes](docs/UX_NOTES.md)
 - [Next Tasks](docs/NEXT_TASKS.md)
+- [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)
+- [Worklog](docs/WORKLOG.md)
+
+## Development
+
+```bash
+npm install
+npm run dev
+npm run build
+```
 
 ## True v0.1
 

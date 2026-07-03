@@ -1,0 +1,258 @@
+:root {
+  color: #f4efe6;
+  background: #101010;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(180deg, #181818 0%, #0f0f0f 100%);
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.app-shell {
+  width: min(100%, 46rem);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.hero {
+  display: grid;
+  gap: 1rem;
+  padding: 2rem 0 1.25rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #d8b45b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  max-width: 12ch;
+  color: #fff8ed;
+  font-size: 2.65rem;
+  line-height: 0.95;
+}
+
+h2 {
+  color: #fff8ed;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.hero-copy {
+  max-width: 32rem;
+  color: #cfc7ba;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.primary-action,
+.save-action,
+.ghost-action {
+  min-height: 3.25rem;
+  border: 0;
+  border-radius: 0.5rem;
+  font-weight: 800;
+}
+
+.primary-action,
+.save-action {
+  color: #17130b;
+  background: #f2c45b;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.28);
+}
+
+.primary-action {
+  width: 100%;
+  font-size: 1.2rem;
+}
+
+.save-action {
+  width: 100%;
+}
+
+.save-action:disabled {
+  color: #8f887d;
+  background: #333333;
+  box-shadow: none;
+}
+
+.ghost-action {
+  min-width: 6rem;
+  padding: 0 1rem;
+  color: #f2e6d0;
+  background: #2a2a2a;
+}
+
+.save-note {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(242, 196, 91, 0.32);
+  border-radius: 0.5rem;
+  color: #ffe3a3;
+  background: rgba(242, 196, 91, 0.1);
+}
+
+.editor-panel,
+.recent-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 0.5rem;
+  background: rgba(18, 18, 18, 0.82);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.18);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.spark-label {
+  display: block;
+  margin-top: 1.25rem;
+  color: #f1ddb5;
+  font-weight: 800;
+}
+
+.spark-input {
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  margin-top: 0.6rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.5rem;
+  color: #fff8ed;
+  background: #0f0f0f;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.spark-input:focus {
+  border-color: #f2c45b;
+  outline: 3px solid rgba(242, 196, 91, 0.2);
+}
+
+.editor-actions {
+  margin-top: 1rem;
+}
+
+.spark-count {
+  display: inline-grid;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffe3a3;
+  background: #2a2a2a;
+  font-weight: 900;
+}
+
+.spark-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.spark-card {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  min-height: 5.5rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: inherit;
+  text-align: left;
+  background: #1b1b1b;
+}
+
+.spark-card:focus,
+.spark-card:hover {
+  border-color: rgba(242, 196, 91, 0.6);
+  outline: none;
+}
+
+.spark-card-title {
+  color: #fff8ed;
+  font-weight: 900;
+}
+
+.spark-card-preview {
+  color: #cfc7ba;
+  line-height: 1.4;
+}
+
+.spark-card-time {
+  color: #9f978c;
+  font-size: 0.82rem;
+}
+
+.empty-state {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  color: #cfc7ba;
+  background: #1b1b1b;
+}
+
+@media (min-width: 680px) {
+  .app-shell {
+    padding: 2rem;
+  }
+
+  .hero {
+    padding-top: 3rem;
+  }
+
+  h1 {
+    font-size: 4.1rem;
+  }
+
+  .primary-action {
+    width: fit-content;
+    min-width: 14rem;
+    padding: 0 1.5rem;
+  }
+}

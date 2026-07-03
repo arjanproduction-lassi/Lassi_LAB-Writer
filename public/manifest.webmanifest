@@ -1,0 +1,10 @@
+{
+  "name": "LassiLAB Writer",
+  "short_name": "Writer",
+  "description": "Rýchla dielňa na zachytenie textovej iskry.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#14100c",
+  "theme_color": "#14100c",
+  "icons": []
+}
