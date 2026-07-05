@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">LassiLAB Writer icon</title>
+  <desc id="desc">A warm Writer monogram with a spark mark.</desc>
+  <rect width="512" height="512" rx="112" fill="#14100c"/>
+  <path fill="#f2c45b" d="M306 56 178 276h86l-44 180 126-224h-84z"/>
+  <path fill="#fff8ed" d="M94 144h52l26 168 38-168h42l38 168 26-168h52l-50 224h-50l-37-151-37 151h-50z"/>
+</svg>

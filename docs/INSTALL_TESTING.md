@@ -54,6 +54,15 @@ http://localhost:4173/
 
 Use this to test the built `dist/` output before deploying.
 
+## Install Locally From The Production Preview
+
+After starting `npm run preview`, open the preview URL in Chrome or Edge on
+desktop. Use the browser install option, usually shown as **Install app**,
+**Create shortcut**, or an install icon in the address bar.
+
+The app should install as **LassiLAB Writer**, separate from Songbook and
+Storyboard.
+
 ## Deploy On Vercel From GitHub
 
 Do not use local tokens for this project setup. Use the Vercel dashboard GitHub
@@ -117,6 +126,9 @@ In Chrome on Android:
 4. Confirm the name.
 5. Launch Writer from the home screen icon.
 
+The installed Android app should use the Writer name and icon. It is still a
+separate app from Songbook because it is served from its own Vercel project URL.
+
 ## Storage Warning
 
 The v0.1 app stores sparks in `localStorage`.
@@ -130,7 +142,8 @@ This means:
 
 ## PWA Status
 
-This is only a minimal install/testing shell.
+This is a minimal installable PWA shell.
 
-Full offline PWA install is not complete yet because app icons and a service
-worker are future work. The current manifest is intentionally minimal.
+The app includes a manifest, Writer icons, and a small service worker for the
+static app shell. Full offline behavior beyond the current local text-spark
+workflow remains future work.
