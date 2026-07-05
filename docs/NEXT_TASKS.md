@@ -11,9 +11,12 @@ The first MVP slice is now implemented:
 - Reopen and edit it.
 - Export the local Writer DB as JSON.
 - Import that JSON on another device.
+- Connect Google Drive when `VITE_GOOGLE_CLIENT_ID` is configured.
+- Manually sync the hidden Drive DB across PC, mobile, and tablet.
 
-This proves the core loop and a first manual device bridge without AI, Songbook,
-Storyboard, cloud sync, accounts, backends, or shared databases.
+This proves the core loop, a manual JSON bridge, and an experimental manual
+Google Drive bridge without AI, Songbook, Storyboard, automatic background sync,
+custom accounts, backends, or shared databases.
 
 ## Repository Setup Tasks
 
@@ -37,12 +40,20 @@ Storyboard, cloud sync, accounts, backends, or shared databases.
 - Sketch recent sparks list.
 - Sketch spark detail.
 - Sketch the image-first prompt language without implementing image upload.
+- Design the "four notebooks" workspace model before implementing complex draft
+  features.
+- Preserve the device roles: mobile = chytit, sync = preniest, PC = upratat,
+  tablet = citat a tvarovat.
 
 ## Technical Tasks For Later
 
 - Test manual JSON export/import on phone and desktop with real saved sparks.
+- Create the Google Cloud OAuth web client for the Vercel production URL.
+- Add `VITE_GOOGLE_CLIENT_ID` to Vercel production and preview environments.
+- Test Google Drive sync PC -> mobile -> tablet and back with real sparks.
 - Add minimal test setup.
 - Add recovery notes for the local import backup key.
+- Add recovery notes for the local sync backup key.
 - Add export bridge design notes for future Songbook or Storyboard handoff.
 - Add accessibility checks for the capture flow.
 
@@ -57,3 +68,4 @@ Storyboard, cloud sync, accounts, backends, or shared databases.
 - Do not add Kováč yet.
 - Do not add Songbook or Storyboard export bridges yet.
 - Do not turn the manual Writer DB JSON file into a final public export schema.
+- Do not turn experimental Google Drive sync into automatic background sync yet.

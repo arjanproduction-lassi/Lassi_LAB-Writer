@@ -2,6 +2,19 @@
 
 ## 2026-07-05
 
+- Added experimental manual Google Drive sync as the next device bridge for one
+  author across PC, mobile, and tablet.
+- Added browser-only Google Identity Services token flow behind
+  `VITE_GOOGLE_CLIENT_ID`.
+- Added Drive API calls for one hidden `appDataFolder` DB file:
+  `lassilab-writer-db-v001.json`.
+- Reused the Writer DB merge rule for manual import and Google sync: merge by
+  spark `id`, keep the newer `updatedAt`, and avoid duplicates.
+- Added a local backup before sync merges under
+  `lassilab-writer:v0.1:sparks:backup-before-sync`.
+- Kept tokens in memory only and did not add a backend, custom accounts,
+  automatic background sync, AI, media capture, Songbook integration,
+  Storyboard integration, or shared databases.
 - Added manual Writer DB export/import as the first device bridge.
 - Added `Exportovať DB` and `Importovať DB` actions in a small data section.
 - Export creates `LassiLAB_Writer_DBv001_YYYY-MM-DD.json`.

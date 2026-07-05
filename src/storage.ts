@@ -1,8 +1,15 @@
-import type { Spark, SparkInput, WriterDbExport, WriterDbImportResult } from "./types";
+import type {
+  Spark,
+  SparkInput,
+  WriterDbExport,
+  WriterDbImportResult,
+  WriterDbMergeResult
+} from "./types";
 
 const APP_NAME = "LassiLAB Writer";
 const STORAGE_KEY = "lassilab-writer:v0.1:sparks";
 const IMPORT_BACKUP_STORAGE_KEY = "lassilab-writer:v0.1:sparks:backup-before-import";
+const SYNC_BACKUP_STORAGE_KEY = "lassilab-writer:v0.1:sparks:backup-before-sync";
 const SCHEMA_VERSION = 1;
 
 function readRawSparks(): Spark[] {
@@ -71,7 +78,7 @@ function formatDatePart(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function backupSparksBeforeImport(sparks: Spark[]) {
+function backupSparks(sparks: Spark[], storageKey: string) {
   const backedUpAt = new Date().toISOString();
   const backup = {
     app: APP_NAME,
@@ -82,7 +89,7 @@ function backupSparksBeforeImport(sparks: Spark[]) {
     sparks
   };
 
-  window.localStorage.setItem(IMPORT_BACKUP_STORAGE_KEY, JSON.stringify(backup));
+  window.localStorage.setItem(storageKey, JSON.stringify(backup));
   return backedUpAt;
 }
 
@@ -147,16 +154,33 @@ export function getWriterDbExportFileName(date = new Date()) {
 }
 
 export function importWriterDb(value: unknown): WriterDbImportResult {
+  const result = mergeWriterDbExportIntoStorage(value, IMPORT_BACKUP_STORAGE_KEY);
+
+  return {
+    added: result.added,
+    updated: result.updated,
+    skipped: result.kept,
+    invalid: result.invalid,
+    backupKey: result.backupKey,
+    backedUpAt: result.backedUpAt
+  };
+}
+
+export function mergeWriterDbExportIntoStorage(
+  value: unknown,
+  backupKey = SYNC_BACKUP_STORAGE_KEY
+): WriterDbMergeResult {
   if (!isWriterDbExport(value)) {
     throw new Error("Invalid Writer DB export.");
   }
 
   const current = readRawSparks();
-  const backedUpAt = backupSparksBeforeImport(current);
+  const backedUpAt = backupSparks(current, backupKey);
   const byId = new Map(current.map((spark) => [spark.id, spark]));
+  const remoteById = new Map<string, Spark>();
   let added = 0;
   let updated = 0;
-  let skipped = 0;
+  let kept = 0;
   let invalid = 0;
 
   for (const candidate of value.sparks) {
@@ -165,6 +189,7 @@ export function importWriterDb(value: unknown): WriterDbImportResult {
       continue;
     }
 
+    remoteById.set(candidate.id, candidate);
     const existing = byId.get(candidate.id);
 
     if (!existing) {
@@ -177,18 +202,31 @@ export function importWriterDb(value: unknown): WriterDbImportResult {
       byId.set(candidate.id, candidate);
       updated += 1;
     } else {
-      skipped += 1;
+      kept += 1;
     }
   }
 
-  writeRawSparks([...byId.values()].sort(compareUpdatedAt));
+  let pushed = 0;
+  for (const spark of current) {
+    const remoteSpark = remoteById.get(spark.id);
+
+    if (!remoteSpark || Date.parse(spark.updatedAt) > Date.parse(remoteSpark.updatedAt)) {
+      pushed += 1;
+    }
+  }
+
+  const merged = [...byId.values()].sort(compareUpdatedAt);
+  writeRawSparks(merged);
 
   return {
     added,
     updated,
-    skipped,
+    kept,
     invalid,
-    backupKey: IMPORT_BACKUP_STORAGE_KEY,
+    pushed,
+    pulled: added + updated,
+    total: merged.length,
+    backupKey,
     backedUpAt
   };
 }

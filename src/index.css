@@ -58,6 +58,7 @@ button:disabled {
 
 h1,
 h2,
+h3,
 p {
   margin: 0;
 }
@@ -73,6 +74,12 @@ h2 {
   color: #fff8ed;
   font-size: 1.35rem;
   line-height: 1.1;
+}
+
+h3 {
+  color: #fff8ed;
+  font-size: 1.05rem;
+  line-height: 1.2;
 }
 
 .hero-copy {
@@ -263,10 +270,21 @@ h2 {
   font-weight: 800;
 }
 
+.data-action:disabled {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #8f887d;
+  background: #262626;
+}
+
 .data-action:focus,
 .data-action:hover {
   border-color: rgba(242, 196, 91, 0.7);
   outline: none;
+}
+
+.data-action:disabled:focus,
+.data-action:disabled:hover {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .data-note {
@@ -276,6 +294,25 @@ h2 {
   color: #f2e6d0;
   background: #1b1b1b;
   line-height: 1.45;
+}
+
+.sync-panel {
+  display: grid;
+  gap: 0.8rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.data-note[data-status="error"] {
+  border-color: rgba(255, 120, 120, 0.32);
+  color: #ffd2d2;
+  background: rgba(120, 30, 30, 0.25);
+}
+
+.data-note[data-status="connected"] {
+  border-color: rgba(132, 204, 22, 0.32);
+  color: #e5f7c5;
+  background: rgba(54, 83, 20, 0.28);
 }
 
 .file-input {

@@ -92,7 +92,10 @@ Use these settings when importing the GitHub repository:
 - Build Command: `npm run build`
 - Output Directory: `dist`
 - Development Command: `npm run dev`
-- Environment Variables: none required for v0.1
+- Environment Variables:
+  - none required for the local text-spark loop or manual JSON export/import
+  - optional for experimental Google Drive sync:
+    `VITE_GOOGLE_CLIENT_ID`
 
 The repository also includes a minimal `vercel.json`:
 
@@ -149,6 +152,60 @@ lassilab-writer:v0.1:sparks:backup-before-import
 
 This backup is local to the current browser and can be overwritten by the next
 import.
+
+## Test Experimental Google Drive Sync
+
+Google Drive sync is manual and experimental. It is not automatic background
+sync, not Gmail email transport, and not a shared database.
+
+Required setup before testing on Vercel:
+
+1. Create or open a Google Cloud project.
+2. Enable **Google Drive API**.
+3. Configure the OAuth consent screen.
+4. Add the non-sensitive Drive scope:
+   `https://www.googleapis.com/auth/drive.appdata`.
+5. Create an OAuth Client ID with type **Web application**.
+6. Add the production origin:
+   `https://lassi-lab-writer.vercel.app`.
+7. Add local development origins if needed, for example:
+   `http://localhost:5173`.
+8. Copy the OAuth Client ID.
+9. In Vercel, add:
+   `VITE_GOOGLE_CLIENT_ID=<client-id>`
+10. Redeploy the Vercel project.
+
+Test PC -> mobile:
+
+1. Open Writer on PC.
+2. Save a spark.
+3. In **Dáta**, tap **Pripojiť Google** and approve access.
+4. Tap **Synchronizovať teraz**.
+5. Open Writer on the Android phone with the same Google account.
+6. Tap **Pripojiť Google**.
+7. Tap **Synchronizovať teraz**.
+8. Confirm the PC spark appears on the phone.
+
+Test mobile -> PC:
+
+1. Save a new spark on the phone.
+2. Tap **Synchronizovať teraz** on the phone.
+3. Tap **Synchronizovať teraz** on PC.
+4. Confirm the phone spark appears on PC.
+
+Conflict rule:
+
+- Writer merges by spark `id`.
+- If the same spark exists on both devices, newer `updatedAt` wins.
+- Older copies do not overwrite newer copies.
+- Before a sync merge, Writer stores a local backup under:
+
+```text
+lassilab-writer:v0.1:sparks:backup-before-sync
+```
+
+If `VITE_GOOGLE_CLIENT_ID` is missing, Writer must still build and run. The
+Google sync controls should be disabled with a short setup message.
 
 ## Add To Home Screen On Android
 

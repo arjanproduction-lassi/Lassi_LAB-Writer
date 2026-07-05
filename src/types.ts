@@ -33,3 +33,48 @@ export interface WriterDbImportResult {
   backupKey: string;
   backedUpAt: string;
 }
+
+export type RemoteSyncStatus =
+  | "unavailable"
+  | "idle"
+  | "authorizing"
+  | "connected"
+  | "syncing"
+  | "error";
+
+export interface WriterDbMergeResult {
+  added: number;
+  updated: number;
+  kept: number;
+  invalid: number;
+  pushed: number;
+  pulled: number;
+  total: number;
+  backupKey: string;
+  backedUpAt: string;
+}
+
+export interface GoogleSyncCounts {
+  added: number;
+  updated: number;
+  kept: number;
+  pushed: number;
+  pulled: number;
+  errors: number;
+}
+
+export interface RemoteDbMetadata {
+  fileId: string;
+  fileName: string;
+  created: boolean;
+  updatedAt: string;
+}
+
+export interface GoogleSyncResult {
+  status: "created" | "synced" | "upload-warning";
+  message: string;
+  counts: GoogleSyncCounts;
+  remote: RemoteDbMetadata;
+  backupKey?: string;
+  backedUpAt?: string;
+}

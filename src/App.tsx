@@ -1,12 +1,17 @@
 import { type ChangeEvent, useMemo, useRef, useState } from "react";
 import {
+  connectGoogleDrive,
+  isGoogleDriveSyncConfigured,
+  syncGoogleDrive
+} from "./googleDriveSync";
+import {
   createWriterDbExport,
   getWriterDbExportFileName,
   importWriterDb,
   listSparks,
   saveSpark
 } from "./storage";
-import type { Spark } from "./types";
+import type { RemoteSyncStatus, Spark } from "./types";
 
 type EditorState = {
   id?: string;
@@ -33,10 +38,19 @@ function sparkPreview(spark: Spark) {
 }
 
 export default function App() {
+  const googleSyncAvailable = isGoogleDriveSyncConfigured();
   const [sparks, setSparks] = useState<Spark[]>(() => listSparks());
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [savedMessage, setSavedMessage] = useState("");
   const [dataMessage, setDataMessage] = useState("");
+  const [googleSyncStatus, setGoogleSyncStatus] = useState<RemoteSyncStatus>(
+    googleSyncAvailable ? "idle" : "unavailable"
+  );
+  const [googleSyncMessage, setGoogleSyncMessage] = useState(
+    googleSyncAvailable
+      ? ""
+      : "Google Drive sync este nie je nakonfigurovany. Chyba VITE_GOOGLE_CLIENT_ID."
+  );
   const importInputRef = useRef<HTMLInputElement>(null);
 
   const activeSpark = useMemo(
@@ -46,6 +60,8 @@ export default function App() {
 
   const isEditing = Boolean(editor?.id);
   const canSave = Boolean(editor?.text.trim());
+  const isGoogleSyncBusy =
+    googleSyncStatus === "authorizing" || googleSyncStatus === "syncing";
 
   function startNewSpark() {
     setEditor({ text: "" });
@@ -121,6 +137,57 @@ export default function App() {
       );
     } catch {
       setDataMessage("Import zlyhal. Aktuálne iskry ostali nezmenené.");
+    }
+  }
+
+  async function handleConnectGoogle() {
+    if (!googleSyncAvailable) {
+      setGoogleSyncStatus("unavailable");
+      setGoogleSyncMessage(
+        "Google Drive sync este nie je nakonfigurovany. Chyba VITE_GOOGLE_CLIENT_ID."
+      );
+      return;
+    }
+
+    setGoogleSyncStatus("authorizing");
+    setGoogleSyncMessage("Otváram Google pripojenie...");
+
+    try {
+      await connectGoogleDrive();
+      setGoogleSyncStatus("connected");
+      setGoogleSyncMessage("Google je pripojený. Teraz môžeš synchronizovať.");
+    } catch {
+      setGoogleSyncStatus("error");
+      setGoogleSyncMessage("Pripojenie Google zlyhalo alebo bolo zrušené.");
+    }
+  }
+
+  async function handleGoogleSync() {
+    if (!googleSyncAvailable) {
+      setGoogleSyncStatus("unavailable");
+      setGoogleSyncMessage(
+        "Google Drive sync este nie je nakonfigurovany. Chyba VITE_GOOGLE_CLIENT_ID."
+      );
+      return;
+    }
+
+    setGoogleSyncStatus("syncing");
+    setGoogleSyncMessage("Synchronizujem cez Google Drive...");
+
+    try {
+      const result = await syncGoogleDrive();
+      setSparks(listSparks());
+      setEditor(null);
+      setSavedMessage("");
+      setGoogleSyncStatus(result.status === "upload-warning" ? "error" : "connected");
+      setGoogleSyncMessage(
+        `${result.message} Pridane ${result.counts.added}, aktualizovane ${result.counts.updated}, ponechane ${result.counts.kept}.`
+      );
+    } catch {
+      setGoogleSyncStatus("error");
+      setGoogleSyncMessage(
+        "Synchronizacia zlyhala. Lokalne iskry ostali chranene; ak bol vzdialeny subor neplatny, nic sa neprepisalo."
+      );
     }
   }
 
@@ -242,6 +309,40 @@ export default function App() {
           onChange={handleImportDb}
         />
         {dataMessage ? <p className="data-note">{dataMessage}</p> : null}
+
+        <div className="sync-panel" aria-labelledby="google-sync-title">
+          <div>
+            <p className="eyebrow">Google Drive sync</p>
+            <h3 id="google-sync-title">Skrytý most medzi zariadeniami</h3>
+          </div>
+          <p className="data-copy">
+            Experimentálne. Pre jedného autora a viac zariadení. Google účet slúži
+            len na prístup k skrytému appDataFolder súboru.
+          </p>
+          <div className="data-actions">
+            <button
+              className="data-action"
+              type="button"
+              disabled={!googleSyncAvailable || isGoogleSyncBusy}
+              onClick={handleConnectGoogle}
+            >
+              Pripojiť Google
+            </button>
+            <button
+              className="data-action"
+              type="button"
+              disabled={!googleSyncAvailable || isGoogleSyncBusy}
+              onClick={handleGoogleSync}
+            >
+              Synchronizovať teraz
+            </button>
+          </div>
+          {googleSyncMessage ? (
+            <p className="data-note" data-status={googleSyncStatus}>
+              {googleSyncMessage}
+            </p>
+          ) : null}
+        </div>
       </section>
     </main>
   );

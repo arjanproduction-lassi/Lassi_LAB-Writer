@@ -7,6 +7,76 @@ Writer must be faster than forgetting.
 The first screen should help the author capture, continue, or revisit work
 without making them choose a complex structure first.
 
+## Four Notebook Comfort
+
+Writer should recreate the comfort of the author's old 3-4 physical notebook
+workflow without forcing the physical mess into a database-shaped UI.
+
+The product model is:
+
+1. **Iskra**
+   - Fastest possible capture.
+   - No organizing pressure.
+   - Mobile-first.
+   - Faster than forgetting.
+2. **Poznámky**
+   - Image, mood, fragments, phrases, rhymes, and context.
+   - A place to expand the spark without needing a finished text.
+   - The author can add material before knowing what it is.
+3. **Dielňa / Rozpracované**
+   - Shaping text.
+   - Trying versions.
+   - Crossing out, moving, restructuring.
+   - Desktop and tablet friendly.
+4. **Text OK**
+   - Clean accepted version.
+   - Separated from messy drafts because the old third notebook became too
+     crossed out and confusing.
+
+The goal is not to create four heavy admin categories. The goal is to preserve
+the psychological comfort of separate spaces: catch, expand, shape, accept.
+
+## Device Roles
+
+- Mobile = chytiť.
+- Sync = preniesť.
+- PC = upratať.
+- Tablet = čítať a tvarovať.
+
+Mobile is the net for sparks, quick capture, quick continuation, and minimal
+decisions. It must never become an organizing burden.
+
+Tablet is the reading and shaping bench. It should feel comfortable for medium
+editing, comparing, and continuing text without the weight of the full desktop
+workspace.
+
+PC/Desktop is the main workbench for organizing, merging, cleaning, versioning,
+and separating accepted text from draft noise.
+
+Sync or another bridge is essential because a spark captured on mobile must be
+able to wait safely for PC or tablet later.
+
+## Workspace UX Rules
+
+- Main mobile action remains fast capture.
+- Organization can be richer on PC than on mobile.
+- The product is for one author across multiple devices, not multi-user
+  collaboration.
+- Comfort of writing is as important as technical storage.
+- The app should feel like a friendly work table, not a database admin panel.
+
+## Future UX Order
+
+The next larger UX steps should happen in this order:
+
+1. Google Drive Svitok sync.
+2. Autosave rozpisanej iskry.
+3. Gentle spark status: Iskra / Poznámky / Dielňa / Text OK.
+4. Only then build deeper editors for notes and versions.
+
+This protects the real workflow: catch first, move safely between devices,
+avoid losing unfinished writing, then add structure.
+
 ## Mobile-First Priorities
 
 - One large, obvious capture action in v0.1.
