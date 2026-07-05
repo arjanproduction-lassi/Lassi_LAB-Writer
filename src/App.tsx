@@ -1,5 +1,11 @@
-import { useMemo, useState } from "react";
-import { listSparks, saveSpark } from "./storage";
+import { type ChangeEvent, useMemo, useRef, useState } from "react";
+import {
+  createWriterDbExport,
+  getWriterDbExportFileName,
+  importWriterDb,
+  listSparks,
+  saveSpark
+} from "./storage";
 import type { Spark } from "./types";
 
 type EditorState = {
@@ -30,6 +36,8 @@ export default function App() {
   const [sparks, setSparks] = useState<Spark[]>(() => listSparks());
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [savedMessage, setSavedMessage] = useState("");
+  const [dataMessage, setDataMessage] = useState("");
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const activeSpark = useMemo(
     () => sparks.find((spark) => spark.id === editor?.id),
@@ -42,11 +50,13 @@ export default function App() {
   function startNewSpark() {
     setEditor({ text: "" });
     setSavedMessage("");
+    setDataMessage("");
   }
 
   function openSpark(spark: Spark) {
     setEditor({ id: spark.id, text: spark.text });
     setSavedMessage("");
+    setDataMessage("");
   }
 
   function closeEditor() {
@@ -66,6 +76,52 @@ export default function App() {
     setSparks(listSparks());
     setEditor(null);
     setSavedMessage(`Iskra uložená ${formatDate(saved.updatedAt)}`);
+  }
+
+  function handleExportDb() {
+    const exportData = createWriterDbExport();
+    const fileName = getWriterDbExportFileName(new Date(exportData.exportedAt));
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json"
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 0);
+    setDataMessage(`Export pripravený: ${exportData.sparkCount} iskier.`);
+  }
+
+  function openImportPicker() {
+    importInputRef.current?.click();
+  }
+
+  async function handleImportDb(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(await file.text());
+      const result = importWriterDb(parsed);
+      const skippedInvalid = result.skipped + result.invalid;
+
+      setSparks(listSparks());
+      setEditor(null);
+      setSavedMessage("");
+      setDataMessage(
+        `Import hotový: pridané ${result.added}, aktualizované ${result.updated}, preskočené/neplatné ${skippedInvalid}.`
+      );
+    } catch {
+      setDataMessage("Import zlyhal. Aktuálne iskry ostali nezmenené.");
+    }
   }
 
   return (
@@ -159,6 +215,33 @@ export default function App() {
             <p>Jedno tlačidlo hore stačí. Zachyť len to najnutnejšie.</p>
           </div>
         )}
+      </section>
+
+      <section className="data-section" aria-labelledby="data-title">
+        <div>
+          <p className="eyebrow">Dáta</p>
+          <h2 id="data-title">Ručný prenos DB</h2>
+        </div>
+        <p className="data-copy">
+          Exportuj lokálne iskry do JSON súboru alebo importuj Writer DB z iného
+          zariadenia. Toto nie je cloud sync.
+        </p>
+        <div className="data-actions">
+          <button className="data-action" type="button" onClick={handleExportDb}>
+            Exportovať DB
+          </button>
+          <button className="data-action" type="button" onClick={openImportPicker}>
+            Importovať DB
+          </button>
+        </div>
+        <input
+          ref={importInputRef}
+          className="file-input"
+          type="file"
+          accept="application/json,.json"
+          onChange={handleImportDb}
+        />
+        {dataMessage ? <p className="data-note">{dataMessage}</p> : null}
       </section>
     </main>
   );

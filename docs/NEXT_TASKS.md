@@ -2,17 +2,18 @@
 
 ## Smallest Safe Next Step
 
-Choose the first MVP slice before writing app code.
-
-Recommended slice:
+The first MVP slice is now implemented:
 
 - Open app on mobile.
 - Tap one capture action.
 - Save a text spark.
 - See it in a recent list.
 - Reopen and edit it.
+- Export the local Writer DB as JSON.
+- Import that JSON on another device.
 
-This proves the core loop without AI, Songbook, Storyboard, or shared databases.
+This proves the core loop and a first manual device bridge without AI, Songbook,
+Storyboard, cloud sync, accounts, backends, or shared databases.
 
 ## Repository Setup Tasks
 
@@ -39,11 +40,10 @@ This proves the core loop without AI, Songbook, Storyboard, or shared databases.
 
 ## Technical Tasks For Later
 
-- Initialize PWA project.
-- Add local persistence.
-- Add basic offline behavior.
+- Test manual JSON export/import on phone and desktop with real saved sparks.
 - Add minimal test setup.
-- Add export bridge design notes.
+- Add recovery notes for the local import backup key.
+- Add export bridge design notes for future Songbook or Storyboard handoff.
 - Add accessibility checks for the capture flow.
 
 ## Not Yet
@@ -55,5 +55,5 @@ This proves the core loop without AI, Songbook, Storyboard, or shared databases.
 - Do not add image upload yet.
 - Do not add voice or melody recording yet.
 - Do not add Kováč yet.
-- Do not add export bridges yet.
-- Do not design final export schemas before the first MVP flow is clear.
+- Do not add Songbook or Storyboard export bridges yet.
+- Do not turn the manual Writer DB JSON file into a final public export schema.

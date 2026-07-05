@@ -1,6 +1,8 @@
-import type { Spark, SparkInput } from "./types";
+import type { Spark, SparkInput, WriterDbExport, WriterDbImportResult } from "./types";
 
+const APP_NAME = "LassiLAB Writer";
 const STORAGE_KEY = "lassilab-writer:v0.1:sparks";
+const IMPORT_BACKUP_STORAGE_KEY = "lassilab-writer:v0.1:sparks:backup-before-import";
 const SCHEMA_VERSION = 1;
 
 function readRawSparks(): Spark[] {
@@ -30,11 +32,62 @@ function isSpark(value: unknown): value is Spark {
   const spark = value as Partial<Spark>;
   return (
     typeof spark.id === "string" &&
+    (spark.title === undefined || typeof spark.title === "string") &&
     typeof spark.text === "string" &&
-    typeof spark.createdAt === "string" &&
-    typeof spark.updatedAt === "string" &&
+    isValidDateString(spark.createdAt) &&
+    isValidDateString(spark.updatedAt) &&
+    spark.temperature === "spark" &&
+    Array.isArray(spark.tags) &&
+    spark.tags.every((tag) => typeof tag === "string") &&
     spark.schemaVersion === SCHEMA_VERSION
   );
+}
+
+function isValidDateString(value: unknown): value is string {
+  return typeof value === "string" && !Number.isNaN(Date.parse(value));
+}
+
+function isWriterDbExport(value: unknown): value is WriterDbExport {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const exportData = value as Partial<WriterDbExport>;
+  return (
+    exportData.app === APP_NAME &&
+    exportData.schemaVersion === SCHEMA_VERSION &&
+    isValidDateString(exportData.exportedAt) &&
+    Number.isInteger(exportData.sparkCount) &&
+    typeof exportData.sparkCount === "number" &&
+    exportData.sparkCount >= 0 &&
+    Array.isArray(exportData.sparks)
+  );
+}
+
+function formatDatePart(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function backupSparksBeforeImport(sparks: Spark[]) {
+  const backedUpAt = new Date().toISOString();
+  const backup = {
+    app: APP_NAME,
+    schemaVersion: SCHEMA_VERSION,
+    backedUpAt,
+    storageKey: STORAGE_KEY,
+    sparkCount: sparks.length,
+    sparks
+  };
+
+  window.localStorage.setItem(IMPORT_BACKUP_STORAGE_KEY, JSON.stringify(backup));
+  return backedUpAt;
+}
+
+function compareUpdatedAt(a: Spark, b: Spark) {
+  return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
 }
 
 function createId() {
@@ -46,9 +99,7 @@ function createId() {
 }
 
 export function listSparks(): Spark[] {
-  return readRawSparks().sort(
-    (a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt)
-  );
+  return readRawSparks().sort(compareUpdatedAt);
 }
 
 export function getSpark(id: string): Spark | undefined {
@@ -77,4 +128,67 @@ export function saveSpark(input: SparkInput): Spark {
 
   writeRawSparks(next);
   return saved;
+}
+
+export function createWriterDbExport(): WriterDbExport {
+  const sparks = listSparks();
+
+  return {
+    app: APP_NAME,
+    schemaVersion: SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
+    sparkCount: sparks.length,
+    sparks
+  };
+}
+
+export function getWriterDbExportFileName(date = new Date()) {
+  return `LassiLAB_Writer_DBv001_${formatDatePart(date)}.json`;
+}
+
+export function importWriterDb(value: unknown): WriterDbImportResult {
+  if (!isWriterDbExport(value)) {
+    throw new Error("Invalid Writer DB export.");
+  }
+
+  const current = readRawSparks();
+  const backedUpAt = backupSparksBeforeImport(current);
+  const byId = new Map(current.map((spark) => [spark.id, spark]));
+  let added = 0;
+  let updated = 0;
+  let skipped = 0;
+  let invalid = 0;
+
+  for (const candidate of value.sparks) {
+    if (!isSpark(candidate)) {
+      invalid += 1;
+      continue;
+    }
+
+    const existing = byId.get(candidate.id);
+
+    if (!existing) {
+      byId.set(candidate.id, candidate);
+      added += 1;
+      continue;
+    }
+
+    if (Date.parse(candidate.updatedAt) > Date.parse(existing.updatedAt)) {
+      byId.set(candidate.id, candidate);
+      updated += 1;
+    } else {
+      skipped += 1;
+    }
+  }
+
+  writeRawSparks([...byId.values()].sort(compareUpdatedAt));
+
+  return {
+    added,
+    updated,
+    skipped,
+    invalid,
+    backupKey: IMPORT_BACKUP_STORAGE_KEY,
+    backedUpAt
+  };
 }

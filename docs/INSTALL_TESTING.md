@@ -116,6 +116,40 @@ After Vercel deploys:
 6. Reopen it.
 7. Edit it and save again.
 
+## Test Manual DB Export And Import
+
+The v0.1 JSON DB bridge is manual and file-based. It is not cloud sync.
+
+From desktop to phone:
+
+1. Open Writer on desktop.
+2. Save one or more sparks.
+3. Tap **Exportovať DB**.
+4. Confirm the downloaded filename looks like
+   `LassiLAB_Writer_DBv001_YYYY-MM-DD.json`.
+5. Send or copy that JSON file to the phone.
+6. Open Writer on the phone.
+7. Tap **Importovať DB** and choose the JSON file.
+8. Confirm the import result shows added, updated, and skipped/invalid counts.
+9. Confirm imported sparks appear in **Posledné iskry**.
+
+From phone to desktop:
+
+1. Export the DB on the phone.
+2. Move the JSON file to the desktop.
+3. Import it in the desktop browser.
+4. Reopen a spark and confirm the newest edit wins when the same spark `id`
+   exists on both devices.
+
+Before each import, Writer stores a local backup copy under:
+
+```text
+lassilab-writer:v0.1:sparks:backup-before-import
+```
+
+This backup is local to the current browser and can be overwritten by the next
+import.
+
 ## Add To Home Screen On Android
 
 In Chrome on Android:
@@ -136,9 +170,12 @@ The v0.1 app stores sparks in `localStorage`.
 This means:
 
 - Sparks are stored only on the current browser and device.
-- Sparks do not sync between desktop, phone, or tablet.
+- Sparks do not automatically sync between desktop, phone, or tablet.
+- JSON export/import is the first manual bridge between devices.
 - Clearing browser data can delete saved sparks.
 - A Vercel deployment does not create a shared database.
+- Importing a JSON file does not create accounts, cloud storage, or backend
+  sync.
 
 ## PWA Status
 

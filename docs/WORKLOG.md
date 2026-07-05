@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-07-05
+
+- Added manual Writer DB export/import as the first device bridge.
+- Added `Exportovať DB` and `Importovať DB` actions in a small data section.
+- Export creates `LassiLAB_Writer_DBv001_YYYY-MM-DD.json`.
+- Import validates the Writer DB structure, backs up current local sparks before
+  writing, merges by spark `id`, and keeps the newer `updatedAt` version.
+- Kept persistence local to `localStorage`.
+- Kept cloud sync, accounts, backend, AI, media capture, Songbook integration,
+  Storyboard integration, and shared databases out of scope.
+
 ## 2026-07-03
 
 - Added the first minimal Vite, React, and TypeScript shell.

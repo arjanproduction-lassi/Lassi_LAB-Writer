@@ -16,3 +16,20 @@ export interface SparkInput {
   title?: string;
   text: string;
 }
+
+export interface WriterDbExport {
+  app: "LassiLAB Writer";
+  schemaVersion: 1;
+  exportedAt: string;
+  sparkCount: number;
+  sparks: Spark[];
+}
+
+export interface WriterDbImportResult {
+  added: number;
+  updated: number;
+  skipped: number;
+  invalid: number;
+  backupKey: string;
+  backedUpAt: string;
+}
