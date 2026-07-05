@@ -37,6 +37,13 @@ npm run dev
 npm run build
 ```
 
+## Mobile Testing Via Vercel
+
+The current v0.1 shell can be imported into Vercel from GitHub for quick phone
+and tablet testing. See [Install And Testing](docs/INSTALL_TESTING.md) for local
+commands, Vercel settings, Android home-screen testing, and the `localStorage`
+limitations.
+
 ## True v0.1
 
 The true v0.1 should be the smallest capture loop:
