@@ -43,6 +43,7 @@ function isSpark(value: unknown): value is Spark {
     typeof spark.text === "string" &&
     isValidDateString(spark.createdAt) &&
     isValidDateString(spark.updatedAt) &&
+    (spark.deletedAt === undefined || isValidDateString(spark.deletedAt)) &&
     spark.temperature === "spark" &&
     Array.isArray(spark.tags) &&
     spark.tags.every((tag) => typeof tag === "string") &&
@@ -97,6 +98,10 @@ function compareUpdatedAt(a: Spark, b: Spark) {
   return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
 }
 
+function isVisibleSpark(spark: Spark) {
+  return !spark.deletedAt;
+}
+
 function createId() {
   if (window.crypto?.randomUUID) {
     return window.crypto.randomUUID();
@@ -106,11 +111,11 @@ function createId() {
 }
 
 export function listSparks(): Spark[] {
-  return readRawSparks().sort(compareUpdatedAt);
+  return readRawSparks().filter(isVisibleSpark).sort(compareUpdatedAt);
 }
 
 export function getSpark(id: string): Spark | undefined {
-  return readRawSparks().find((spark) => spark.id === id);
+  return readRawSparks().find((spark) => spark.id === id && isVisibleSpark(spark));
 }
 
 export function saveSpark(input: SparkInput): Spark {
@@ -137,8 +142,31 @@ export function saveSpark(input: SparkInput): Spark {
   return saved;
 }
 
+export function deleteSpark(id: string): Spark | undefined {
+  const now = new Date().toISOString();
+  const sparks = readRawSparks();
+  const existing = sparks.find((spark) => spark.id === id);
+
+  if (!existing) {
+    return undefined;
+  }
+
+  if (existing.deletedAt) {
+    return existing;
+  }
+
+  const deleted: Spark = {
+    ...existing,
+    updatedAt: now,
+    deletedAt: now
+  };
+
+  writeRawSparks(sparks.map((spark) => (spark.id === id ? deleted : spark)));
+  return deleted;
+}
+
 export function createWriterDbExport(): WriterDbExport {
-  const sparks = listSparks();
+  const sparks = readRawSparks().sort(compareUpdatedAt);
 
   return {
     app: APP_NAME,

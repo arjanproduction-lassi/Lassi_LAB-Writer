@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-07-09
+
+- Added sync-safe spark delete as a soft delete.
+- Added optional `deletedAt` to sparks.
+- Delete sets both `deletedAt` and `updatedAt` to the current timestamp.
+- Normal Writer lists hide deleted sparks.
+- Manual JSON export/import and Google Drive sync keep deleted tombstones in the
+  DB payload so deletes can travel across devices.
+- Kept the main capture flow unchanged and did not add restore, permanent purge,
+  backend, AI, media capture, Songbook integration, or Storyboard integration.
+
 ## 2026-07-05
 
 - Added experimental manual Google Drive sync as the next device bridge for one

@@ -6,6 +6,7 @@ import {
 } from "./googleDriveSync";
 import {
   createWriterDbExport,
+  deleteSpark,
   getWriterDbExportFileName,
   importWriterDb,
   listSparks,
@@ -92,6 +93,31 @@ export default function App() {
     setSparks(listSparks());
     setEditor(null);
     setSavedMessage(`Iskra uložená ${formatDate(saved.updatedAt)}`);
+  }
+
+  function handleDeleteSpark() {
+    if (!editor?.id) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Zmazať túto iskru? Po synchronizácii zmizne aj z ďalších zariadení."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const deleted = deleteSpark(editor.id);
+
+    if (!deleted) {
+      return;
+    }
+
+    setSparks(listSparks());
+    setEditor(null);
+    setDataMessage("");
+    setSavedMessage(`Iskra zmazaná ${formatDate(deleted.updatedAt)}`);
   }
 
   function handleExportDb() {
@@ -246,6 +272,11 @@ export default function App() {
             >
               Uložiť iskru
             </button>
+            {isEditing ? (
+              <button className="delete-action" type="button" onClick={handleDeleteSpark}>
+                Zmazať iskru
+              </button>
+            ) : null}
           </div>
         </section>
       ) : null}

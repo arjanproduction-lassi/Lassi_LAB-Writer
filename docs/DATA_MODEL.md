@@ -34,11 +34,18 @@ Possible fields:
 - body
 - createdAt
 - updatedAt
+- deletedAt
 - originHint
 
 `originHint` can be simple text such as "image", "melody", "dream", "line", or
 "feeling". It preserves the image-first and spark-first philosophy without
 requiring image, voice, or melody capture in v0.1.
+
+`deletedAt` is optional. When present, it marks a sync-safe soft delete. Deleted
+sparks are hidden from normal lists, but the record remains in the local DB,
+manual JSON export, and Google Drive sync payload so the delete can travel to
+other devices. A delete also updates `updatedAt` to the same timestamp so the
+existing "newer updatedAt wins" merge rule can carry the tombstone.
 
 ### Spark
 

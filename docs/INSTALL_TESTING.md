@@ -144,6 +144,20 @@ From phone to desktop:
 4. Reopen a spark and confirm the newest edit wins when the same spark `id`
    exists on both devices.
 
+Delete bridge:
+
+1. Open an existing spark.
+2. Tap **Zmazať iskru**.
+3. Confirm the browser prompt.
+4. Confirm the spark disappears from **Posledné iskry**.
+5. Export the DB.
+6. Import that DB on another device.
+7. Confirm the deleted spark does not reappear.
+
+Deletes are sync-safe soft deletes. Writer stores `deletedAt` and updates
+`updatedAt`; the hidden tombstone remains in the DB export so the delete can
+travel to other devices.
+
 Before each import, Writer stores a local backup copy under:
 
 ```text
@@ -197,6 +211,8 @@ Conflict rule:
 
 - Writer merges by spark `id`.
 - If the same spark exists on both devices, newer `updatedAt` wins.
+- A deleted spark uses `deletedAt` plus a newer `updatedAt`, so the delete wins
+  over older undeleted copies.
 - Older copies do not overwrite newer copies.
 - Before a sync merge, Writer stores a local backup under:
 

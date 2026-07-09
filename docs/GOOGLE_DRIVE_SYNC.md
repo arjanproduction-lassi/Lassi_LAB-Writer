@@ -62,6 +62,10 @@ Useful official docs:
 11. Writer saves merged sparks locally.
 12. Writer uploads the merged DB back to the same Drive file.
 
+Deleted sparks are included as tombstones with `deletedAt`. They stay hidden
+from normal Writer lists, but remain in the sync payload so deletes can travel
+between devices.
+
 ## Safety Rules
 
 - If authorization fails, local data is untouched.
@@ -129,6 +133,7 @@ Conflict:
 
 - Sync is manual.
 - There is no real-time conflict UI.
-- There is no delete sync yet.
+- Delete sync uses `deletedAt` tombstones; there is no restore or permanent
+  purge UI yet.
 - Access tokens are short-lived and may require reconnecting.
 - Google OAuth setup must be completed before Vercel production sync works.

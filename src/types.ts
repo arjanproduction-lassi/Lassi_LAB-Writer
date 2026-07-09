@@ -6,6 +6,7 @@ export interface Spark {
   text: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
   temperature: SparkTemperature;
   tags: string[];
   schemaVersion: 1;

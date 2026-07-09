@@ -91,7 +91,8 @@ h3 {
 
 .primary-action,
 .save-action,
-.ghost-action {
+.ghost-action,
+.delete-action {
   min-height: 3.25rem;
   border: 0;
   border-radius: 0.5rem;
@@ -181,7 +182,20 @@ h3 {
 }
 
 .editor-actions {
+  display: grid;
+  gap: 0.75rem;
   margin-top: 1rem;
+}
+
+.delete-action {
+  width: 100%;
+  color: #ffd2d2;
+  background: #3a1f1f;
+}
+
+.delete-action:focus,
+.delete-action:hover {
+  outline: 3px solid rgba(255, 120, 120, 0.2);
 }
 
 .spark-count {

@@ -48,6 +48,7 @@ The v0.1 `Spark` model contains:
 - `text`
 - `createdAt`
 - `updatedAt`
+- `deletedAt`
 - `temperature`
 - `tags`
 - `schemaVersion`
@@ -64,6 +65,11 @@ The manual DB export uses:
 
 The import path merges sparks by `id`. Existing sparks are updated only when the
 imported `updatedAt` value is newer.
+
+`deletedAt` is optional and works as a sync-safe tombstone. Deleted sparks are
+hidden from normal UI lists, but remain in the DB export/sync payload. Deleting
+a spark sets both `deletedAt` and `updatedAt` to the current timestamp so the
+same merge rule can propagate deletes across devices.
 
 The Google Drive sync stores the same Writer DB shape in:
 
