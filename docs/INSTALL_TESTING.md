@@ -169,8 +169,10 @@ import.
 
 ## Test Experimental Google Drive Sync
 
-Google Drive sync is manual and experimental. It is not automatic background
-sync, not Gmail email transport, and not a shared database.
+Google Drive sync is experimental. Manual **Synchronizovať teraz** remains the
+safety fallback, but Writer can now try a quiet sync after save/delete when the
+Google access token is already active in memory. It is not full automatic
+background sync, not Gmail email transport, and not a shared database.
 
 Required setup before testing on Vercel:
 
@@ -194,18 +196,31 @@ Test PC -> mobile:
 1. Open Writer on PC.
 2. Save a spark.
 3. In **Dáta**, tap **Pripojiť Google** and approve access.
-4. Tap **Synchronizovať teraz**.
+4. Tap **Synchronizovať teraz** once, or save/edit the spark again while Google
+   is connected and confirm Writer shows a quiet sync status.
 5. Open Writer on the Android phone with the same Google account.
-6. Tap **Pripojiť Google**.
+6. Tap **Pripojiť Google** if the phone has not connected in this browser
+   session.
 7. Tap **Synchronizovať teraz**.
 8. Confirm the PC spark appears on the phone.
 
 Test mobile -> PC:
 
 1. Save a new spark on the phone.
-2. Tap **Synchronizovať teraz** on the phone.
+2. If Google is already connected in the current phone session, confirm Writer
+   tries quiet sync after save. If not, tap **Synchronizovať teraz**.
 3. Tap **Synchronizovať teraz** on PC.
 4. Confirm the phone spark appears on PC.
+
+Test pending local changes:
+
+1. Disconnect by closing/reopening the browser or wait until Google requires a
+   fresh token.
+2. Save a spark.
+3. Confirm Writer keeps the spark locally and shows that local changes are
+   waiting for sync.
+4. Tap **Pripojiť Google** or **Synchronizovať teraz**.
+5. Confirm pending changes clear after successful sync.
 
 Conflict rule:
 
@@ -222,6 +237,9 @@ lassilab-writer:v0.1:sparks:backup-before-sync
 
 If `VITE_GOOGLE_CLIENT_ID` is missing, Writer must still build and run. The
 Google sync controls should be disabled with a short setup message.
+
+Writer stores only non-secret sync preferences in `localStorage`. It must not
+store access tokens, refresh tokens, client secrets, or the OAuth client ID.
 
 ## Add To Home Screen On Android
 

@@ -48,16 +48,26 @@ let scriptLoading: Promise<void> | null = null;
 let tokenClient: TokenClient | null = null;
 let accessToken: string | null = null;
 
+type GoogleDriveSyncOptions = {
+  useExistingTokenOnly?: boolean;
+};
+
 export function isGoogleDriveSyncConfigured() {
   return Boolean(GOOGLE_CLIENT_ID);
+}
+
+export function hasGoogleDriveAccessToken() {
+  return Boolean(accessToken);
 }
 
 export async function connectGoogleDrive() {
   accessToken = await requestAccessToken();
 }
 
-export async function syncGoogleDrive(): Promise<GoogleSyncResult> {
-  const token = await requestAccessToken();
+export async function syncGoogleDrive(
+  options: GoogleDriveSyncOptions = {}
+): Promise<GoogleSyncResult> {
+  const token = options.useExistingTokenOnly ? getExistingAccessToken() : await requestAccessToken();
   const remoteFile = await findRemoteDbFile(token);
   const localDb = createWriterDbExport();
 
@@ -159,6 +169,14 @@ function requestAccessToken() {
         client.requestAccessToken({ prompt: accessToken ? "" : "consent" });
       })
   );
+}
+
+function getExistingAccessToken() {
+  if (!accessToken) {
+    throw new Error("Google Drive access token is not active.");
+  }
+
+  return accessToken;
 }
 
 function loadGoogleIdentity() {
@@ -287,6 +305,10 @@ async function driveJsonRequest<T>(url: string, token: string, init: RequestInit
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      accessToken = null;
+    }
+
     throw new Error(await response.text());
   }
 

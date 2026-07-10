@@ -13,9 +13,13 @@ The first MVP slice is now implemented:
 - Import that JSON on another device.
 - Connect Google Drive when `VITE_GOOGLE_CLIENT_ID` is configured.
 - Manually sync the hidden Drive DB across PC, mobile, and tablet.
+- Keep Svitok enabled locally after Google connect.
+- Mark local saves/deletes as pending sync changes.
+- Quietly sync after save/delete when a valid Google access token is already
+  active in memory.
 
 This proves the core loop, a manual JSON bridge, and an experimental manual
-Google Drive bridge without AI, Songbook, Storyboard, automatic background sync,
+Google Drive bridge without AI, Songbook, Storyboard, full background sync,
 custom accounts, backends, or shared databases.
 
 ## Repository Setup Tasks
@@ -48,9 +52,10 @@ custom accounts, backends, or shared databases.
 ## Technical Tasks For Later
 
 - Test manual JSON export/import on phone and desktop with real saved sparks.
-- Create the Google Cloud OAuth web client for the Vercel production URL.
-- Add `VITE_GOOGLE_CLIENT_ID` to Vercel production and preview environments.
 - Test Google Drive sync PC -> mobile -> tablet and back with real sparks.
+- Add quiet sync attempt when opening Writer if Google can do it without
+  interrupting the author.
+- Keep manual sync as the safety fallback even as Svitok becomes quieter.
 - Add minimal test setup.
 - Add recovery notes for the local import backup key.
 - Add recovery notes for the local sync backup key.

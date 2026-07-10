@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-10
+
+- Added the first Keep-like Svitok comfort pass for Google Drive sync.
+- Added non-secret local sync preferences:
+  `googleSyncEnabled`, `lastSyncAt`, `lastSyncResult`, `lastSyncError`, and
+  `pendingLocalChanges`.
+- Successful Google connect now enables Svitok locally.
+- Saving, deleting, or importing changed sparks marks local changes as pending.
+- If a Google access token is already active in memory, Writer tries a quiet
+  sync after local changes without forcing a new consent prompt.
+- If no in-memory token exists, Writer keeps data local and shows a calm waiting
+  state instead of opening an aggressive popup.
+- Kept manual JSON export/import and manual **Synchronizovať teraz** as safety
+  fallbacks.
+- Kept tokens in memory only and did not add a backend, custom accounts, AI,
+  media capture, Songbook integration, Storyboard integration, or shared
+  databases.
+
 ## 2026-07-09
 
 - Added sync-safe spark delete as a soft delete.

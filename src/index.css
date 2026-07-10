@@ -317,6 +317,17 @@ h3 {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.sync-status-list {
+  display: grid;
+  gap: 0.35rem;
+  color: #cfc7ba;
+  line-height: 1.45;
+}
+
+.sync-error {
+  color: #ffd2d2;
+}
+
 .data-note[data-status="error"] {
   border-color: rgba(255, 120, 120, 0.32);
   color: #ffd2d2;

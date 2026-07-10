@@ -56,6 +56,26 @@ and separating accepted text from draft noise.
 Sync or another bridge is essential because a spark captured on mobile must be
 able to wait safely for PC or tablet later.
 
+## Keep-Like Svitok Comfort
+
+The author's desired feeling is close to Google Keep: write, close, continue
+later on another device without performing technical rituals.
+
+Writer should not make the author think like a database admin. The comfort rule:
+
+- Mobile = chytiť.
+- Sync = preniesť.
+- PC = upratať.
+- Tablet = čítať a tvarovať.
+
+Google Drive Svitok is the first bridge for this. Manual sync remains as a
+safety fallback, but the long-term direction is quiet sync on open and after
+save whenever Google allows it without interrupting the author.
+
+Tokens must not be stored. If Google needs fresh consent or an expired token
+must be renewed, Writer should continue locally, show a calm waiting state, and
+let the author reconnect intentionally.
+
 ## Workspace UX Rules
 
 - Main mobile action remains fast capture.

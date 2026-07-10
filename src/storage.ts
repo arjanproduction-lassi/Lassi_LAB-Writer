@@ -1,4 +1,5 @@
 import type {
+  GoogleSyncPreferences,
   Spark,
   SparkInput,
   WriterDbExport,
@@ -10,7 +11,13 @@ const APP_NAME = "LassiLAB Writer";
 const STORAGE_KEY = "lassilab-writer:v0.1:sparks";
 const IMPORT_BACKUP_STORAGE_KEY = "lassilab-writer:v0.1:sparks:backup-before-import";
 const SYNC_BACKUP_STORAGE_KEY = "lassilab-writer:v0.1:sparks:backup-before-sync";
+const SYNC_PREFERENCES_STORAGE_KEY = "lassilab-writer:v0.1:google-sync-preferences";
 const SCHEMA_VERSION = 1;
+
+const DEFAULT_SYNC_PREFERENCES: GoogleSyncPreferences = {
+  googleSyncEnabled: false,
+  pendingLocalChanges: false
+};
 
 function readRawSparks(): Spark[] {
   const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -72,6 +79,24 @@ function isWriterDbExport(value: unknown): value is WriterDbExport {
   );
 }
 
+function isGoogleSyncPreferences(value: unknown): value is GoogleSyncPreferences {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const preferences = value as Partial<GoogleSyncPreferences>;
+  return (
+    typeof preferences.googleSyncEnabled === "boolean" &&
+    (preferences.lastSyncAt === undefined || isValidDateString(preferences.lastSyncAt)) &&
+    (preferences.lastSyncResult === undefined ||
+      typeof preferences.lastSyncResult === "string") &&
+    (preferences.lastSyncError === undefined ||
+      typeof preferences.lastSyncError === "string") &&
+    (preferences.pendingLocalChanges === undefined ||
+      typeof preferences.pendingLocalChanges === "boolean")
+  );
+}
+
 function formatDatePart(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -116,6 +141,49 @@ export function listSparks(): Spark[] {
 
 export function getSpark(id: string): Spark | undefined {
   return readRawSparks().find((spark) => spark.id === id && isVisibleSpark(spark));
+}
+
+export function readGoogleSyncPreferences(): GoogleSyncPreferences {
+  const raw = window.localStorage.getItem(SYNC_PREFERENCES_STORAGE_KEY);
+
+  if (!raw) {
+    return DEFAULT_SYNC_PREFERENCES;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return isGoogleSyncPreferences(parsed)
+      ? { ...DEFAULT_SYNC_PREFERENCES, ...parsed }
+      : DEFAULT_SYNC_PREFERENCES;
+  } catch {
+    return DEFAULT_SYNC_PREFERENCES;
+  }
+}
+
+export function writeGoogleSyncPreferences(
+  preferences: GoogleSyncPreferences
+): GoogleSyncPreferences {
+  const next: GoogleSyncPreferences = {
+    googleSyncEnabled: preferences.googleSyncEnabled,
+    ...(preferences.lastSyncAt ? { lastSyncAt: preferences.lastSyncAt } : {}),
+    ...(preferences.lastSyncResult ? { lastSyncResult: preferences.lastSyncResult } : {}),
+    ...(preferences.lastSyncError ? { lastSyncError: preferences.lastSyncError } : {}),
+    ...(preferences.pendingLocalChanges !== undefined
+      ? { pendingLocalChanges: preferences.pendingLocalChanges }
+      : {})
+  };
+
+  window.localStorage.setItem(SYNC_PREFERENCES_STORAGE_KEY, JSON.stringify(next));
+  return next;
+}
+
+export function updateGoogleSyncPreferences(
+  patch: Partial<GoogleSyncPreferences>
+): GoogleSyncPreferences {
+  return writeGoogleSyncPreferences({
+    ...readGoogleSyncPreferences(),
+    ...patch
+  });
 }
 
 export function saveSpark(input: SparkInput): Spark {

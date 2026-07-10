@@ -79,3 +79,11 @@ export interface GoogleSyncResult {
   backupKey?: string;
   backedUpAt?: string;
 }
+
+export interface GoogleSyncPreferences {
+  googleSyncEnabled: boolean;
+  lastSyncAt?: string;
+  lastSyncResult?: string;
+  lastSyncError?: string;
+  pendingLocalChanges?: boolean;
+}
