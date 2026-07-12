@@ -6,16 +6,24 @@ import {
   syncGoogleDrive
 } from "./googleDriveSync";
 import {
+  clearNewSparkDraft,
   createWriterDbExport,
   deleteSpark,
   getWriterDbExportFileName,
   importWriterDb,
   listSparks,
+  readNewSparkDraft,
   readGoogleSyncPreferences,
   saveSpark,
+  saveNewSparkDraft,
   updateGoogleSyncPreferences
 } from "./storage";
-import type { GoogleSyncPreferences, RemoteSyncStatus, Spark } from "./types";
+import type {
+  GoogleSyncPreferences,
+  NewSparkDraft,
+  RemoteSyncStatus,
+  Spark
+} from "./types";
 
 type EditorState = {
   id?: string;
@@ -24,6 +32,7 @@ type EditorState = {
 
 const QUIET_SYNC_DEBOUNCE_MS = 4000;
 const STALE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+const DRAFT_AUTOSAVE_DEBOUNCE_MS = 500;
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("sk-SK", {
@@ -96,6 +105,9 @@ export default function App() {
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [savedMessage, setSavedMessage] = useState("");
   const [dataMessage, setDataMessage] = useState("");
+  const [newSparkDraft, setNewSparkDraft] = useState<NewSparkDraft | undefined>(() =>
+    readNewSparkDraft()
+  );
   const [syncPreferences, setSyncPreferences] = useState<GoogleSyncPreferences>(() =>
     readGoogleSyncPreferences()
   );
@@ -112,6 +124,8 @@ export default function App() {
   const importInputRef = useRef<HTMLInputElement>(null);
   const googleSyncBusyRef = useRef(false);
   const quietSyncTimerRef = useRef<number | null>(null);
+  const draftAutosaveTimerRef = useRef<number | null>(null);
+  const editorRef = useRef<EditorState | null>(editor);
   const syncPreferencesRef = useRef(syncPreferences);
   const isOnlineRef = useRef(isOnline);
 
@@ -140,6 +154,10 @@ export default function App() {
   const lastSyncText = syncPreferences.lastSyncAt
     ? `Posledný sync: ${formatDate(syncPreferences.lastSyncAt)}`
     : "Posledný sync: zatiaľ nie";
+
+  useEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
 
   useEffect(() => {
     syncPreferencesRef.current = syncPreferences;
@@ -178,37 +196,114 @@ export default function App() {
     }
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", flushNewSparkDraft);
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+    window.addEventListener("pagehide", flushNewSparkDraft);
 
     return () => {
+      flushNewSparkDraft();
       clearQuietSyncTimer();
+      clearDraftAutosaveTimer();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", flushNewSparkDraft);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("pagehide", flushNewSparkDraft);
     };
   }, []);
 
   function startNewSpark() {
-    setEditor({ text: "" });
+    const nextEditor = { text: "" };
+    editorRef.current = nextEditor;
+    setEditor(nextEditor);
     setSavedMessage("");
     setDataMessage("");
   }
 
   function openSpark(spark: Spark) {
-    setEditor({ id: spark.id, text: spark.text });
+    const nextEditor = { id: spark.id, text: spark.text };
+    editorRef.current = nextEditor;
+    setEditor(nextEditor);
     setSavedMessage("");
     setDataMessage("");
   }
 
   function closeEditor() {
+    flushNewSparkDraft();
+    editorRef.current = null;
+
     setEditor(null);
+  }
+
+  function handleRestoreDraft() {
+    if (!newSparkDraft) {
+      return;
+    }
+
+    const nextEditor = { text: newSparkDraft.text };
+    editorRef.current = nextEditor;
+    setEditor(nextEditor);
+    setSavedMessage("");
+    setDataMessage("");
+  }
+
+  function handleDiscardDraft() {
+    clearDraftAutosaveTimer();
+    clearNewSparkDraft();
+    setNewSparkDraft(undefined);
+    setSavedMessage("Rozpísaná iskra zahodená.");
   }
 
   function clearQuietSyncTimer() {
     if (quietSyncTimerRef.current !== null) {
       window.clearTimeout(quietSyncTimerRef.current);
       quietSyncTimerRef.current = null;
+    }
+  }
+
+  function clearDraftAutosaveTimer() {
+    if (draftAutosaveTimerRef.current !== null) {
+      window.clearTimeout(draftAutosaveTimerRef.current);
+      draftAutosaveTimerRef.current = null;
+    }
+  }
+
+  function flushNewSparkDraft() {
+    const current = editorRef.current;
+
+    if (current && !current.id && current.text.trim()) {
+      clearDraftAutosaveTimer();
+      setNewSparkDraft(saveNewSparkDraft(current.text));
+    }
+  }
+
+  function scheduleNewSparkDraftSave(text: string) {
+    clearDraftAutosaveTimer();
+
+    if (!text.trim()) {
+      clearNewSparkDraft();
+      setNewSparkDraft(undefined);
+      return;
+    }
+
+    draftAutosaveTimerRef.current = window.setTimeout(() => {
+      draftAutosaveTimerRef.current = null;
+      setNewSparkDraft(saveNewSparkDraft(text));
+    }, DRAFT_AUTOSAVE_DEBOUNCE_MS);
+  }
+
+  function handleSparkTextChange(text: string) {
+    const isNewSpark = editor !== null && !editor.id;
+
+    setEditor((current) => {
+      const next = current ? { ...current, text } : current;
+      editorRef.current = next;
+      return next;
+    });
+
+    if (isNewSpark) {
+      scheduleNewSparkDraftSave(text);
     }
   }
 
@@ -338,6 +433,8 @@ export default function App() {
 
       setSparks(listSparks());
       if (!quiet) {
+        flushNewSparkDraft();
+        editorRef.current = null;
         setEditor(null);
         setSavedMessage("");
       }
@@ -388,12 +485,20 @@ export default function App() {
       return;
     }
 
+    const isNewSpark = !editor.id;
     const saved = saveSpark({
       id: editor.id,
       text: editor.text
     });
 
+    if (isNewSpark) {
+      clearDraftAutosaveTimer();
+      clearNewSparkDraft();
+      setNewSparkDraft(undefined);
+    }
+
     setSparks(listSparks());
+    editorRef.current = null;
     setEditor(null);
     setSavedMessage(`Iskra uložená ${formatDate(saved.updatedAt)}`);
     markLocalChangesForSync();
@@ -419,6 +524,7 @@ export default function App() {
     }
 
     setSparks(listSparks());
+    editorRef.current = null;
     setEditor(null);
     setDataMessage("");
     setSavedMessage(`Iskra zmazaná ${formatDate(deleted.updatedAt)}`);
@@ -460,6 +566,8 @@ export default function App() {
       const result = importWriterDb(parsed);
       const skippedInvalid = result.skipped + result.invalid;
 
+      flushNewSparkDraft();
+      editorRef.current = null;
       setSparks(listSparks());
       setEditor(null);
       setSavedMessage("");
@@ -533,6 +641,24 @@ export default function App() {
 
       {savedMessage ? <p className="save-note">{savedMessage}</p> : null}
 
+      {newSparkDraft && !editor ? (
+        <section className="draft-recovery" aria-labelledby="draft-recovery-title">
+          <div>
+            <p className="eyebrow">Rozpísané</p>
+            <h2 id="draft-recovery-title">Našiel som rozpísanú iskru.</h2>
+          </div>
+          <p className="data-copy">Obnoviť ju? Writer ju drží len lokálne v tomto prehliadači.</p>
+          <div className="draft-actions">
+            <button className="data-action" type="button" onClick={handleRestoreDraft}>
+              Obnoviť
+            </button>
+            <button className="ghost-action" type="button" onClick={handleDiscardDraft}>
+              Zahodiť
+            </button>
+          </div>
+        </section>
+      ) : null}
+
       {editor ? (
         <section className="editor-panel" aria-labelledby="editor-title">
           <div className="panel-heading">
@@ -556,11 +682,7 @@ export default function App() {
             autoFocus
             placeholder="Obraz, veta, pocit, kus melódie v hlave..."
             value={editor.text}
-            onChange={(event) =>
-              setEditor((current) =>
-                current ? { ...current, text: event.target.value } : current
-              )
-            }
+            onChange={(event) => handleSparkTextChange(event.target.value)}
           />
 
           <div className="editor-actions">

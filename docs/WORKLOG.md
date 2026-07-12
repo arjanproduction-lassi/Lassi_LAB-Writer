@@ -12,6 +12,12 @@
 - Added calmer sync status copy: waiting for Google, offline, syncing, pending
   local changes, and "Písať môžeš ďalej, Writer ukladá lokálne."
 - Kept Google popup behavior user-initiated only.
+- Added local autosave and recovery for a new unsaved spark.
+- Added a local draft key:
+  `lassilab-writer:v0.1:draft:new-spark`.
+- Added a gentle recovery card with **Obnoviť** and **Zahodiť** actions.
+- The new spark draft is local only, is not synced, is not part of manual DB
+  export/import, and is cleared after a successful spark save.
 - Kept tokens in memory only and did not add refresh tokens, backend, custom
   accounts, AI, media capture, Songbook integration, Storyboard integration, or
   shared databases.

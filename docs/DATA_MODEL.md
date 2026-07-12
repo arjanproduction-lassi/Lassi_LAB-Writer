@@ -11,6 +11,10 @@ independent from Songbook and Storyboard.
 For v0.1, prefer one local spark record before introducing separate tables or
 collections for drafts, images, voice, melody, or exports.
 
+The only exception in the current app is a small local recovery draft for a new
+unsaved spark. It is not a synced object, not part of the Writer DB export, and
+not a replacement for future structured draft/workshop models.
+
 ## Data Principles
 
 - Writer owns its own data.
@@ -46,6 +50,24 @@ sparks are hidden from normal lists, but the record remains in the local DB,
 manual JSON export, and Google Drive sync payload so the delete can travel to
 other devices. A delete also updates `updatedAt` to the same timestamp so the
 existing "newer updatedAt wins" merge rule can carry the tombstone.
+
+### v0.1 New Spark Recovery Draft
+
+Temporary local storage key:
+
+```text
+lassilab-writer:v0.1:draft:new-spark
+```
+
+Fields:
+
+- `text`
+- `updatedAt`
+- `schemaVersion`
+
+This protects a new unsaved spark if the app refreshes, closes, or the mobile
+browser is interrupted. It is local to the current browser, is not synced to
+Google Drive, and is cleared after the spark is successfully saved.
 
 ### Spark
 

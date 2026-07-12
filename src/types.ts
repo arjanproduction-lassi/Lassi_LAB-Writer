@@ -18,6 +18,12 @@ export interface SparkInput {
   text: string;
 }
 
+export interface NewSparkDraft {
+  text: string;
+  updatedAt: string;
+  schemaVersion: 1;
+}
+
 export interface WriterDbExport {
   app: "LassiLAB Writer";
   schemaVersion: 1;

@@ -20,6 +20,8 @@ The first MVP slice is now implemented:
 - Try quiet sync on app open and on foreground return when Svitok is enabled and
   the access token is already active in memory.
 - Show offline and waiting-for-Google states without interrupting writing.
+- Autosave an unsaved new spark into a local recovery draft.
+- Offer **Obnoviť** / **Zahodiť** when a local draft is found on return.
 
 This proves the core loop, a manual JSON bridge, and an experimental manual
 Google Drive bridge without AI, Songbook, Storyboard, full background sync,
@@ -60,6 +62,8 @@ custom accounts, backends, or shared databases.
   too slow.
 - Consider a gentle sync-on-open pull only if Google can do it without a popup
   or token persistence.
+- Test draft recovery on Android after closing the installed app, browser tab,
+  and browser process.
 - Keep manual sync as the safety fallback even as Svitok becomes quieter.
 - Add minimal test setup.
 - Add recovery notes for the local import backup key.

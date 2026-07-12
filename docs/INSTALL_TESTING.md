@@ -119,6 +119,38 @@ After Vercel deploys:
 6. Reopen it.
 7. Edit it and save again.
 
+## Test New Spark Draft Recovery
+
+Draft recovery protects only a new unsaved spark. It is local to the current
+browser and is not part of Google sync or manual DB export/import.
+
+Basic recovery:
+
+1. Open Writer.
+2. Tap **⚡ Nová iskra**.
+3. Type a short unfinished thought.
+4. Wait about one second so autosave can run.
+5. Refresh the page or close and reopen the app.
+6. Confirm Writer shows **Našiel som rozpísanú iskru.**
+7. Tap **Obnoviť**.
+8. Confirm the unfinished text returns to the editor.
+
+Discard:
+
+1. Create an unsaved draft as above.
+2. Refresh or reopen Writer.
+3. Tap **Zahodiť**.
+4. Confirm the recovery card disappears and the draft does not return after
+   another refresh.
+
+Save clears draft:
+
+1. Restore or type a new draft.
+2. Tap **Uložiť iskru**.
+3. Refresh Writer.
+4. Confirm the saved spark appears in **Posledné iskry** and no recovery card
+   appears for that same text.
+
 ## Test Manual DB Export And Import
 
 The v0.1 JSON DB bridge is manual and file-based. It is not cloud sync.
@@ -294,6 +326,8 @@ The v0.1 app stores sparks in `localStorage`.
 This means:
 
 - Sparks are stored only on the current browser and device.
+- A new unsaved spark draft is also stored only on the current browser and
+  device until it is saved or discarded.
 - Sparks do not automatically sync between desktop, phone, or tablet.
 - JSON export/import is the first manual bridge between devices.
 - Clearing browser data can delete saved sparks.

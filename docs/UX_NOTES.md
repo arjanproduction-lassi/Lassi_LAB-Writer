@@ -89,6 +89,20 @@ let the author reconnect intentionally.
 
 Quiet sync never means opening a Google popup without a user action.
 
+## Draft Recovery Comfort
+
+Autosave for a new unsaved spark protects the most fragile moment: the author is
+still thinking, has not committed the text, and a refresh, accidental close, or
+mobile interruption could lose the idea.
+
+The recovery UX should feel like a quiet note on the table:
+
+- Save the new spark draft locally while typing.
+- Show "Našiel som rozpísanú iskru" on return.
+- Let the author choose **Obnoviť** or **Zahodiť**.
+- Clear the draft after the spark is saved.
+- Keep the draft local only; it is not synced and not part of export/import.
+
 ## Workspace UX Rules
 
 - Main mobile action remains fast capture.
