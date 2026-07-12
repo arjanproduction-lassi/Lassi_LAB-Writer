@@ -40,6 +40,7 @@ export type RemoteSyncStatus =
   | "idle"
   | "authorizing"
   | "connected"
+  | "offline"
   | "syncing"
   | "error";
 

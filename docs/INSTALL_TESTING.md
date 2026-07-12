@@ -170,9 +170,10 @@ import.
 ## Test Experimental Google Drive Sync
 
 Google Drive sync is experimental. Manual **Synchronizovať teraz** remains the
-safety fallback, but Writer can now try a quiet sync after save/delete when the
-Google access token is already active in memory. It is not full automatic
-background sync, not Gmail email transport, and not a shared database.
+safety fallback, but Writer can now try a quiet sync on app open, on return to
+the app, and after save/delete/import when the Google access token is already
+active in memory. It is not full automatic background sync, not Gmail email
+transport, and not a shared database.
 
 Required setup before testing on Vercel:
 
@@ -197,7 +198,8 @@ Test PC -> mobile:
 2. Save a spark.
 3. In **Dáta**, tap **Pripojiť Google** and approve access.
 4. Tap **Synchronizovať teraz** once, or save/edit the spark again while Google
-   is connected and confirm Writer shows a quiet sync status.
+   is connected and confirm Writer waits briefly, then shows a quiet sync
+   status.
 5. Open Writer on the Android phone with the same Google account.
 6. Tap **Pripojiť Google** if the phone has not connected in this browser
    session.
@@ -211,6 +213,31 @@ Test mobile -> PC:
    tries quiet sync after save. If not, tap **Synchronizovať teraz**.
 3. Tap **Synchronizovať teraz** on PC.
 4. Confirm the phone spark appears on PC.
+
+Test app open:
+
+1. Connect Google and sync once.
+2. Save another spark while the same page session is still active.
+3. Reload or reopen the app.
+4. If the access token is still active in memory, Writer may sync quietly.
+5. If the token is gone, confirm Writer does not open a Google popup and shows
+   that Svitok is waiting for Google connection.
+
+Test return to app:
+
+1. Save or edit a spark while Google is connected.
+2. Switch away from Writer, then return to the tab or installed app.
+3. Confirm Writer tries quiet sync only if changes are waiting or the last sync
+   is stale.
+
+Test offline:
+
+1. Turn off network access.
+2. Save a spark.
+3. Confirm Writer shows **Offline** and says changes are stored locally.
+4. Turn network access back on.
+5. If the token is still active, Writer may sync quietly. If not, it waits for
+   **Pripojiť Google** or **Synchronizovať teraz**.
 
 Test pending local changes:
 
@@ -240,6 +267,12 @@ Google sync controls should be disabled with a short setup message.
 
 Writer stores only non-secret sync preferences in `localStorage`. It must not
 store access tokens, refresh tokens, client secrets, or the OAuth client ID.
+
+Google popup rule:
+
+- A Google popup may open only after an explicit user action such as
+  **Pripojiť Google** or **Synchronizovať teraz**.
+- Quiet sync must not open Google by itself while the author is writing.
 
 ## Add To Home Screen On Android
 

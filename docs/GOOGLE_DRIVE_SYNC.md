@@ -9,9 +9,10 @@ Google Drive sync is working across PC and mobile when the Google Cloud OAuth
 client and Vercel `VITE_GOOGLE_CLIENT_ID` are configured.
 
 This is not full automatic background sync. The user still has the manual
-**Synchronizovať teraz** fallback, but Writer now has the first Keep-like comfort
-pass: after Google is connected, local saves/deletes can trigger a quiet sync
-when an access token is already active in memory.
+**Synchronizovať teraz** fallback, but Writer now has a second Keep-like comfort
+pass: after Google is connected, Writer can try quiet sync on app open, on
+return to the app, and shortly after saved local changes when an access token is
+already active in memory.
 
 ## What It Is
 
@@ -62,18 +63,25 @@ Useful official docs:
 3. Google returns a short-lived access token.
 4. Writer keeps the access token in memory only.
 5. A successful Google connection enables Svitok in local sync preferences.
-6. Save/delete marks `pendingLocalChanges`.
-7. If the in-memory token is still active, Writer tries a quiet sync.
-8. If no active token exists, Writer does not force a popup; it shows that
-   changes are waiting for Google connection or manual sync.
-9. During sync, Writer lists `appDataFolder` for `lassilab-writer-db-v001.json`.
-10. If the file does not exist, Writer creates it from the local DB.
-11. If the file exists, Writer downloads it.
-12. Writer validates the remote DB structure.
-13. Writer backs up local sparks before applying a merge.
-14. Writer merges by spark `id`; newer `updatedAt` wins.
-15. Writer saves merged sparks locally.
-16. Writer uploads the merged DB back to the same Drive file.
+6. Save/delete/import marks `pendingLocalChanges`.
+7. After saved local changes, Writer waits briefly, then tries a quiet sync if
+   the in-memory token is still active.
+8. On app open, Writer tries a quiet sync only when Svitok is enabled and the
+   token is already active in memory.
+9. When the page returns to foreground, Writer tries a quiet sync if there are
+   pending changes or the last sync is stale.
+10. If the browser is offline, Writer does not call Google and shows that
+    changes are saved locally.
+11. If no active token exists, Writer does not force a popup; it shows that
+    Svitok is waiting for Google connection or manual sync.
+12. During sync, Writer lists `appDataFolder` for `lassilab-writer-db-v001.json`.
+13. If the file does not exist, Writer creates it from the local DB.
+14. If the file exists, Writer downloads it.
+15. Writer validates the remote DB structure.
+16. Writer backs up local sparks before applying a merge.
+17. Writer merges by spark `id`; newer `updatedAt` wins.
+18. Writer saves merged sparks locally.
+19. Writer uploads the merged DB back to the same Drive file.
 
 Deleted sparks are included as tombstones with `deletedAt`. They stay hidden
 from normal Writer lists, but remain in the sync payload so deletes can travel
@@ -85,6 +93,8 @@ between devices.
 - If the remote file is invalid, local data is untouched.
 - If upload fails after local merge, Writer shows a warning and the user can
   tap sync again.
+- Writer never opens a Google popup without a user action.
+- Quiet sync uses only an access token already active in memory.
 - Before every sync merge, Writer writes:
 
 ```text
@@ -141,8 +151,8 @@ PC to mobile:
 
 1. Save a spark on PC.
 2. Connect Google on PC.
-3. Tap **Synchronizovať teraz** on PC, or save again while the token is still
-   active and confirm quiet sync runs.
+3. Tap **Synchronizovať teraz** once, or save again while the token is still
+   active and confirm Writer waits briefly before quiet sync.
 4. Open Writer on mobile.
 5. Connect Google with the same Google account.
 6. Tap **Synchronizovať teraz** on mobile.
@@ -152,9 +162,28 @@ Mobile to PC:
 
 1. Save a spark on mobile.
 2. If Google is already connected in the current session, confirm Writer tries a
-   quiet sync after save. Otherwise tap **Synchronizovať teraz**.
+   debounced quiet sync after save. Otherwise tap **Synchronizovať teraz**.
 3. Tap **Synchronizovať teraz** on PC.
 4. Confirm the mobile spark appears on PC.
+
+Open/return behavior:
+
+1. Connect Google and sync once.
+2. Save or edit a spark while the access token is still active.
+3. Switch to another app or tab, then return.
+4. Confirm Writer tries quiet sync if there are pending changes or the last sync
+   is stale.
+5. Close and reopen the browser. If the in-memory token is gone, confirm Writer
+   does not open Google automatically and shows a waiting state.
+
+Offline:
+
+1. Turn the device offline.
+2. Save a spark.
+3. Confirm Writer keeps it locally and shows an offline state.
+4. Return online.
+5. If the token is still active, Writer may sync quietly; if not, it waits for a
+   user Google action.
 
 Conflict:
 
@@ -166,7 +195,8 @@ Conflict:
 ## Known Limitations
 
 - Initial connection and expired-token recovery still require user action.
-- There is no automatic pull on app open yet.
+- App-open and foreground sync only work when an access token is already active
+  in memory.
 - There is no timer-based background sync.
 - There is no real-time conflict UI.
 - Delete sync uses `deletedAt` tombstones; there is no restore or permanent

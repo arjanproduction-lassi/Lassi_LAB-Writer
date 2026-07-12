@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-12
+
+- Added Tichý Svitok v2 as a small Google Drive sync comfort pass.
+- Added quiet sync attempts on app open and when returning to the foreground,
+  but only when Svitok is enabled and an access token is already active in
+  memory.
+- Added a debounced quiet sync after save, delete, or changed manual import.
+- Added online/offline awareness so Writer does not call Google while offline
+  and keeps local writing uninterrupted.
+- Added calmer sync status copy: waiting for Google, offline, syncing, pending
+  local changes, and "Písať môžeš ďalej, Writer ukladá lokálne."
+- Kept Google popup behavior user-initiated only.
+- Kept tokens in memory only and did not add refresh tokens, backend, custom
+  accounts, AI, media capture, Songbook integration, Storyboard integration, or
+  shared databases.
+
 ## 2026-07-10
 
 - Added the first Keep-like Svitok comfort pass for Google Drive sync.

@@ -17,6 +17,9 @@ The first MVP slice is now implemented:
 - Mark local saves/deletes as pending sync changes.
 - Quietly sync after save/delete when a valid Google access token is already
   active in memory.
+- Try quiet sync on app open and on foreground return when Svitok is enabled and
+  the access token is already active in memory.
+- Show offline and waiting-for-Google states without interrupting writing.
 
 This proves the core loop, a manual JSON bridge, and an experimental manual
 Google Drive bridge without AI, Songbook, Storyboard, full background sync,
@@ -53,8 +56,10 @@ custom accounts, backends, or shared databases.
 
 - Test manual JSON export/import on phone and desktop with real saved sparks.
 - Test Google Drive sync PC -> mobile -> tablet and back with real sparks.
-- Add quiet sync attempt when opening Writer if Google can do it without
-  interrupting the author.
+- Tune the quiet sync interval if real PC/mobile use shows it is too eager or
+  too slow.
+- Consider a gentle sync-on-open pull only if Google can do it without a popup
+  or token persistence.
 - Keep manual sync as the safety fallback even as Svitok becomes quieter.
 - Add minimal test setup.
 - Add recovery notes for the local import backup key.

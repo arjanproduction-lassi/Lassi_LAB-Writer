@@ -1,4 +1,4 @@
-import { type ChangeEvent, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   connectGoogleDrive,
   hasGoogleDriveAccessToken,
@@ -21,6 +21,9 @@ type EditorState = {
   id?: string;
   text: string;
 };
+
+const QUIET_SYNC_DEBOUNCE_MS = 4000;
+const STALE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("sk-SK", {
@@ -45,13 +48,43 @@ function googleSyncUnavailableMessage() {
   return "Google Drive sync ešte nie je nastavený. Chýba VITE_GOOGLE_CLIENT_ID.";
 }
 
+function googleSyncWaitingMessage() {
+  return "Svitok čaká na Google pripojenie. Písať môžeš ďalej.";
+}
+
+function googleSyncOfflineMessage() {
+  return "Offline — zmeny sú uložené lokálne. Písať môžeš ďalej.";
+}
+
+function isLastSyncStale(lastSyncAt?: string) {
+  if (!lastSyncAt) {
+    return true;
+  }
+
+  return Date.now() - Date.parse(lastSyncAt) > STALE_SYNC_INTERVAL_MS;
+}
+
 function googleSyncHeading(
   googleSyncAvailable: boolean,
   preferences: GoogleSyncPreferences,
-  googleConnectedInMemory: boolean
+  googleConnectedInMemory: boolean,
+  isOnline: boolean,
+  googleSyncStatus: RemoteSyncStatus
 ) {
   if (!googleSyncAvailable || !preferences.googleSyncEnabled) {
     return "Sync nie je nastavený";
+  }
+
+  if (!isOnline || googleSyncStatus === "offline") {
+    return "Offline";
+  }
+
+  if (googleSyncStatus === "syncing") {
+    return "Svitok synchronizuje";
+  }
+
+  if (googleSyncStatus === "error") {
+    return "Svitok hlási chybu";
   }
 
   return googleConnectedInMemory ? "Svitok zapnutý" : "Čaká na Google pripojenie";
@@ -66,6 +99,7 @@ export default function App() {
   const [syncPreferences, setSyncPreferences] = useState<GoogleSyncPreferences>(() =>
     readGoogleSyncPreferences()
   );
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine);
   const [googleConnectedInMemory, setGoogleConnectedInMemory] = useState(() =>
     hasGoogleDriveAccessToken()
   );
@@ -77,6 +111,9 @@ export default function App() {
   );
   const importInputRef = useRef<HTMLInputElement>(null);
   const googleSyncBusyRef = useRef(false);
+  const quietSyncTimerRef = useRef<number | null>(null);
+  const syncPreferencesRef = useRef(syncPreferences);
+  const isOnlineRef = useRef(isOnline);
 
   const activeSpark = useMemo(
     () => sparks.find((spark) => spark.id === editor?.id),
@@ -90,16 +127,67 @@ export default function App() {
   const googleSyncTitle = googleSyncHeading(
     googleSyncAvailable,
     syncPreferences,
-    googleConnectedInMemory
+    googleConnectedInMemory,
+    isOnline,
+    googleSyncStatus
   );
   const showConnectGoogleButton =
     googleSyncAvailable &&
+    isOnline &&
     (!syncPreferences.googleSyncEnabled ||
       !googleConnectedInMemory ||
       googleSyncStatus === "error");
   const lastSyncText = syncPreferences.lastSyncAt
     ? `Posledný sync: ${formatDate(syncPreferences.lastSyncAt)}`
     : "Posledný sync: zatiaľ nie";
+
+  useEffect(() => {
+    syncPreferencesRef.current = syncPreferences;
+  }, [syncPreferences]);
+
+  useEffect(() => {
+    isOnlineRef.current = isOnline;
+  }, [isOnline]);
+
+  useEffect(() => {
+    tryQuietSyncIfUseful({ force: true });
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        tryQuietSyncIfUseful();
+      }
+    }
+
+    function handleOnline() {
+      setIsOnline(true);
+      isOnlineRef.current = true;
+      tryQuietSyncIfUseful();
+    }
+
+    function handleOffline() {
+      setIsOnline(false);
+      isOnlineRef.current = false;
+      clearQuietSyncTimer();
+
+      if (!syncPreferencesRef.current.googleSyncEnabled) {
+        return;
+      }
+
+      setGoogleSyncStatus("offline");
+      setGoogleSyncMessage(googleSyncOfflineMessage());
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      clearQuietSyncTimer();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   function startNewSpark() {
     setEditor({ text: "" });
@@ -117,10 +205,64 @@ export default function App() {
     setEditor(null);
   }
 
+  function clearQuietSyncTimer() {
+    if (quietSyncTimerRef.current !== null) {
+      window.clearTimeout(quietSyncTimerRef.current);
+      quietSyncTimerRef.current = null;
+    }
+  }
+
   function applySyncPreferences(patch: Partial<GoogleSyncPreferences>) {
     const next = updateGoogleSyncPreferences(patch);
+    syncPreferencesRef.current = next;
     setSyncPreferences(next);
     return next;
+  }
+
+  function showWaitingForGoogle() {
+    setGoogleConnectedInMemory(false);
+    setGoogleSyncStatus("idle");
+    setGoogleSyncMessage(googleSyncWaitingMessage());
+  }
+
+  function scheduleQuietSync() {
+    clearQuietSyncTimer();
+    quietSyncTimerRef.current = window.setTimeout(() => {
+      quietSyncTimerRef.current = null;
+      void runGoogleSync({ useExistingTokenOnly: true, quiet: true });
+    }, QUIET_SYNC_DEBOUNCE_MS);
+
+    setGoogleSyncStatus("connected");
+    setGoogleSyncMessage("Svitok dorovná zmeny o chvíľu. Písať môžeš ďalej.");
+  }
+
+  function tryQuietSyncIfUseful({ force = false } = {}) {
+    const preferences = syncPreferencesRef.current;
+
+    if (!googleSyncAvailable || !preferences.googleSyncEnabled) {
+      return;
+    }
+
+    if (!isOnlineRef.current) {
+      setGoogleSyncStatus("offline");
+      setGoogleSyncMessage(googleSyncOfflineMessage());
+      return;
+    }
+
+    if (
+      !force &&
+      !preferences.pendingLocalChanges &&
+      !isLastSyncStale(preferences.lastSyncAt)
+    ) {
+      return;
+    }
+
+    if (!hasGoogleDriveAccessToken()) {
+      showWaitingForGoogle();
+      return;
+    }
+
+    void runGoogleSync({ useExistingTokenOnly: true, quiet: true });
   }
 
   function markLocalChangesForSync() {
@@ -135,6 +277,12 @@ export default function App() {
       return;
     }
 
+    if (!isOnlineRef.current) {
+      setGoogleSyncStatus("offline");
+      setGoogleSyncMessage(googleSyncOfflineMessage());
+      return;
+    }
+
     if (!nextPreferences.googleSyncEnabled) {
       setGoogleSyncStatus("idle");
       setGoogleSyncMessage("Lokálne zmeny čakajú. Svitok zapneš cez Pripojiť Google.");
@@ -142,13 +290,11 @@ export default function App() {
     }
 
     if (!hasGoogleDriveAccessToken()) {
-      setGoogleConnectedInMemory(false);
-      setGoogleSyncStatus("idle");
-      setGoogleSyncMessage("Zmeny čakajú na sync. Pripoj Google, keď budeš pripravený.");
+      showWaitingForGoogle();
       return;
     }
 
-    void runGoogleSync({ useExistingTokenOnly: true, quiet: true });
+    scheduleQuietSync();
   }
 
   async function runGoogleSync({
@@ -164,17 +310,22 @@ export default function App() {
       return;
     }
 
+    if (!isOnlineRef.current) {
+      setGoogleSyncStatus("offline");
+      setGoogleSyncMessage(googleSyncOfflineMessage());
+      return;
+    }
+
     if (googleSyncBusyRef.current) {
       return;
     }
 
     if (useExistingTokenOnly && !hasGoogleDriveAccessToken()) {
-      setGoogleConnectedInMemory(false);
-      setGoogleSyncStatus("idle");
-      setGoogleSyncMessage("Zmeny čakajú na sync. Pripoj Google, keď budeš pripravený.");
+      showWaitingForGoogle();
       return;
     }
 
+    clearQuietSyncTimer();
     googleSyncBusyRef.current = true;
     setGoogleSyncStatus("syncing");
     setGoogleSyncMessage(
@@ -213,17 +364,19 @@ export default function App() {
 
       setGoogleSyncMessage(resultMessage);
     } catch {
-      const message = useExistingTokenOnly
-        ? "Zmeny čakajú na sync. Google pripojenie už nie je aktívne."
-        : "Synchronizácia zlyhala. Lokálne iskry ostali chránené; ak bol vzdialený súbor neplatný, nič sa neprepísalo.";
+      const tokenStillActive = hasGoogleDriveAccessToken();
+      const message =
+        useExistingTokenOnly && !tokenStillActive
+          ? googleSyncWaitingMessage()
+          : "Synchronizácia zlyhala. Lokálne iskry ostali chránené; ak bol vzdialený súbor neplatný, nič sa neprepísalo.";
       const pendingLocalChanges = readGoogleSyncPreferences().pendingLocalChanges ?? false;
 
-      setGoogleConnectedInMemory(hasGoogleDriveAccessToken());
+      setGoogleConnectedInMemory(tokenStillActive);
       applySyncPreferences({
         lastSyncError: message,
         pendingLocalChanges
       });
-      setGoogleSyncStatus("error");
+      setGoogleSyncStatus(useExistingTokenOnly && !tokenStillActive ? "idle" : "error");
       setGoogleSyncMessage(message);
     } finally {
       googleSyncBusyRef.current = false;
@@ -335,7 +488,7 @@ export default function App() {
     try {
       await connectGoogleDrive();
       setGoogleConnectedInMemory(true);
-      const nextPreferences = applySyncPreferences({
+      applySyncPreferences({
         googleSyncEnabled: true,
         lastSyncError: undefined
       });
@@ -343,9 +496,7 @@ export default function App() {
       setGoogleSyncStatus("connected");
       setGoogleSyncMessage("Google je pripojený. Svitok je zapnutý.");
 
-      if (nextPreferences.pendingLocalChanges) {
-        void runGoogleSync({ useExistingTokenOnly: true, quiet: true });
-      }
+      scheduleQuietSync();
     } catch {
       setGoogleConnectedInMemory(false);
       applySyncPreferences({
@@ -357,6 +508,12 @@ export default function App() {
   }
 
   async function handleGoogleSync() {
+    if (!isOnlineRef.current) {
+      setGoogleSyncStatus("offline");
+      setGoogleSyncMessage(googleSyncOfflineMessage());
+      return;
+    }
+
     await runGoogleSync({ useExistingTokenOnly: false });
   }
 
@@ -500,6 +657,7 @@ export default function App() {
             ) : (
               <p>Lokálne zmeny sú pokojné.</p>
             )}
+            <p>Písať môžeš ďalej, Writer ukladá lokálne.</p>
             {syncPreferences.lastSyncResult ? (
               <p>Posledný výsledok: {syncPreferences.lastSyncResult}</p>
             ) : null}
@@ -512,7 +670,7 @@ export default function App() {
               <button
                 className="data-action"
                 type="button"
-                disabled={!googleSyncAvailable || isGoogleSyncBusy}
+                disabled={!googleSyncAvailable || !isOnline || isGoogleSyncBusy}
                 onClick={handleConnectGoogle}
               >
                 Pripojiť Google
@@ -521,7 +679,7 @@ export default function App() {
             <button
               className="data-action"
               type="button"
-              disabled={!googleSyncAvailable || isGoogleSyncBusy}
+              disabled={!googleSyncAvailable || !isOnline || isGoogleSyncBusy}
               onClick={handleGoogleSync}
             >
               Synchronizovať teraz

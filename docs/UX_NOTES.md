@@ -72,9 +72,22 @@ Google Drive Svitok is the first bridge for this. Manual sync remains as a
 safety fallback, but the long-term direction is quiet sync on open and after
 save whenever Google allows it without interrupting the author.
 
+Tichý Svitok v2 moves closer to that feeling:
+
+- Try sync on app open if Svitok is enabled and an access token is still active
+  in memory.
+- Try sync when returning to the app if local changes are waiting or the last
+  sync is stale.
+- Debounce sync briefly after save/delete/import so Writer does not sync on
+  every tiny action.
+- Show offline and waiting states calmly: the author can keep writing because
+  local save is the first safety layer.
+
 Tokens must not be stored. If Google needs fresh consent or an expired token
 must be renewed, Writer should continue locally, show a calm waiting state, and
 let the author reconnect intentionally.
+
+Quiet sync never means opening a Google popup without a user action.
 
 ## Workspace UX Rules
 

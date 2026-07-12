@@ -340,6 +340,18 @@ h3 {
   background: rgba(54, 83, 20, 0.28);
 }
 
+.data-note[data-status="syncing"] {
+  border-color: rgba(242, 196, 91, 0.32);
+  color: #ffe3a3;
+  background: rgba(99, 75, 22, 0.26);
+}
+
+.data-note[data-status="offline"] {
+  border-color: rgba(148, 163, 184, 0.32);
+  color: #dbe4ef;
+  background: rgba(51, 65, 85, 0.26);
+}
+
 .file-input {
   position: absolute;
   width: 1px;
