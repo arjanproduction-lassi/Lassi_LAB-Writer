@@ -51,6 +51,10 @@ manual JSON export, and Google Drive sync payload so the delete can travel to
 other devices. A delete also updates `updatedAt` to the same timestamp so the
 existing "newer updatedAt wins" merge rule can carry the tombstone.
 
+Editing an existing spark keeps the same `id` and original `createdAt`, updates
+the text, and sets a fresh `updatedAt`. This lets sync treat the edit as a newer
+version of the same spark instead of a duplicate spark.
+
 ### v0.1 New Spark Recovery Draft
 
 Temporary local storage key:

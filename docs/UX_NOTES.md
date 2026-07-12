@@ -103,6 +103,21 @@ The recovery UX should feel like a quiet note on the table:
 - Clear the draft after the spark is saved.
 - Keep the draft local only; it is not synced and not part of export/import.
 
+## Existing Spark Editing
+
+Saved sparks should remain easy to revisit without turning Writer into a large
+editor. The author can open a spark from **Posledne iskry**, adjust the text,
+and save the change deliberately.
+
+Editing an existing spark is different from creating a new spark:
+
+- The existing spark keeps its `id` and `createdAt`.
+- Saving changes updates `updatedAt` so sync can carry the newer version.
+- Saving changes marks local sync preferences as pending local changes.
+- New spark draft recovery stays only for a new unsaved spark.
+- Cancelling an edit leaves the saved spark unchanged and does not overwrite the
+  new-spark recovery draft.
+
 ## Workspace UX Rules
 
 - Main mobile action remains fast capture.

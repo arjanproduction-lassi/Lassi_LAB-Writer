@@ -18,6 +18,10 @@
 - Added a gentle recovery card with **Obnoviť** and **Zahodiť** actions.
 - The new spark draft is local only, is not synced, is not part of manual DB
   export/import, and is cleared after a successful spark save.
+- Clarified existing spark editing in the UI: saved sparks open into edit mode,
+  the author sees that an existing spark is being edited, **Uložiť zmeny**
+  keeps the original `id` and `createdAt`, and `updatedAt` moves forward.
+- Kept new-spark draft recovery separate from existing spark editing.
 - Kept tokens in memory only and did not add refresh tokens, backend, custom
   accounts, AI, media capture, Songbook integration, Storyboard integration, or
   shared databases.

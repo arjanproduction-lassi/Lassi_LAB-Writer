@@ -9,6 +9,7 @@ The first MVP slice is now implemented:
 - Save a text spark.
 - See it in a recent list.
 - Reopen and edit it.
+- Clearly distinguish new spark capture from editing an existing saved spark.
 - Export the local Writer DB as JSON.
 - Import that JSON on another device.
 - Connect Google Drive when `VITE_GOOGLE_CLIENT_ID` is configured.
@@ -58,6 +59,8 @@ custom accounts, backends, or shared databases.
 
 - Test manual JSON export/import on phone and desktop with real saved sparks.
 - Test Google Drive sync PC -> mobile -> tablet and back with real sparks.
+- Test editing the same spark across PC and mobile; confirm newer `updatedAt`
+  wins and no duplicate spark appears.
 - Tune the quiet sync interval if real PC/mobile use shows it is too eager or
   too slow.
 - Consider a gentle sync-on-open pull only if Google can do it without a popup

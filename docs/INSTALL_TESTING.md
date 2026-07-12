@@ -151,6 +151,38 @@ Save clears draft:
 4. Confirm the saved spark appears in **Posledné iskry** and no recovery card
    appears for that same text.
 
+## Test Existing Spark Editing
+
+Editing an existing spark is a deliberate save, not draft recovery.
+
+Basic edit:
+
+1. Save a new spark.
+2. Open it from **Posledné iskry**.
+3. Confirm Writer says the existing spark is being edited.
+4. Change the text.
+5. Tap **Uložiť zmeny**.
+6. Confirm the same spark appears once in **Posledné iskry** with the changed
+   text.
+
+Metadata and sync:
+
+1. Export the DB before and after the edit if you need to inspect JSON.
+2. Confirm the edited spark keeps the same `id`.
+3. Confirm `createdAt` stays the same.
+4. Confirm `updatedAt` changes to the edit time.
+5. Confirm Writer marks local changes for sync or quietly syncs if Google is
+   connected.
+
+Cancel edit:
+
+1. Open an existing spark.
+2. Change the text.
+3. Tap **Zrušiť úpravu**.
+4. Reopen the spark and confirm the original saved text is unchanged.
+5. Confirm the new-spark draft recovery card was not created from the edited
+   text.
+
 ## Test Manual DB Export And Import
 
 The v0.1 JSON DB bridge is manual and file-based. It is not cloud sync.

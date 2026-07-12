@@ -163,6 +163,12 @@ h3 {
   font-weight: 800;
 }
 
+.editor-context {
+  margin-top: 0.9rem;
+  color: #cfc7ba;
+  line-height: 1.45;
+}
+
 .spark-input {
   display: block;
   width: 100%;
@@ -248,6 +254,14 @@ h3 {
 .spark-card-time {
   color: #9f978c;
   font-size: 0.82rem;
+}
+
+.spark-card-action {
+  justify-self: start;
+  margin-top: 0.25rem;
+  color: #ffe3a3;
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .empty-state {

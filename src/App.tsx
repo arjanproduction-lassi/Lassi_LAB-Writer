@@ -500,7 +500,11 @@ export default function App() {
     setSparks(listSparks());
     editorRef.current = null;
     setEditor(null);
-    setSavedMessage(`Iskra uložená ${formatDate(saved.updatedAt)}`);
+    setSavedMessage(
+      isNewSpark
+        ? `Iskra uložená ${formatDate(saved.updatedAt)}`
+        : `Zmeny uložené ${formatDate(saved.updatedAt)}`
+    );
     markLocalChangesForSync();
   }
 
@@ -663,18 +667,24 @@ export default function App() {
         <section className="editor-panel" aria-labelledby="editor-title">
           <div className="panel-heading">
             <div>
-              <p className="eyebrow">{isEditing ? "Upraviť" : "Zachytiť"}</p>
+              <p className="eyebrow">{isEditing ? "Upravuješ" : "Zachytiť"}</p>
               <h2 id="editor-title">
                 {isEditing && activeSpark ? sparkTitle(activeSpark) : "Nová iskra"}
               </h2>
             </div>
             <button className="ghost-action" type="button" onClick={closeEditor}>
-              Zavrieť
+              {isEditing ? "Zrušiť úpravu" : "Zavrieť"}
             </button>
           </div>
 
+          <p className="editor-context">
+            {isEditing
+              ? "Upravuješ uloženú iskru. Rozpísaná nová iskra ostáva chránená zvlášť."
+              : "Rýchlo zachyť novú iskru. Rozpísaný text sa chráni lokálne."}
+          </p>
+
           <label className="spark-label" htmlFor="spark-text">
-            Čo práve nechceš stratiť?
+            {isEditing ? "Text iskry" : "Čo práve nechceš stratiť?"}
           </label>
           <textarea
             id="spark-text"
@@ -692,7 +702,7 @@ export default function App() {
               disabled={!canSave}
               onClick={handleSave}
             >
-              Uložiť iskru
+              {isEditing ? "Uložiť zmeny" : "Uložiť iskru"}
             </button>
             {isEditing ? (
               <button className="delete-action" type="button" onClick={handleDeleteSpark}>
@@ -726,6 +736,7 @@ export default function App() {
                 <span className="spark-card-time">
                   Úprava {formatDate(spark.updatedAt)}
                 </span>
+                <span className="spark-card-action">Upraviť</span>
               </button>
             ))}
           </div>
