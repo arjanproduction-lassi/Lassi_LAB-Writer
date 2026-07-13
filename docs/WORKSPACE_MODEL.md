@@ -97,6 +97,11 @@ type WriterPackage = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  packageVersion: 1;
+  legacy?: {
+    source: "spark";
+    stage?: SparkStage;
+  };
 };
 
 type WriterNote = {
@@ -105,7 +110,6 @@ type WriterNote = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
-  order: number;
 };
 ```
 
@@ -183,9 +187,9 @@ They can contain:
 - context
 - a continuation that is not ready to become a workshop text
 
-Notes should be an ordered array because there may be more than one. The first
-implementation can support simple add/edit only. Reorder, note deletion
-tombstones, and advanced note structure can wait.
+Notes are an array because there may be more than one. The first implementation
+can support simple add/edit only. Explicit ordering, note deletion tombstones,
+and advanced note structure can wait.
 
 ### Dielňa
 
@@ -305,7 +309,7 @@ Safe compatibility rules:
 - Display each old Spark as a simple Writer Package.
 - Use the current Spark `id` as the displayed package `id` when possible.
 - Preserve `createdAt`, `updatedAt`, and `deletedAt`.
-- Put the old Spark text into `sparkText`.
+- Put the old Spark current text into `sparkText`.
 - Keep `notes`, `workshopText`, and `finalText` empty at first.
 - Use existing `title` if it exists; otherwise derive a display title from the
   first useful line.
@@ -329,6 +333,48 @@ This deliberately avoids a clever stage-based migration. A user may have marked
 a spark as `workshop` while the text still contains the original spark. The
 first package pass should protect the text by treating old Sparks as origins,
 not by splitting them into layers automatically.
+
+Important historical truth:
+
+- Old `Spark` records contain only one current text layer.
+- If the user already edited a Spark, Writer cannot reconstruct its original
+  historical spark or intermediate writing path.
+- The legacy adapter therefore uses the current Spark text as the initial
+  `sparkText` view.
+- That title and package view are not persisted by the adapter.
+- New `WriterPackage` records can preserve the layers separately later.
+
+## Legacy Adapter v1
+
+The first implemented bridge is a pure adapter:
+
+```ts
+adaptSparkToWriterPackage(spark: Spark): WriterPackage
+```
+
+It follows this path:
+
+```text
+old Spark
+   -> legacy adapter
+WriterPackage
+```
+
+Rules:
+
+- Same `id`.
+- Same `createdAt`.
+- Same `updatedAt`.
+- Same `deletedAt` when present.
+- Spark current `text` becomes `sparkText`.
+- `notes` starts as an empty array.
+- `workshopText` starts empty.
+- `finalText` starts empty.
+- Spark `stage` is preserved only as `legacy.stage`.
+- The title is derived from the first non-empty Spark text line.
+- The adapter does not write to storage.
+- The adapter does not change export/import/sync payloads.
+- The adapter does not run a migration.
 
 ## What Happens To Stage
 

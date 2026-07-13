@@ -14,6 +14,33 @@ export interface Spark {
   schemaVersion: 1;
 }
 
+export interface WriterPackageLegacyMetadata {
+  source: "spark";
+  stage?: SparkStage;
+}
+
+export interface WriterPackageNote {
+  id: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
+
+export interface WriterPackage {
+  id: string;
+  title: string;
+  sparkText: string;
+  notes: WriterPackageNote[];
+  workshopText: string;
+  finalText: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+  packageVersion: 1;
+  legacy?: WriterPackageLegacyMetadata;
+}
+
 export interface SparkInput {
   id?: string;
   title?: string;

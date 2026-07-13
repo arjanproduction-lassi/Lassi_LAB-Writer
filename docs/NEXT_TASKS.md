@@ -30,6 +30,24 @@ This proves the core loop, a manual JSON bridge, and an experimental manual
 Google Drive bridge without AI, Songbook, Storyboard, full background sync,
 custom accounts, backends, or shared databases.
 
+## Next Product Direction
+
+Writer Package v1 is now the target data direction.
+
+The first code bridge is intentionally small:
+
+- add the `WriterPackage` and `WriterPackageNote` types
+- keep `Spark` as the active legacy storage model
+- adapt old Sparks into read-only package views
+- do not migrate local data automatically
+- do not change the Writer DB export/import format yet
+- do not change Google Drive sync payloads yet
+
+Next implementation decision:
+
+- decide how to start saving new captures as `WriterPackage` records without
+  damaging old Spark data or breaking sync/export/import compatibility
+
 ## Repository Setup Tasks
 
 - Confirm this folder is the intended Git worktree.
@@ -52,7 +70,9 @@ custom accounts, backends, or shared databases.
 - Sketch recent sparks list.
 - Sketch spark detail.
 - Sketch the image-first prompt language without implementing image upload.
-- Design the "four notebooks" workspace model before implementing complex draft
+- Design the package detail screen before implementing the PC horizontal
+  workspace.
+- Design the one-package layered workspace before implementing complex draft
   features.
 - Preserve the device roles: mobile = chytit, sync = preniest, PC = upratat,
   tablet = citat a tvarovat.

@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-13 - Writer Package legacy adapter
+
+- Added the first runtime-safe Writer Package data bridge.
+- Added `WriterPackage` and `WriterPackageNote` types.
+- Kept `Spark` as the active legacy storage model.
+- Added a deterministic read-only adapter from old `Spark` records to
+  `WriterPackage` views.
+- The adapter keeps the same `id`, `createdAt`, `updatedAt`, and `deletedAt`.
+- The adapter places the current Spark text into `sparkText`, starts notes,
+  workshop, and final text empty, and preserves `stage` only as legacy metadata.
+- Documented that old Spark records contain only one current text layer, so
+  Writer cannot reconstruct historical original sparks from already edited old
+  records.
+- No storage key changes, no Writer DB schema change, no Google Drive sync
+  payload change, no automatic migration, and no UI behavior change.
+
 ## 2026-07-13
 
 - Added the first "four notebooks" workflow as an optional spark `stage`:

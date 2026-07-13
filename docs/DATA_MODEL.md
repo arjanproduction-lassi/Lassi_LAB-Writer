@@ -134,6 +134,11 @@ type WriterPackage = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  packageVersion: 1;
+  legacy?: {
+    source: "spark";
+    stage?: SparkStage;
+  };
 };
 
 type WriterNote = {
@@ -142,7 +147,6 @@ type WriterNote = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
-  order: number;
 };
 ```
 
@@ -162,16 +166,47 @@ Old `Spark` records should be displayed through a compatibility adapter as
 simple packages:
 
 - Spark `id` becomes package `id`
-- Spark text becomes package `sparkText`
+- Spark current text becomes package `sparkText`
 - package `notes`, `workshopText`, and `finalText` start empty
 - Spark `createdAt`, `updatedAt`, and `deletedAt` are preserved
 - Spark `stage` remains legacy metadata and should not automatically move text
   into notes, workshop, or final
+- the adapter derives a temporary title from the first non-empty Spark text line
+  and does not persist it
+
+Important historical truth:
+
+- Old `Spark` records contain only one current text layer.
+- If an old Spark was edited, Writer cannot reconstruct the original historical
+  spark or the path of edits from the current record.
+- The legacy adapter therefore treats the current text as the initial
+  `sparkText` for display only.
+- New `WriterPackage` records can preserve layers separately later.
 
 For sync/export/import, the target is that the whole package travels as one
 record. Later optional layers can be added for musical dramaturgy, Suno prompts,
 visual/storyboard prompts, publication notes, or booklet metadata without
 turning Writer into Songbook or Storyboard.
+
+### v1 Legacy Adapter
+
+The first runtime step toward packages is a pure read-only adapter:
+
+```ts
+adaptSparkToWriterPackage(spark: Spark): WriterPackage
+```
+
+Rules:
+
+- It returns a deterministic `WriterPackage` view of one `Spark`.
+- It keeps `id`, `createdAt`, `updatedAt`, and `deletedAt`.
+- It copies the current Spark `text` into `sparkText`.
+- It starts `notes`, `workshopText`, and `finalText` empty.
+- It stores Spark `stage` only under `legacy.stage`.
+- It does not write to `localStorage`.
+- It does not change the Writer DB export/import schema.
+- It does not change Google Drive sync payloads.
+- It does not run an automatic migration.
 
 ### v0.1 New Spark Recovery Draft
 
