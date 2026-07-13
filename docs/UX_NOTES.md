@@ -45,8 +45,62 @@ spark:
 - **Dielňa** = this is being shaped into working text.
 - **Text OK** = this is the clean accepted version.
 
-These are not separate databases and not a project-management system. They are
-the digital equivalent of moving a page between four notebooks.
+These are not separate databases and not a project-management system. In the
+first stage UI they are only a light orientation layer, not the final model of
+the work.
+
+Important correction after first use: the stage/filter model is not the final
+workflow. It helps orientation, but it still feels like moving one card between
+labels.
+
+The desired Writer workspace is **Tvorivá jednotka / Writer Package**: one
+creative package with one id and connected layers. The original spark is the
+birth certificate of the work. It should remain visible and protected while the
+work grows into notes, workshop material, and final text.
+
+```text
+[Iskra] [Poznámky] [Dielňa] [Text OK]
+```
+
+On desktop, at least two layers should be visible side by side when possible.
+The author can read the spark while writing notes, read notes while shaping
+Dielňa, and read Dielňa while polishing Text OK.
+
+On mobile, the same layers appear one at a time with simple switching. Mobile
+still catches and continues; PC remains the broader work table.
+
+The UX rule:
+
+```text
+not "move this card to another label"
+but "open this work and grow it layer by layer"
+```
+
+Product principle:
+
+```text
+Každé dielo má svoje počatie.
+Writer ho nesmie roztrhať na kartičky.
+Má ho niesť v jednom balíku od prvej iskry až po hotový text.
+```
+
+Workspace wording:
+
+```text
+LassiLAB Writer neukladá poznámky ako voľné kartičky.
+Ukladá tvorivé jednotky — balíky s jedinečným ID, v ktorých pôvodná iskra rastie
+cez poznámky a dielňu až do publikovateľného textu.
+```
+
+Transition UX:
+
+- New captures should feel like new packages from the start.
+- Old saved Sparks should still open naturally as packages with the Iskra layer
+  filled.
+- The author should not need to know whether a record began life as legacy
+  `Spark` or new `WriterPackage`.
+- The PC horizontal work table comes after this unified package feeling is
+  stable.
 
 ## Device Roles
 
@@ -145,8 +199,10 @@ The next larger UX steps should happen in this order:
 
 1. Google Drive Svitok sync.
 2. Autosave rozpisanej iskry.
-3. Gentle spark status: Iskra / Poznámky / Dielňa / Text OK.
-4. Only then build deeper editors for notes and versions.
+3. Gentle spark status: Iskra / Poznámky / Dielňa / Text OK as temporary
+   orientation.
+4. Writer Package workspace: one work with visible layers.
+5. Only then build deeper editors for notes and versions.
 
 This protects the real workflow: catch first, move safely between devices,
 avoid losing unfinished writing, then add structure.

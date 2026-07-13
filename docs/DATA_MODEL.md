@@ -25,6 +25,50 @@ not a replacement for future structured draft/workshop models.
 - Persistent keys and export formats should not be finalized until the MVP
   behavior is clearer.
 
+## Target Direction: Writer Package
+
+The current `Spark` record is a useful first storage shape, but the target
+Writer object is a **Writer Package / Tvorivá jednotka**: one creative work with
+one id and connected layers.
+
+The important product correction:
+
+```text
+not one card moving between stages
+but one package growing through layers
+```
+
+Product data rule:
+
+```text
+LassiLAB Writer neukladá poznámky ako voľné kartičky.
+Ukladá tvorivé jednotky — balíky s jedinečným ID, v ktorých pôvodná iskra rastie
+cez poznámky a dielňu až do publikovateľného textu.
+```
+
+Target minimum layers:
+
+- `title`
+- `sparkText` - the original spark, the birth certificate of the work
+- `notes` - development notes; eventually more than one
+- `workshopText` - rough shaping space
+- `finalText` - clean accepted text
+
+The `stage` field is backward-compatible and can remain during transition, but
+it is not the final workspace model. `stage` says where a card currently sits.
+The Writer Package model says how one work grows from first capture to clean
+text while keeping the original spark visible.
+
+The safest future migration is additive:
+
+- add `WriterPackage` as the new primary type
+- keep old `Spark` records readable as legacy
+- save new captures as packages
+- show old Spark records as simple packages with `sparkText` filled
+- keep manual JSON export/import and Google Drive sync on the same bridge
+- let the whole package travel as one record
+- only rename or split the data model after the layered workflow is proven
+
 ## Core Objects
 
 ### v0.1 Spark Record
@@ -68,6 +112,66 @@ separate databases; they are one simple state on the same spark record. Changing
 stage keeps the same `id` and `createdAt`, updates `updatedAt`, and travels
 through manual JSON export/import and Google Drive sync with the rest of the
 spark.
+
+### Target Writer Package
+
+This is the intended next model, not the current runtime schema.
+
+`WriterPackage` should become the primary model for new writing. `Spark` remains
+as a legacy readable model so older local data, JSON exports, and synced Drive
+DB files do not break.
+
+Minimum target shape:
+
+```ts
+type WriterPackage = {
+  id: string;
+  title: string;
+  sparkText: string;
+  notes: WriterNote[];
+  workshopText: string;
+  finalText: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+};
+
+type WriterNote = {
+  id: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+  order: number;
+};
+```
+
+The original `sparkText` is the birth certificate of the work. It should remain
+available even after the author adds notes, shapes a workshop version, or writes
+the final accepted text.
+
+New captures should be created as `WriterPackage` records with:
+
+- `sparkText` filled from the captured text
+- `notes` as an empty array
+- `workshopText` empty
+- `finalText` empty
+- `createdAt` and `updatedAt` set to the capture time
+
+Old `Spark` records should be displayed through a compatibility adapter as
+simple packages:
+
+- Spark `id` becomes package `id`
+- Spark text becomes package `sparkText`
+- package `notes`, `workshopText`, and `finalText` start empty
+- Spark `createdAt`, `updatedAt`, and `deletedAt` are preserved
+- Spark `stage` remains legacy metadata and should not automatically move text
+  into notes, workshop, or final
+
+For sync/export/import, the target is that the whole package travels as one
+record. Later optional layers can be added for musical dramaturgy, Suno prompts,
+visual/storyboard prompts, publication notes, or booklet metadata without
+turning Writer into Songbook or Storyboard.
 
 ### v0.1 New Spark Recovery Draft
 
