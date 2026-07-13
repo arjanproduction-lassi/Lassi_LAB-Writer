@@ -3,6 +3,7 @@ import type {
   NewSparkDraft,
   Spark,
   SparkInput,
+  SparkStage,
   WriterDbExport,
   WriterDbImportResult,
   WriterDbMergeResult
@@ -15,6 +16,8 @@ const SYNC_BACKUP_STORAGE_KEY = "lassilab-writer:v0.1:sparks:backup-before-sync"
 const SYNC_PREFERENCES_STORAGE_KEY = "lassilab-writer:v0.1:google-sync-preferences";
 const NEW_SPARK_DRAFT_STORAGE_KEY = "lassilab-writer:v0.1:draft:new-spark";
 const SCHEMA_VERSION = 1;
+const DEFAULT_SPARK_STAGE: SparkStage = "spark";
+const SPARK_STAGES = new Set<SparkStage>(["spark", "notes", "workshop", "final"]);
 
 const DEFAULT_SYNC_PREFERENCES: GoogleSyncPreferences = {
   googleSyncEnabled: false,
@@ -53,11 +56,20 @@ function isSpark(value: unknown): value is Spark {
     isValidDateString(spark.createdAt) &&
     isValidDateString(spark.updatedAt) &&
     (spark.deletedAt === undefined || isValidDateString(spark.deletedAt)) &&
+    (spark.stage === undefined || isSparkStage(spark.stage)) &&
     spark.temperature === "spark" &&
     Array.isArray(spark.tags) &&
     spark.tags.every((tag) => typeof tag === "string") &&
     spark.schemaVersion === SCHEMA_VERSION
   );
+}
+
+function isSparkStage(value: unknown): value is SparkStage {
+  return typeof value === "string" && SPARK_STAGES.has(value as SparkStage);
+}
+
+export function normalizeSparkStage(value: unknown): SparkStage {
+  return isSparkStage(value) ? value : DEFAULT_SPARK_STAGE;
 }
 
 function isValidDateString(value: unknown): value is string {
@@ -247,6 +259,7 @@ export function saveSpark(input: SparkInput): Spark {
     text: input.text.trim(),
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
+    stage: normalizeSparkStage(input.stage ?? existing?.stage),
     temperature: "spark",
     tags: existing?.tags ?? [],
     schemaVersion: SCHEMA_VERSION
@@ -258,6 +271,32 @@ export function saveSpark(input: SparkInput): Spark {
 
   writeRawSparks(next);
   return saved;
+}
+
+export function updateSparkStage(id: string, stage: SparkStage): Spark | undefined {
+  const now = new Date().toISOString();
+  const sparks = readRawSparks();
+  const existing = sparks.find((spark) => spark.id === id);
+
+  if (!existing || existing.deletedAt) {
+    return undefined;
+  }
+
+  const nextStage = normalizeSparkStage(stage);
+  const currentStage = normalizeSparkStage(existing.stage);
+
+  if (currentStage === nextStage) {
+    return existing;
+  }
+
+  const updated: Spark = {
+    ...existing,
+    stage: nextStage,
+    updatedAt: now
+  };
+
+  writeRawSparks(sparks.map((spark) => (spark.id === id ? updated : spark)));
+  return updated;
 }
 
 export function deleteSpark(id: string): Spark | undefined {

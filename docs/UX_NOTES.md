@@ -36,6 +36,18 @@ The product model is:
 The goal is not to create four heavy admin categories. The goal is to preserve
 the psychological comfort of separate spaces: catch, expand, shape, accept.
 
+In the first app version this is represented by one gentle `stage` on a saved
+spark:
+
+- **Iskra** = this was only caught.
+- **Poznámky** = this is being expanded with fragments, mood, rhymes, or
+  context.
+- **Dielňa** = this is being shaped into working text.
+- **Text OK** = this is the clean accepted version.
+
+These are not separate databases and not a project-management system. They are
+the digital equivalent of moving a page between four notebooks.
+
 ## Device Roles
 
 - Mobile = chytiť.

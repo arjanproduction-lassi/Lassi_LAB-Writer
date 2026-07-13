@@ -1,4 +1,5 @@
 export type SparkTemperature = "spark";
+export type SparkStage = "spark" | "notes" | "workshop" | "final";
 
 export interface Spark {
   id: string;
@@ -7,6 +8,7 @@ export interface Spark {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  stage?: SparkStage;
   temperature: SparkTemperature;
   tags: string[];
   schemaVersion: 1;
@@ -16,6 +18,7 @@ export interface SparkInput {
   id?: string;
   title?: string;
   text: string;
+  stage?: SparkStage;
 }
 
 export interface NewSparkDraft {

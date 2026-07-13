@@ -183,6 +183,44 @@ Cancel edit:
 5. Confirm the new-spark draft recovery card was not created from the edited
    text.
 
+## Test Four Notebooks Stage
+
+The four notebooks are one optional `stage` field on a saved spark. They are not
+separate databases.
+
+Basic stage flow:
+
+1. Save a new spark.
+2. Confirm the card shows **Iskra**.
+3. Open the spark from **Posledné iskry**.
+4. In **Zošit**, change **Iskra** to **Poznámky**.
+5. Confirm the card badge changes to **Poznámky**.
+6. Repeat with **Dielňa** and **Text OK**.
+7. Move it back to **Iskra** to confirm mistakes can be undone.
+
+Filters:
+
+1. Use the filters **Všetko**, **Iskry**, **Poznámky**, **Dielňa**, and
+   **Text OK**.
+2. Confirm the spark appears only in its current notebook and also in
+   **Všetko**.
+3. Confirm an empty notebook shows a calm empty state.
+
+Metadata and sync:
+
+1. Export the DB before and after changing **Zošit** if you need to inspect JSON.
+2. Confirm the spark keeps the same `id`.
+3. Confirm `createdAt` stays the same.
+4. Confirm `updatedAt` changes when stage changes.
+5. Confirm the exported JSON includes `stage` for staged sparks.
+6. Import or sync the DB on another device and confirm the stage travels.
+
+Backward compatibility:
+
+- Older sparks without `stage` should still load.
+- Writer treats missing `stage` as **Iskra**.
+- Editing an older spark or changing its stage should not create a duplicate.
+
 ## Test Manual DB Export And Import
 
 The v0.1 JSON DB bridge is manual and file-based. It is not cloud sync.

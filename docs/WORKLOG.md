@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-07-13
+
+- Added the first "four notebooks" workflow as an optional spark `stage`:
+  `spark`, `notes`, `workshop`, and `final`.
+- Old sparks without `stage` are treated as **Iskra**.
+- Added simple list filters for **Všetko**, **Iskry**, **Poznámky**,
+  **Dielňa**, and **Text OK**.
+- Added a subtle stage badge on each spark card.
+- Added a small **Zošit** selector when editing a saved spark.
+- Changing stage keeps the same `id` and `createdAt`, updates `updatedAt`, and
+  marks local changes as pending for Svitok sync.
+- Kept draft recovery scoped to new unsaved sparks only.
+- Kept manual JSON export/import, Google Drive sync, sync-safe delete
+  tombstones, and sync backups on the existing storage path.
+
 ## 2026-07-12
 
 - Added Tichý Svitok v2 as a small Google Drive sync comfort pass.

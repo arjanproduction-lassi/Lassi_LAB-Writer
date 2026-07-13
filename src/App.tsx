@@ -12,17 +12,20 @@ import {
   getWriterDbExportFileName,
   importWriterDb,
   listSparks,
+  normalizeSparkStage,
   readNewSparkDraft,
   readGoogleSyncPreferences,
   saveSpark,
   saveNewSparkDraft,
+  updateSparkStage,
   updateGoogleSyncPreferences
 } from "./storage";
 import type {
   GoogleSyncPreferences,
   NewSparkDraft,
   RemoteSyncStatus,
-  Spark
+  Spark,
+  SparkStage
 } from "./types";
 
 type EditorState = {
@@ -30,9 +33,27 @@ type EditorState = {
   text: string;
 };
 
+type StageFilter = "all" | SparkStage;
+
 const QUIET_SYNC_DEBOUNCE_MS = 4000;
 const STALE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
 const DRAFT_AUTOSAVE_DEBOUNCE_MS = 500;
+const STAGE_LABELS: Record<SparkStage, string> = {
+  spark: "Iskra",
+  notes: "Poznámky",
+  workshop: "Dielňa",
+  final: "Text OK"
+};
+const STAGE_OPTIONS: Array<{ value: SparkStage; label: string }> = [
+  { value: "spark", label: STAGE_LABELS.spark },
+  { value: "notes", label: STAGE_LABELS.notes },
+  { value: "workshop", label: STAGE_LABELS.workshop },
+  { value: "final", label: STAGE_LABELS.final }
+];
+const STAGE_FILTERS: Array<{ value: StageFilter; label: string }> = [
+  { value: "all", label: "Všetko" },
+  ...STAGE_OPTIONS
+];
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("sk-SK", {
@@ -51,6 +72,10 @@ function sparkTitle(spark: Spark) {
 function sparkPreview(spark: Spark) {
   const compact = spark.text.replace(/\s+/g, " ").trim();
   return compact.length > 96 ? `${compact.slice(0, 96)}...` : compact;
+}
+
+function sparkStageLabel(spark: Spark) {
+  return STAGE_LABELS[normalizeSparkStage(spark.stage)];
 }
 
 function googleSyncUnavailableMessage() {
@@ -103,6 +128,7 @@ export default function App() {
   const googleSyncAvailable = isGoogleDriveSyncConfigured();
   const [sparks, setSparks] = useState<Spark[]>(() => listSparks());
   const [editor, setEditor] = useState<EditorState | null>(null);
+  const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [savedMessage, setSavedMessage] = useState("");
   const [dataMessage, setDataMessage] = useState("");
   const [newSparkDraft, setNewSparkDraft] = useState<NewSparkDraft | undefined>(() =>
@@ -133,8 +159,16 @@ export default function App() {
     () => sparks.find((spark) => spark.id === editor?.id),
     [editor?.id, sparks]
   );
+  const filteredSparks = useMemo(
+    () =>
+      stageFilter === "all"
+        ? sparks
+        : sparks.filter((spark) => normalizeSparkStage(spark.stage) === stageFilter),
+    [sparks, stageFilter]
+  );
 
   const isEditing = Boolean(editor?.id);
+  const activeSparkStage = activeSpark ? normalizeSparkStage(activeSpark.stage) : "spark";
   const canSave = Boolean(editor?.text.trim());
   const isGoogleSyncBusy =
     googleSyncStatus === "authorizing" || googleSyncStatus === "syncing";
@@ -305,6 +339,26 @@ export default function App() {
     if (isNewSpark) {
       scheduleNewSparkDraftSave(text);
     }
+  }
+
+  function handleStageChange(stage: SparkStage) {
+    if (!activeSpark) {
+      return;
+    }
+
+    const updated = updateSparkStage(activeSpark.id, stage);
+
+    if (!updated) {
+      return;
+    }
+
+    setSparks(listSparks());
+    setSavedMessage(
+      `Zošit zmenený na ${STAGE_LABELS[normalizeSparkStage(updated.stage)]} ${formatDate(
+        updated.updatedAt
+      )}`
+    );
+    markLocalChangesForSync();
   }
 
   function applySyncPreferences(patch: Partial<GoogleSyncPreferences>) {
@@ -695,6 +749,23 @@ export default function App() {
             onChange={(event) => handleSparkTextChange(event.target.value)}
           />
 
+          {isEditing && activeSpark ? (
+            <label className="stage-field" htmlFor="spark-stage">
+              <span>Zošit</span>
+              <select
+                id="spark-stage"
+                value={activeSparkStage}
+                onChange={(event) => handleStageChange(event.target.value as SparkStage)}
+              >
+                {STAGE_OPTIONS.map((stage) => (
+                  <option key={stage.value} value={stage.value}>
+                    {stage.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
           <div className="editor-actions">
             <button
               className="save-action"
@@ -722,15 +793,31 @@ export default function App() {
           <span className="spark-count">{sparks.length}</span>
         </div>
 
-        {sparks.length ? (
+        <div className="stage-filters" aria-label="Filtrovať zošity">
+          {STAGE_FILTERS.map((filter) => (
+            <button
+              className="stage-filter"
+              data-active={stageFilter === filter.value}
+              key={filter.value}
+              type="button"
+              aria-pressed={stageFilter === filter.value}
+              onClick={() => setStageFilter(filter.value)}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        {filteredSparks.length ? (
           <div className="spark-list">
-            {sparks.map((spark) => (
+            {filteredSparks.map((spark) => (
               <button
                 className="spark-card"
                 key={spark.id}
                 type="button"
                 onClick={() => openSpark(spark)}
               >
+                <span className="stage-badge">{sparkStageLabel(spark)}</span>
                 <span className="spark-card-title">{sparkTitle(spark)}</span>
                 <span className="spark-card-preview">{sparkPreview(spark)}</span>
                 <span className="spark-card-time">
@@ -742,8 +829,17 @@ export default function App() {
           </div>
         ) : (
           <div className="empty-state">
-            <p>Zatiaľ tu nie je žiadna iskra.</p>
-            <p>Jedno tlačidlo hore stačí. Zachyť len to najnutnejšie.</p>
+            {sparks.length ? (
+              <>
+                <p>V tomto zošite zatiaľ nič nie je.</p>
+                <p>Skús iný filter alebo presuň uloženú iskru do tohto zošita.</p>
+              </>
+            ) : (
+              <>
+                <p>Zatiaľ tu nie je žiadna iskra.</p>
+                <p>Jedno tlačidlo hore stačí. Zachyť len to najnutnejšie.</p>
+              </>
+            )}
           </div>
         )}
       </section>

@@ -22,6 +22,7 @@ body {
 }
 
 button,
+select,
 textarea {
   font: inherit;
 }
@@ -188,6 +189,28 @@ h3 {
   outline: 3px solid rgba(242, 196, 91, 0.2);
 }
 
+.stage-field {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  color: #f1ddb5;
+  font-weight: 800;
+}
+
+.stage-field select {
+  min-height: 3rem;
+  border: 1px solid rgba(242, 196, 91, 0.28);
+  border-radius: 0.5rem;
+  color: #fff8ed;
+  background: #171717;
+  padding: 0 0.85rem;
+}
+
+.stage-field select:focus {
+  border-color: #f2c45b;
+  outline: 3px solid rgba(242, 196, 91, 0.2);
+}
+
 .editor-actions {
   display: grid;
   gap: 0.75rem;
@@ -222,6 +245,35 @@ h3 {
   margin-top: 1rem;
 }
 
+.stage-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.stage-filter {
+  min-height: 2.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: #cfc7ba;
+  background: #1b1b1b;
+  padding: 0 0.8rem;
+  font-weight: 800;
+}
+
+.stage-filter[data-active="true"] {
+  border-color: rgba(242, 196, 91, 0.58);
+  color: #17130b;
+  background: #f2c45b;
+}
+
+.stage-filter:focus,
+.stage-filter:hover {
+  border-color: rgba(242, 196, 91, 0.7);
+  outline: none;
+}
+
 .spark-card {
   display: grid;
   gap: 0.35rem;
@@ -239,6 +291,17 @@ h3 {
 .spark-card:hover {
   border-color: rgba(242, 196, 91, 0.6);
   outline: none;
+}
+
+.stage-badge {
+  justify-self: start;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(242, 196, 91, 0.26);
+  border-radius: 999px;
+  color: #f1ddb5;
+  background: rgba(242, 196, 91, 0.08);
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .spark-card-title {

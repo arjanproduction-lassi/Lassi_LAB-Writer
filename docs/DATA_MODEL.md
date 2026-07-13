@@ -39,6 +39,7 @@ Possible fields:
 - createdAt
 - updatedAt
 - deletedAt
+- stage
 - originHint
 
 `originHint` can be simple text such as "image", "melody", "dream", "line", or
@@ -54,6 +55,19 @@ existing "newer updatedAt wins" merge rule can carry the tombstone.
 Editing an existing spark keeps the same `id` and original `createdAt`, updates
 the text, and sets a fresh `updatedAt`. This lets sync treat the edit as a newer
 version of the same spark instead of a duplicate spark.
+
+`stage` is an optional backward-compatible field for the four-notebook workflow:
+
+- `spark` = Iskra
+- `notes` = Poznámky
+- `workshop` = Dielňa
+- `final` = Text OK
+
+Old sparks without `stage` are treated as `spark`. The four notebooks are not
+separate databases; they are one simple state on the same spark record. Changing
+stage keeps the same `id` and `createdAt`, updates `updatedAt`, and travels
+through manual JSON export/import and Google Drive sync with the rest of the
+spark.
 
 ### v0.1 New Spark Recovery Draft
 
