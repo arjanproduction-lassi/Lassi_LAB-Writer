@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-07-13 - Writer Package storage foundation
+
+- Added separate Writer Package local storage foundation under
+  `lassilab-writer:v0.1:packages`.
+- Kept legacy Sparks in the existing `lassilab-writer:v0.1:sparks` storage.
+- Added package storage helpers for loading, saving, upserting, and finding
+  Writer Packages.
+- Added a read-only package catalog that combines real Writer Packages with
+  legacy Sparks adapted through `adaptSparkToWriterPackage`.
+- The catalog prefers a real Writer Package when the same id also exists as a
+  legacy Spark.
+- The catalog sorts by `updatedAt`, newest first.
+- No UI behavior change, no automatic migration, no Spark storage change, no
+  Writer DB export/import change, and no Google Drive sync payload change.
+
 ## 2026-07-13 - Writer Package legacy adapter
 
 - Added the first runtime-safe Writer Package data bridge.

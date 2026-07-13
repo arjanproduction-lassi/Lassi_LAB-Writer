@@ -376,6 +376,40 @@ Rules:
 - The adapter does not change export/import/sync payloads.
 - The adapter does not run a migration.
 
+## Package Storage Foundation v1
+
+The next infrastructure layer keeps old and new records separate:
+
+```text
+legacy Sparks storage
+   -> read-only adapter
+      \
+       shared read-only catalog
+      /
+WriterPackage storage
+```
+
+Storage keys:
+
+```text
+legacy Sparks:   lassilab-writer:v0.1:sparks
+WriterPackage:   lassilab-writer:v0.1:packages
+```
+
+Rules:
+
+- Old Sparks remain untouched in the Spark storage.
+- Writer Packages have their own storage key.
+- The shared catalog is a read-only view that can show both.
+- The catalog never migrates data.
+- The catalog never writes adapted Sparks back as packages.
+- If a real Writer Package and a legacy Spark have the same id, the real
+  Writer Package wins in the catalog.
+- The catalog sorts by `updatedAt`, newest first.
+
+This prepares the future UI to see one list of works without forcing an
+immediate database migration.
+
 ## What Happens To Stage
 
 Keep `stage` for now.

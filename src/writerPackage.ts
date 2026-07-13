@@ -3,6 +3,24 @@ import type { Spark, WriterPackage } from "./types";
 const UNTITLED_WRITER_PACKAGE_TITLE = "Bez názvu";
 const LEGACY_TITLE_MAX_LENGTH = 72;
 
+export interface CreateWriterPackageInput {
+  title?: string;
+  sparkText: string;
+}
+
+function createWriterPackageId() {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+export function normalizeWriterPackageTitle(value: string | undefined): string {
+  const normalized = value?.replace(/\s+/g, " ").trim();
+  return normalized || UNTITLED_WRITER_PACKAGE_TITLE;
+}
+
 export function deriveLegacyWriterPackageTitle(text: string): string {
   const firstContentLine = text
     .split(/\r?\n/)
@@ -36,5 +54,21 @@ export function adaptSparkToWriterPackage(spark: Spark): WriterPackage {
       source: "spark",
       ...(spark.stage ? { stage: spark.stage } : {})
     }
+  };
+}
+
+export function createWriterPackage(input: CreateWriterPackageInput): WriterPackage {
+  const now = new Date().toISOString();
+
+  return {
+    id: createWriterPackageId(),
+    title: normalizeWriterPackageTitle(input.title),
+    sparkText: input.sparkText.trim(),
+    notes: [],
+    workshopText: "",
+    finalText: "",
+    createdAt: now,
+    updatedAt: now,
+    packageVersion: 1
   };
 }

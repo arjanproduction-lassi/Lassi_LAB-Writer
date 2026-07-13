@@ -39,14 +39,17 @@ The first code bridge is intentionally small:
 - add the `WriterPackage` and `WriterPackageNote` types
 - keep `Spark` as the active legacy storage model
 - adapt old Sparks into read-only package views
+- store Writer Packages under their own local key
+- provide a read-only catalog that can show real packages and adapted legacy
+  Sparks together
 - do not migrate local data automatically
 - do not change the Writer DB export/import format yet
 - do not change Google Drive sync payloads yet
 
 Next implementation decision:
 
-- decide how to start saving new captures as `WriterPackage` records without
-  damaging old Spark data or breaking sync/export/import compatibility
+- design the next Writer DB/export/sync payload that can carry
+  `WriterPackage` records while preserving legacy Spark compatibility
 
 ## Repository Setup Tasks
 

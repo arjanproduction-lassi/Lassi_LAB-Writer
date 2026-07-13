@@ -208,6 +208,56 @@ Rules:
 - It does not change Google Drive sync payloads.
 - It does not run an automatic migration.
 
+### v1 Package Storage Foundation
+
+Writer Package now has a separate local storage foundation.
+
+Storage key:
+
+```text
+lassilab-writer:v0.1:packages
+```
+
+This key is separate from the existing Spark key:
+
+```text
+lassilab-writer:v0.1:sparks
+```
+
+Rules:
+
+- Legacy Sparks remain in the old Spark storage.
+- Writer Packages are stored in the package storage.
+- The package storage does not rewrite or migrate Spark records.
+- The current Writer DB export/import format still exports Sparks only.
+- Google Drive sync still carries the existing Writer DB payload.
+- The existing DB `schemaVersion` is unchanged.
+
+Package storage helpers:
+
+- `loadWriterPackages()`
+- `saveWriterPackages(packages)`
+- `upsertWriterPackage(writerPackage)`
+- `getWriterPackageById(id)`
+- `loadWriterPackageCatalog()`
+
+Validation rules for loading:
+
+- `packageVersion` must be `1`
+- `id` must be a non-empty string
+- `title`, `sparkText`, `workshopText`, and `finalText` must be strings
+- `notes` must be an array of valid notes
+- timestamps must be valid ISO-readable date strings
+- invalid package records are ignored so one damaged record cannot break the
+  app
+
+The shared catalog is read-only. It combines real Writer Packages from package
+storage with legacy Sparks adapted through `adaptSparkToWriterPackage`. If the
+same id exists in both storages, the real Writer Package wins. The catalog is
+sorted by `updatedAt`, newest first.
+
+No automatic migration runs in this step.
+
 ### v0.1 New Spark Recovery Draft
 
 Temporary local storage key:
