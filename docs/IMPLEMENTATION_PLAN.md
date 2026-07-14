@@ -110,8 +110,10 @@ type WriterDb = WriterDbV1 | WriterDbV2;
 
 Small commits:
 
-1. Add TypeScript types and validators for `WriterDbV2`.
-2. Add a read-only parser that accepts v1 and v2.
+1. Add TypeScript types and validators for `WriterDbV2`. Done as read-only
+   foundation in `src/writerDb.ts`.
+2. Add a read-only parser that accepts v1 and v2. Done locally without changing
+   production import/export behavior.
 3. Add manual v2 export.
 4. Add manual import that can merge v1 and v2 safely.
 5. Add tests and local backups that cover Sparks and Packages.
@@ -131,6 +133,8 @@ Rules:
 - No automatic Spark-to-Package migration.
 - No production Google sync payload change until v2 rollout is explicitly
   planned and tested.
+- The parser is read-only and must not persist, migrate, or partially accept a
+  corrupted payload as if it were healthy.
 
 ## Explicit Non-Goals
 

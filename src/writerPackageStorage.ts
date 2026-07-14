@@ -15,7 +15,7 @@ function isSparkStage(value: unknown): value is SparkStage {
   return typeof value === "string" && SPARK_STAGES.has(value as SparkStage);
 }
 
-function isWriterPackageNote(value: unknown): value is WriterPackageNote {
+export function isWriterPackageNote(value: unknown): value is WriterPackageNote {
   if (!value || typeof value !== "object") {
     return false;
   }
@@ -31,7 +31,7 @@ function isWriterPackageNote(value: unknown): value is WriterPackageNote {
   );
 }
 
-function isWriterPackage(value: unknown): value is WriterPackage {
+export function isWriterPackage(value: unknown): value is WriterPackage {
   if (!value || typeof value !== "object") {
     return false;
   }

@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-07-14 - Read-only Writer DB parser foundation
+
+- Added a read-only `WriterDbV1 | WriterDbV2` parser foundation in
+  `src/writerDb.ts`.
+- The parser validates the app marker, `schemaVersion`, `exportedAt`, counts,
+  Sparks, and v2 Writer Packages.
+- Counts remain informational only; the arrays are the source of truth.
+- Invalid JSON, unsupported versions, or invalid records return `ok: false`
+  instead of throwing an unhandled error.
+- The parser does not write to localStorage, does not migrate data, does not
+  create v2 payloads, and does not change production export/import or Google
+  Drive sync.
+- The next smallest step is manual v2 export, not Google sync.
+
 ## 2026-07-13 - Writer DB v2 design
 
 - Documented a proposed Writer DB v2 envelope that can carry both legacy

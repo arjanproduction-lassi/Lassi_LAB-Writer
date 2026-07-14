@@ -301,6 +301,23 @@ Rules:
 - v2 must not perform lossy conversion from Sparks to Packages.
 - v2 must not pretend to know historical original sparks for legacy Spark data.
 
+### Read-Only Parser Foundation
+
+`src/writerDb.ts` contains the first read-only parser foundation for
+`WriterDbV1 | WriterDbV2`.
+
+Current behavior:
+
+- it validates v1 and v2 envelopes without writing anything
+- it returns `{ ok: false }` for unsupported versions, invalid JSON, or invalid
+  records inside `sparks` or `packages`
+- it treats `sparkCount` and `packageCount` as informational only
+- it does not create v2 payloads
+- it does not run a migration
+- it does not change localStorage
+- production export/import still uses the existing v1 format
+- Google Drive sync still uses the existing v1 remote payload
+
 ### Export Rules
 
 Recommended v2 file name:

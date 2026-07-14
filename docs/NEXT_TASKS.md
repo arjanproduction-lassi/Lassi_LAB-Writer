@@ -55,18 +55,21 @@ Next implementation decision:
 
 Do not start with Google sync or UI.
 
-Smallest safe first implementation step for Writer DB v2:
+First implementation step for Writer DB v2:
 
 1. Add `WriterDbV1`, `WriterDbV2`, and `WriterDb` TypeScript types.
 2. Add validators for v1 and v2 envelopes.
 3. Add a read-only parser that can identify v1 vs v2 without writing anything.
 4. Keep current export/import and Google sync behavior unchanged.
 
+Status: prepared locally in `src/writerDb.ts`. It does not create v2 payloads,
+does not persist anything, and does not change current production import/export.
+
 After that:
 
 1. Add manual v2 export.
 2. Add manual v1/v2 import with backups.
-3. Add tests for merge and tombstones.
+3. Add tests for parser validation, merge, id conflicts, and tombstones.
 4. Only then plan Google Drive v2 sync rollout.
 5. Only after that begin production creation of WriterPackages.
 6. Only after packages can travel safely build the new workspace UI.
