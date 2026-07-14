@@ -1,5 +1,24 @@
 # Worklog
 
+## 2026-07-13 - Writer DB v2 design
+
+- Documented a proposed Writer DB v2 envelope that can carry both legacy
+  `Spark` records and new `WriterPackage` records.
+- Clarified that `sparkCount` and `packageCount` are informational only; the
+  arrays are the source of truth.
+- Documented v1/v2 import compatibility rules: v1 imports merge Sparks only,
+  v2 imports merge Sparks and Packages, missing records do not imply deletion,
+  tombstones remain valid, and newer `updatedAt` wins.
+- Documented temporary Spark/Package id conflicts: both can coexist, the
+  read-only catalog prefers WriterPackage, and final migration is a separate
+  explicit step.
+- Recommended whole-package merge by package `id` and top-level `updatedAt` as
+  the smallest safe first merge model.
+- Added a phased Google Drive rollout plan from v1-only sync to v2 primary sync
+  without creating two equal write targets.
+- No runtime code changes, no export/import behavior change, no Google sync
+  payload change, and no automatic migration.
+
 ## 2026-07-13 - Writer Package storage foundation
 
 - Added separate Writer Package local storage foundation under

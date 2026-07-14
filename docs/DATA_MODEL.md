@@ -258,6 +258,141 @@ sorted by `updatedAt`, newest first.
 
 No automatic migration runs in this step.
 
+## Writer DB v2 Proposal
+
+This is a design proposal only. Runtime code still writes the existing Writer DB
+v1 payload.
+
+### Schema Types
+
+Current v1 payload:
+
+```ts
+type WriterDbV1 = {
+  app: "LassiLAB Writer";
+  schemaVersion: 1;
+  exportedAt: string;
+  sparkCount: number;
+  sparks: Spark[];
+};
+```
+
+Proposed v2 payload:
+
+```ts
+type WriterDbV2 = {
+  app: "LassiLAB Writer";
+  schemaVersion: 2;
+  exportedAt: string;
+  sparkCount: number;
+  packageCount: number;
+  sparks: Spark[];
+  packages: WriterPackage[];
+};
+
+type WriterDb = WriterDbV1 | WriterDbV2;
+```
+
+Rules:
+
+- `sparkCount` and `packageCount` are informational only.
+- The actual source of truth is the content of `sparks` and `packages`.
+- v2 must be able to carry legacy Sparks and Writer Packages at the same time.
+- v2 must not perform lossy conversion from Sparks to Packages.
+- v2 must not pretend to know historical original sparks for legacy Spark data.
+
+### Export Rules
+
+Recommended v2 file name:
+
+```text
+LassiLAB_Writer_DBv002_YYYY-MM-DD.json
+```
+
+v2 export should include:
+
+- all current Spark records, including `deletedAt` tombstones
+- all current WriterPackage records, including future `deletedAt` tombstones
+- `packages: []` even when no packages exist yet
+- informational `sparkCount` and `packageCount`
+
+The v1 export should not be removed until a clear rollout proves that all active
+devices can read v2 safely. During rollout, v1 may remain a manual compatibility
+export or read-only fallback.
+
+### Import Compatibility Rules
+
+- v1 import remains supported.
+- v1 import merges Sparks only.
+- v1 import must not delete or overwrite existing Writer Packages.
+- v2 import merges both Sparks and Writer Packages.
+- Absence of a Spark or Package from an imported file never means local deletion.
+- `deletedAt` tombstones must be respected.
+- Newer `updatedAt` wins for records with the same id.
+- A local backup must be created before applying import changes.
+- Invalid payloads must leave local data untouched.
+
+### ID Conflicts
+
+The same id may temporarily exist as both a legacy Spark and a real
+WriterPackage.
+
+Rules:
+
+- Both records may exist during transition.
+- The shared read-only catalog prefers the real WriterPackage.
+- Import must not automatically delete the Spark when a Package with the same id
+  appears.
+- Final migration or cleanup must be a separate explicit step.
+
+### WriterPackage Merge Rules
+
+Minimum safe v1 package merge:
+
+- merge by package `id`
+- require compatible `packageVersion`
+- newer top-level package `updatedAt` wins
+- preserve `deletedAt` tombstones using the same newer-`updatedAt` rule
+- do not merge notes individually yet
+
+Why whole-package merge first:
+
+- It is the smallest implementation surface.
+- It avoids inventing complex conflict rules before the workspace UI exists.
+- It matches the current Spark merge model.
+
+Future safer merge may merge notes by `note.id` and `note.updatedAt`, and may
+merge individual layers by layer timestamps if the UI later supports parallel
+editing on different devices.
+
+### Backup And Recovery
+
+Before v2 import or v2 sync merge, Writer should create a backup that contains
+both local Sparks and local Writer Packages.
+
+Recommended backup contents:
+
+- app name
+- backup schema/version marker
+- backup timestamp
+- Spark storage key and Sparks
+- Package storage key and Packages
+
+If a v2 payload is malformed, invalid, or only partially valid, it must not
+overwrite local data. Invalid individual records can be skipped only when the
+payload envelope itself is trustworthy and a backup already exists.
+
+### Version Meanings
+
+These versions are different and must not be mixed:
+
+- Spark `schemaVersion: 1` describes the shape of one Spark record.
+- Writer DB `schemaVersion: 1 | 2` describes the export/import/sync envelope.
+- WriterPackage `packageVersion: 1` describes the shape of one WriterPackage
+  record.
+
+Changing one of these does not automatically imply changing the others.
+
 ### v0.1 New Spark Recovery Draft
 
 Temporary local storage key:

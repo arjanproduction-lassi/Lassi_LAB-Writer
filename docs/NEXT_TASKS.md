@@ -51,6 +51,26 @@ Next implementation decision:
 - design the next Writer DB/export/sync payload that can carry
   `WriterPackage` records while preserving legacy Spark compatibility
 
+## Next Technical Slice
+
+Do not start with Google sync or UI.
+
+Smallest safe first implementation step for Writer DB v2:
+
+1. Add `WriterDbV1`, `WriterDbV2`, and `WriterDb` TypeScript types.
+2. Add validators for v1 and v2 envelopes.
+3. Add a read-only parser that can identify v1 vs v2 without writing anything.
+4. Keep current export/import and Google sync behavior unchanged.
+
+After that:
+
+1. Add manual v2 export.
+2. Add manual v1/v2 import with backups.
+3. Add tests for merge and tombstones.
+4. Only then plan Google Drive v2 sync rollout.
+5. Only after that begin production creation of WriterPackages.
+6. Only after packages can travel safely build the new workspace UI.
+
 ## Repository Setup Tasks
 
 - Confirm this folder is the intended Git worktree.
@@ -88,6 +108,8 @@ Next implementation decision:
   wins and no duplicate spark appears.
 - Test four-notebook stage changes across PC and mobile; confirm newer
   `updatedAt` wins and the stage travels through sync/export/import.
+- Design tests for Writer DB v2 parsing, v1 compatibility, package merge,
+  Spark/Package id conflicts, and deleted tombstones.
 - Tune the quiet sync interval if real PC/mobile use shows it is too eager or
   too slow.
 - Consider a gentle sync-on-open pull only if Google can do it without a popup

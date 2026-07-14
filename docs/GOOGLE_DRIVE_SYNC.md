@@ -87,6 +87,95 @@ Deleted sparks are included as tombstones with `deletedAt`. They stay hidden
 from normal Writer lists, but remain in the sync payload so deletes can travel
 between devices.
 
+## Future Writer DB v2 Rollout
+
+Current production sync uses:
+
+```text
+lassilab-writer-db-v001.json
+```
+
+Future WriterPackage sync should use a separate v2 file, for example:
+
+```text
+lassilab-writer-db-v002.json
+```
+
+This rollout is intentionally cautious because one author may use PC, notebook,
+tablet, and mobile, and not all devices refresh at exactly the same time.
+
+### v2 Payload Goal
+
+The v2 payload should carry both models:
+
+```ts
+type WriterDbV2 = {
+  app: "LassiLAB Writer";
+  schemaVersion: 2;
+  exportedAt: string;
+  sparkCount: number;
+  packageCount: number;
+  sparks: Spark[];
+  packages: WriterPackage[];
+};
+```
+
+`sparkCount` and `packageCount` are informational only. The `sparks` and
+`packages` arrays are the source of truth.
+
+### Rollout Phases
+
+Phase A: dual-read, v1-write
+
+- New clients can parse local/manual v1 and proposed v2 payloads.
+- Google sync still writes only `lassilab-writer-db-v001.json`.
+- No production UI creates WriterPackage records yet.
+- This proves v2 parsing and validation without risking remote sync data.
+
+Phase B: v2 manual export/import
+
+- Manual export can produce `LassiLAB_Writer_DBv002_YYYY-MM-DD.json`.
+- Manual import accepts both v1 and v2.
+- v1 import merges Sparks only and must not touch Packages.
+- v2 import merges Sparks and Packages.
+- No Google v2 writing yet.
+
+Phase C: v2 remote shadow/readiness
+
+- New clients may create or read `lassilab-writer-db-v002.json`.
+- v1 sync remains the production source for Sparks.
+- Writer warns or blocks package sync until all active devices are refreshed to
+  a client that understands v2.
+- This avoids a stale v1-only client overwriting or ignoring v2 package data.
+
+Phase D: v2 primary sync
+
+- After the author confirms all active devices have the new client, v2 becomes
+  the primary remote file.
+- Sync reads/writes `lassilab-writer-db-v002.json`.
+- v1 remains read-only fallback or backup.
+- v1 should not be updated from v2 automatically unless a separate compatibility
+  export is deliberately designed.
+
+### Split-Brain Avoidance
+
+Do not run v1 and v2 as equal write targets indefinitely. That would create two
+remote truths. During transition, there should be a clear primary write target:
+
+- early rollout: v1 is primary, v2 is read/manual/shadow
+- later rollout: v2 is primary, v1 is fallback/backup
+
+### v2 Sync Safety Rules
+
+- Invalid remote v2 payload must leave local data untouched.
+- A v2 sync backup must include both local Sparks and local WriterPackages.
+- Missing records in the remote payload do not imply local deletion.
+- `deletedAt` tombstones travel in both `sparks` and `packages`.
+- Newer `updatedAt` wins for records with the same id.
+- Same id may exist as Spark and Package during transition; sync must not delete
+  the Spark automatically.
+- The shared catalog can prefer Package for display, but storage stays separate.
+
 ## Safety Rules
 
 - If authorization fails, local data is untouched.

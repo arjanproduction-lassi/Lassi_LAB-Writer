@@ -79,6 +79,59 @@ The Google Drive sync stores the same Writer DB shape in:
 Sync also merges by `id`, keeps the newer `updatedAt`, avoids duplicates, and
 backs up local sparks before applying a remote merge.
 
+## Writer DB v2 Rollout Plan
+
+Writer DB v2 is the proposed future export/import/sync envelope for carrying
+both legacy Sparks and WriterPackages.
+
+Proposed shape:
+
+```ts
+type WriterDbV1 = {
+  app: "LassiLAB Writer";
+  schemaVersion: 1;
+  exportedAt: string;
+  sparkCount: number;
+  sparks: Spark[];
+};
+
+type WriterDbV2 = {
+  app: "LassiLAB Writer";
+  schemaVersion: 2;
+  exportedAt: string;
+  sparkCount: number;
+  packageCount: number;
+  sparks: Spark[];
+  packages: WriterPackage[];
+};
+
+type WriterDb = WriterDbV1 | WriterDbV2;
+```
+
+Small commits:
+
+1. Add TypeScript types and validators for `WriterDbV2`.
+2. Add a read-only parser that accepts v1 and v2.
+3. Add manual v2 export.
+4. Add manual import that can merge v1 and v2 safely.
+5. Add tests and local backups that cover Sparks and Packages.
+6. Only then design Google Drive v2 sync.
+7. Only after v2 sync is safe, start creating WriterPackages from production UI.
+8. Only after packages exist safely across devices, build the workspace UI.
+
+Rules:
+
+- v1 import keeps working.
+- v1 import merges Sparks only.
+- v1 import must not delete or overwrite WriterPackages.
+- v2 import merges Sparks and WriterPackages.
+- Missing records never mean deletion.
+- `deletedAt` tombstones and newer `updatedAt` wins remain the conflict rules.
+- `sparkCount` and `packageCount` are informational; arrays are source of truth.
+- No automatic Spark-to-Package migration.
+- No production Google sync payload change until v2 rollout is explicitly
+  planned and tested.
+
 ## Explicit Non-Goals
 
 - No AI or Kováč implementation.

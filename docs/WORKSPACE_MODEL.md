@@ -290,14 +290,26 @@ Future DB payload can eventually contain:
   app: "LassiLAB Writer";
   schemaVersion: 2;
   exportedAt: string;
+  sparkCount: number;
+  packageCount: number;
+  sparks: Spark[];
   packages: WriterPackage[];
-  legacySparks?: Spark[];
 }
 ```
 
-For the first code step, a full schema jump is not required. The safer path is
-to add package/layer data additively while keeping existing Spark records and
-storage readable.
+For rollout, the v2 envelope should carry both `sparks` and `packages`.
+`sparkCount` and `packageCount` are informational only; the arrays are the source
+of truth.
+
+The v2 envelope must not convert old Sparks into Packages automatically. Old
+Sparks and new Packages can coexist. If the same id appears in both, the
+read-only catalog prefers the WriterPackage for display, but import/sync must
+not delete the legacy Spark. Any final migration is a separate explicit product
+step.
+
+For the first code step, changing the DB envelope is still not required. The
+safer path is to add package/layer data additively, then introduce v2
+export/import, then introduce v2 sync.
 
 ## Migration From Current Sparks
 
