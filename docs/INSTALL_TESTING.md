@@ -51,18 +51,23 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
+- The summary reports 27 checks: 13 existing parser/export checks and 14 pure
+  import-preview checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
-- No v2 import merge is performed.
+- Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
+  v2 package comparison, warnings, duplicate-id blocking, immutability, and no
+  localStorage access.
+- No import merge, backup, or storage write is performed.
 
-## Future Previewed Import Checks (Not Implemented)
+## Writer DB Import Preview Checks
 
-The manual v1/v2 import contract is documented but has no runtime path yet.
-Selecting a file must eventually perform only parsing and read-only preview. It
-must not write until the user explicitly confirms import and a complete local
-backup can be validated.
+Pure `previewWriterDbImport` is implemented for local checks, but it is not
+connected to production import or UI. It receives a successfully parsed DB and
+local arrays as inputs. It does not read or write localStorage, merge records,
+create a backup, or change its inputs.
 
-Future automated checks must cover:
+Current automated checks cover:
 
 - v1 previews Sparks while WriterPackages report `untouched` with zero changes
 - v2 previews Sparks and WriterPackages independently
@@ -72,23 +77,14 @@ Future automated checks must cover:
 - missing incoming ids leave local records unchanged
 - count mismatch and cross-model id overlap remain informational warnings
 - duplicate ids inside one incoming collection block import
-- WriterPackages merge as whole records; notes are not merged individually
-- preview, backup creation, and in-memory merge do not touch localStorage or
-  mutate their inputs
-- both model orders are preserved, with new incoming records appended in source
-  order
-- a validated backup exists before production writes
-- failure between the Spark and WriterPackage writes restores the prior state or
-  leaves a prepared marker for explicit recovery
+- WriterPackages are compared as whole records by top-level `updatedAt`; notes
+  are not evaluated as individual merge units
+- preview does not touch localStorage or mutate incoming data, local arrays, or
+  nested notes
 
-The planned unified backup key is:
-
-```text
-lassilab-writer:v0.1:writer-db:backup-before-import
-```
-
-The current production v1 import continues to use its existing Spark-only
-backup key until the previewed importer is implemented and separately tested.
+The next harness extension will cover pure in-memory merge behavior. The
+planned unified backup key, rollback, transaction marker, and preview UI remain
+documentation only and are not created by the current runtime or checks.
 
 ## Test The Production Build Locally
 

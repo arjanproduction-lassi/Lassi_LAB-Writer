@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-16 - Pure Writer DB v1/v2 import preview
+
+- Added pure `previewWriterDbImport` with explicit parsed DB, local Sparks, and
+  local WriterPackages inputs.
+- Added deterministic create, update, unchanged, ignored-older, and incoming
+  tombstone counts for v1 and v2.
+- Kept v1 WriterPackages in `untouched` mode and compared v2 Sparks and
+  WriterPackages as independent collections.
+- Added informational warnings for count mismatch, v1 untouched Packages,
+  tombstones, empty imports, and same ids across models.
+- Added blocking issues only for duplicate ids inside one incoming collection.
+- Extended `npm run check:writer-db` from 13 to 27 checks, including preview
+  immutability and a throwing localStorage guard.
+- No merge, backup, rollback, transaction marker, UI, production import, or
+  Google Drive sync behavior was added.
+- The next smallest step is pure `mergeWriterDbInMemory`, still without any
+  localStorage access or production UI.
+
 ## 2026-07-16 - Writer DB v1/v2 import safety contract (docs only)
 
 - Documented a deterministic read-only preview model for manual Writer DB v1

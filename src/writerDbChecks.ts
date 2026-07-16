@@ -1,10 +1,18 @@
 import type { Spark, WriterPackage } from "./types";
+import type {
+  ImportCollectionPreview,
+  WriterDb,
+  WriterDbImportPreview,
+  WriterDbV1
+} from "./writerDb";
 import {
   WRITER_DB_APP_NAME,
+  WRITER_DB_V1_SCHEMA_VERSION,
   WRITER_DB_V2_SCHEMA_VERSION,
   createWriterDbV2Payload,
   parseWriterDbJson,
-  parseWriterDbPayload
+  parseWriterDbPayload,
+  previewWriterDbImport
 } from "./writerDb";
 
 type TestCase = {
@@ -129,6 +137,52 @@ function createV2(sparks: Spark[], packages: WriterPackage[]) {
   });
 }
 
+function createV1(sparks: Spark[], sparkCount = sparks.length): WriterDbV1 {
+  return {
+    app: WRITER_DB_APP_NAME,
+    schemaVersion: WRITER_DB_V1_SCHEMA_VERSION,
+    exportedAt: EXPORTED_AT,
+    sparkCount,
+    sparks
+  };
+}
+
+function preview(
+  incoming: WriterDb,
+  localSparks: readonly Spark[] = [],
+  localPackages: readonly WriterPackage[] = []
+): WriterDbImportPreview {
+  return previewWriterDbImport({
+    incoming,
+    localSparks,
+    localPackages
+  });
+}
+
+function warningCodes(result: WriterDbImportPreview) {
+  return result.warnings.map((warning) => warning.code);
+}
+
+function blockingIssueCodes(result: WriterDbImportPreview) {
+  return result.blockingIssues.map((issue) => issue.code);
+}
+
+function collectionPreview(
+  mode: ImportCollectionPreview["mode"],
+  overrides: Partial<ImportCollectionPreview> = {}
+): ImportCollectionPreview {
+  return {
+    mode,
+    incoming: 0,
+    create: 0,
+    update: 0,
+    unchanged: 0,
+    ignoredOlder: 0,
+    tombstones: 0,
+    ...overrides
+  };
+}
+
 function assertRoundTrip(
   name: string,
   sparks: Spark[],
@@ -156,7 +210,7 @@ function cloneJson<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
 
-const tests: TestCase[] = [
+const parserAndExportTests: TestCase[] = [
   {
     name: "empty v2 DB round-trips",
     run: () => assertRoundTrip("empty", [], [])
@@ -290,6 +344,312 @@ const tests: TestCase[] = [
   }
 ];
 
+const importPreviewTests: TestCase[] = [
+  {
+    name: "v1 previews new Sparks and leaves Packages untouched",
+    run: () => {
+      const result = preview(createV1([normalSpark]), [], [basicPackage]);
+
+      assert(result.status === "ready", "v1 new Spark preview should be ready");
+      assertDeepEqual(
+        result.sparks,
+        collectionPreview("merge", { incoming: 1, create: 1 }),
+        "v1 new Spark counts are wrong"
+      );
+      assertDeepEqual(
+        result.packages,
+        collectionPreview("untouched"),
+        "v1 should leave Packages untouched"
+      );
+      assertDeepEqual(
+        result.source,
+        {
+          declaredSparkCount: 1,
+          actualSparkCount: 1,
+          declaredPackageCount: null,
+          actualPackageCount: 0
+        },
+        "v1 source counts are wrong"
+      );
+      assertDeepEqual(
+        warningCodes(result),
+        ["v1-packages-untouched"],
+        "v1 untouched warning is missing"
+      );
+    }
+  },
+  {
+    name: "v1 previews a newer Spark as update",
+    run: () => {
+      const incoming = {
+        ...normalSpark,
+        text: "Newer incoming text",
+        updatedAt: "2026-07-16T10:02:00.000Z"
+      };
+      const result = preview(createV1([incoming]), [normalSpark]);
+
+      assertDeepEqual(
+        result.sparks,
+        collectionPreview("merge", { incoming: 1, update: 1 }),
+        "newer Spark should preview as update"
+      );
+    }
+  },
+  {
+    name: "v1 previews an older Spark as ignoredOlder",
+    run: () => {
+      const incoming = {
+        ...normalSpark,
+        text: "Older incoming text",
+        updatedAt: "2026-07-16T09:59:00.000Z"
+      };
+      const result = preview(createV1([incoming]), [normalSpark]);
+
+      assertDeepEqual(
+        result.sparks,
+        collectionPreview("merge", { incoming: 1, ignoredOlder: 1 }),
+        "older Spark should be ignored"
+      );
+    }
+  },
+  {
+    name: "v1 previews an equal Spark timestamp as unchanged",
+    run: () => {
+      const incoming = { ...normalSpark, text: "Different text with equal timestamp" };
+      const result = preview(createV1([incoming]), [normalSpark]);
+
+      assertDeepEqual(
+        result.sparks,
+        collectionPreview("merge", { incoming: 1, unchanged: 1 }),
+        "equal Spark timestamp should be unchanged"
+      );
+    }
+  },
+  {
+    name: "v2 previews new Sparks and Packages independently",
+    run: () => {
+      const result = preview(createV2([normalSpark], [basicPackage]));
+
+      assert(result.status === "ready", "v2 new records preview should be ready");
+      assertDeepEqual(
+        result.sparks,
+        collectionPreview("merge", { incoming: 1, create: 1 }),
+        "v2 new Spark counts are wrong"
+      );
+      assertDeepEqual(
+        result.packages,
+        collectionPreview("merge", { incoming: 1, create: 1 }),
+        "v2 new Package counts are wrong"
+      );
+      assertDeepEqual(result.warnings, [], "valid v2 new records should have no warnings");
+    }
+  },
+  {
+    name: "v2 previews Package update by top-level updatedAt",
+    run: () => {
+      const incomingPackage: WriterPackage = {
+        ...basicPackage,
+        notes: [packageWithNotes.notes[0]],
+        workshopText: "New workshop text",
+        updatedAt: "2026-07-16T11:05:00.000Z"
+      };
+      const result = preview(createV2([], [incomingPackage]), [], [basicPackage]);
+
+      assertDeepEqual(
+        result.packages,
+        collectionPreview("merge", { incoming: 1, update: 1 }),
+        "newer Package should preview as one whole-record update"
+      );
+    }
+  },
+  {
+    name: "newer incoming tombstone follows updatedAt and previews as update",
+    run: () => {
+      const incoming: Spark = {
+        ...normalSpark,
+        updatedAt: "2026-07-16T10:03:00.000Z",
+        deletedAt: "2026-07-16T10:03:00.000Z"
+      };
+      const result = preview(createV2([incoming], []), [normalSpark]);
+
+      assertDeepEqual(
+        result.sparks,
+        collectionPreview("merge", { incoming: 1, update: 1, tombstones: 1 }),
+        "newer tombstone should preview as update"
+      );
+      assertDeepEqual(
+        warningCodes(result),
+        ["contains-tombstones"],
+        "newer tombstone warning is missing"
+      );
+    }
+  },
+  {
+    name: "older incoming tombstone follows updatedAt and is ignored",
+    run: () => {
+      const local: Spark = {
+        ...normalSpark,
+        updatedAt: "2026-07-16T10:05:00.000Z"
+      };
+      const incoming: Spark = {
+        ...normalSpark,
+        updatedAt: "2026-07-16T10:02:00.000Z",
+        deletedAt: "2026-07-16T10:02:00.000Z"
+      };
+      const result = preview(createV2([incoming], []), [local]);
+
+      assertDeepEqual(
+        result.sparks,
+        collectionPreview("merge", { incoming: 1, ignoredOlder: 1, tombstones: 1 }),
+        "older tombstone should remain ignoredOlder"
+      );
+      assertDeepEqual(
+        warningCodes(result),
+        ["contains-tombstones"],
+        "older tombstone warning is missing"
+      );
+    }
+  },
+  {
+    name: "count mismatches add warnings without blocking preview",
+    run: () => {
+      const parsed = parseWriterDbPayload({
+        ...createV2([normalSpark], [basicPackage]),
+        sparkCount: 99,
+        packageCount: 77
+      });
+
+      assert(parsed.ok, "count mismatch payload should parse before preview");
+      const result = preview(parsed.db);
+
+      assert(result.status === "ready", "count mismatch should not block preview");
+      assertDeepEqual(
+        warningCodes(result),
+        ["count-mismatch", "count-mismatch"],
+        "count mismatch warning order is wrong"
+      );
+      const [sparkWarning, packageWarning] = result.warnings;
+      assert(
+        sparkWarning.code === "count-mismatch" && sparkWarning.collection === "sparks",
+        "Spark count mismatch warning is wrong"
+      );
+      assert(
+        packageWarning.code === "count-mismatch" && packageWarning.collection === "packages",
+        "Package count mismatch warning is wrong"
+      );
+    }
+  },
+  {
+    name: "empty v2 import stays ready and adds warning",
+    run: () => {
+      const result = preview(createV2([], []));
+
+      assert(result.status === "ready", "empty import should remain ready");
+      assertDeepEqual(result.sparks, collectionPreview("merge"), "empty Spark preview is wrong");
+      assertDeepEqual(result.packages, collectionPreview("merge"), "empty Package preview is wrong");
+      assertDeepEqual(warningCodes(result), ["empty-import"], "empty import warning is missing");
+    }
+  },
+  {
+    name: "same id across Spark and Package adds informational warning",
+    run: () => {
+      const result = preview(createV2([sharedIdSpark], [sharedIdPackage]));
+
+      assert(result.status === "ready", "cross-model id should not block preview");
+      assertDeepEqual(
+        warningCodes(result),
+        ["cross-model-id-overlap"],
+        "cross-model id warning is missing"
+      );
+      const warning = result.warnings[0];
+      assert(
+        warning.code === "cross-model-id-overlap" && warning.count === 1,
+        "cross-model id warning count is wrong"
+      );
+      assert(result.sparks.create === 1, "shared-id Spark should remain independent");
+      assert(result.packages.create === 1, "shared-id Package should remain independent");
+    }
+  },
+  {
+    name: "previewWriterDbImport does not mutate incoming or local data",
+    run: () => {
+      const incoming = createV2([deletedSpark], [packageWithNotes]);
+      const localSparks = [normalSpark, stagedSpark];
+      const localPackages = [basicPackage, packageWithNotes];
+      const incomingBefore = cloneJson(incoming);
+      const localSparksBefore = cloneJson(localSparks);
+      const localPackagesBefore = cloneJson(localPackages);
+
+      preview(incoming, localSparks, localPackages);
+
+      assertDeepEqual(incoming, incomingBefore, "preview mutated incoming DB");
+      assertDeepEqual(localSparks, localSparksBefore, "preview mutated local Sparks");
+      assertDeepEqual(localPackages, localPackagesBefore, "preview mutated local Packages or notes");
+    }
+  },
+  {
+    name: "previewWriterDbImport does not touch localStorage",
+    run: () => {
+      let localStorageTouches = 0;
+      const throwingStorage = {
+        getItem(_key: string) {
+          localStorageTouches += 1;
+          throw new Error("previewWriterDbImport touched localStorage");
+        },
+        setItem(_key: string, _value: string) {
+          localStorageTouches += 1;
+          throw new Error("previewWriterDbImport touched localStorage");
+        },
+        removeItem(_key: string) {
+          localStorageTouches += 1;
+          throw new Error("previewWriterDbImport touched localStorage");
+        }
+      };
+
+      (globalThis as unknown as { window: { localStorage: typeof throwingStorage } }).window = {
+        localStorage: throwingStorage
+      };
+
+      const result = preview(createV2([normalSpark], [basicPackage]));
+
+      assert(result.status === "ready", "valid preview should remain ready");
+      assert(localStorageTouches === 0, "preview touched localStorage");
+    }
+  },
+  {
+    name: "duplicate ids inside incoming collections block preview",
+    run: () => {
+      const duplicateSpark: Spark = {
+        ...normalSpark,
+        text: "Duplicate Spark",
+        updatedAt: "2026-07-16T10:02:00.000Z"
+      };
+      const duplicatePackage: WriterPackage = {
+        ...basicPackage,
+        title: "Duplicate Package",
+        updatedAt: "2026-07-16T11:02:00.000Z"
+      };
+      const result = preview(
+        createV2(
+          [normalSpark, duplicateSpark],
+          [basicPackage, duplicatePackage]
+        )
+      );
+
+      assert(result.status === "blocked", "duplicate ids should block preview");
+      assertDeepEqual(
+        blockingIssueCodes(result),
+        ["duplicate-spark-id", "duplicate-package-id"],
+        "duplicate blocking issue order is wrong"
+      );
+      assert(result.blockingIssues[0].count === 1, "duplicate Spark id count is wrong");
+      assert(result.blockingIssues[1].count === 1, "duplicate Package id count is wrong");
+    }
+  }
+];
+
+const tests: TestCase[] = [...parserAndExportTests, ...importPreviewTests];
+
 export function runWriterDbChecks() {
   let passed = 0;
 
@@ -299,7 +659,10 @@ export function runWriterDbChecks() {
     console.log(`ok ${passed} - ${test.name}`);
   }
 
-  console.log(`Writer DB checks passed: ${passed}/${tests.length}`);
+  console.log(
+    `Writer DB checks passed: ${passed}/${tests.length} ` +
+      `(${parserAndExportTests.length} existing, ${importPreviewTests.length} import preview)`
+  );
 }
 
 runWriterDbChecks();

@@ -122,15 +122,17 @@ Small commits:
    guarded write contracts. Done as documentation only; no runtime import path
    changed.
 6. Implement and test pure `previewWriterDbImport` without UI or storage access.
-7. Implement and test pure `createWriterDbImportBackup` and
-   `mergeWriterDbInMemory` without storage writes.
-8. Add the unified backup storage adapter and a small prepared transaction
+   Done with read-only v1/v2 collection counts, warnings, blocking duplicate-id
+   checks, and no merge or persistence.
+7. Implement and test pure `mergeWriterDbInMemory` without storage writes.
+8. Implement and test pure `createWriterDbImportBackup` without persistence.
+9. Add the unified backup storage adapter and a small prepared transaction
    marker, then test rollback and interrupted-write recovery.
-9. Add an explicit manual v1/v2 import preview UI only after the pure and
+10. Add an explicit manual v1/v2 import preview UI only after the pure and
    persistence layers pass their checks.
-10. Only then design Google Drive v2 sync.
-11. Only after v2 sync is safe, start creating WriterPackages from production UI.
-12. Only after packages exist safely across devices, build the workspace UI.
+11. Only then design Google Drive v2 sync.
+12. Only after v2 sync is safe, start creating WriterPackages from production UI.
+13. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 

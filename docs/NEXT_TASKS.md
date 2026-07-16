@@ -48,8 +48,8 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- implement the pure read-only `previewWriterDbImport` contract and extend the
-  local check harness without adding UI or storage writes
+- implement pure `mergeWriterDbInMemory` and extend the local check harness,
+  still without UI, backup persistence, or localStorage writes
 
 ## Next Technical Slice
 
@@ -64,17 +64,18 @@ First implementation step for Writer DB v2:
 
 Status: the read-only parser is prepared in `src/writerDb.ts`, a separate
 manual Writer DB v2 test export can create and validate v2 payloads, and a
-local read-only round-trip test harness can check v2 payload behavior. The
-manual v1/v2 import preview, unified backup, in-memory merge, and guarded write
-contracts are now documented, but none is implemented at runtime. Current
+local check harness covers v2 payload behavior. Pure `previewWriterDbImport`
+now compares parsed v1/v2 data with explicit local arrays, reports deterministic
+counts and warnings, and does not merge or write anything. The unified backup,
+in-memory merge, guarded write, and preview UI remain unimplemented. Current
 production v1 import/export and Google Drive sync remain unchanged.
 
 After that:
 
-1. Implement pure `previewWriterDbImport` and add deterministic checks for v1,
-   v2, warnings, tombstones, timestamp decisions, and blocking duplicate ids.
-2. Implement pure `createWriterDbImportBackup` and
-   `mergeWriterDbInMemory`, then test immutability and both model orders.
+1. Implement pure `mergeWriterDbInMemory`, then test timestamp decisions,
+   tombstones, missing records, immutability, and both model orders.
+2. Implement pure `createWriterDbImportBackup` and test detached snapshots of
+   Sparks, WriterPackages, and nested notes.
 3. Add the new unified backup key and prepared import transaction marker with
    read-back validation, rollback, and interrupted-write recovery checks.
 4. Add the explicit manual v1/v2 preview and confirmation UI.
