@@ -1,5 +1,18 @@
 # Worklog
 
+## 2026-07-16 - Manual Writer DB v2 test export
+
+- Added a separate manual Writer DB v2 test export action.
+- Added a pure v2 payload builder that includes current Sparks and
+  WriterPackages without changing their order.
+- Derived `sparkCount` and `packageCount` from the exported arrays.
+- Validated the v2 payload before download through the existing Writer DB
+  parser path.
+- Export creates `LassiLAB_Writer_DBv002_YYYY-MM-DD.json`.
+- Kept the existing v1 manual export and v1 import unchanged.
+- Kept Google Drive sync on `lassilab-writer-db-v001.json`.
+- No localStorage keys changed, no migration ran, and no v2 import was enabled.
+
 ## 2026-07-14 - Read-only Writer DB parser foundation
 
 - Added a read-only `WriterDbV1 | WriterDbV2` parser foundation in

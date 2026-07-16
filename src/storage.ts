@@ -166,6 +166,10 @@ export function listSparks(): Spark[] {
   return readRawSparks().filter(isVisibleSpark).sort(compareUpdatedAt);
 }
 
+export function loadWriterDbExportSparks(): Spark[] {
+  return readRawSparks();
+}
+
 export function getSpark(id: string): Spark | undefined {
   return readRawSparks().find((spark) => spark.id === id && isVisibleSpark(spark));
 }

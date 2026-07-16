@@ -95,6 +95,9 @@ Current production sync uses:
 lassilab-writer-db-v001.json
 ```
 
+The manual Writer DB v2 test export does not change this production sync file
+name or payload. Google Drive sync still reads and writes only the v1 file.
+
 Future WriterPackage sync should use a separate v2 file, for example:
 
 ```text

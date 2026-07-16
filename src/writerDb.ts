@@ -32,6 +32,12 @@ export type WriterDbParseResult =
   | { ok: true; db: WriterDb }
   | { ok: false; error: string };
 
+type WriterDbV2PayloadInput = {
+  sparks: Spark[];
+  packages: WriterPackage[];
+  exportedAt?: string;
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -105,6 +111,21 @@ function validatePackages(
   }
 
   return { ok: true, packages };
+}
+
+export function createWriterDbV2Payload(input: WriterDbV2PayloadInput): WriterDbV2 {
+  const sparks = [...input.sparks];
+  const packages = [...input.packages];
+
+  return {
+    app: WRITER_DB_APP_NAME,
+    schemaVersion: WRITER_DB_V2_SCHEMA_VERSION,
+    exportedAt: input.exportedAt ?? new Date().toISOString(),
+    sparkCount: sparks.length,
+    packageCount: packages.length,
+    sparks,
+    packages
+  };
 }
 
 export function parseWriterDbPayload(value: unknown): WriterDbParseResult {

@@ -20,6 +20,11 @@ import {
   updateSparkStage,
   updateGoogleSyncPreferences
 } from "./storage";
+import { parseWriterDbPayload } from "./writerDb";
+import {
+  createManualWriterDbV2Export,
+  getManualWriterDbV2ExportFileName
+} from "./writerDbExport";
 import type {
   GoogleSyncPreferences,
   NewSparkDraft,
@@ -607,6 +612,36 @@ export default function App() {
     setDataMessage(`Export pripravený: ${exportData.sparkCount} iskier.`);
   }
 
+  function handleExportDbV2() {
+    const exportData = createManualWriterDbV2Export();
+    const validation = parseWriterDbPayload(exportData);
+
+    if (!validation.ok || validation.db.schemaVersion !== 2) {
+      const message = validation.ok
+        ? "Writer DB v2 export neprešiel v2 kontrolou."
+        : validation.error;
+      setDataMessage(`Writer DB v2 export zlyhal: ${message}`);
+      return;
+    }
+
+    const fileName = getManualWriterDbV2ExportFileName(new Date(exportData.exportedAt));
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json"
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 0);
+    setDataMessage(
+      `Writer DB v2 test export pripravený: ${exportData.sparkCount} iskier, ${exportData.packageCount} balíkov.`
+    );
+  }
+
   function openImportPicker() {
     importInputRef.current?.click();
   }
@@ -856,6 +891,9 @@ export default function App() {
         <div className="data-actions">
           <button className="data-action" type="button" onClick={handleExportDb}>
             Exportovať DB
+          </button>
+          <button className="data-action" type="button" onClick={handleExportDbV2}>
+            Exportovať DB v2 test
           </button>
           <button className="data-action" type="button" onClick={openImportPicker}>
             Importovať DB

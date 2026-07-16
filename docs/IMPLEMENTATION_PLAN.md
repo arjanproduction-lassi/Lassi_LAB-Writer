@@ -114,7 +114,8 @@ Small commits:
    foundation in `src/writerDb.ts`.
 2. Add a read-only parser that accepts v1 and v2. Done locally without changing
    production import/export behavior.
-3. Add manual v2 export.
+3. Add manual v2 export. Done as a separate test action; v1 export/import and
+   Google Drive sync remain unchanged.
 4. Add manual import that can merge v1 and v2 safely.
 5. Add tests and local backups that cover Sparks and Packages.
 6. Only then design Google Drive v2 sync.

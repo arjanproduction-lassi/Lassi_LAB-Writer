@@ -260,8 +260,9 @@ No automatic migration runs in this step.
 
 ## Writer DB v2 Proposal
 
-This is a design proposal only. Runtime code still writes the existing Writer DB
-v1 payload.
+This is a cautious rollout model. Production import/export and Google Drive sync
+still use the existing Writer DB v1 payload. A separate manual test export can
+now create a Writer DB v2 payload for validation and inspection.
 
 ### Schema Types
 
@@ -315,8 +316,25 @@ Current behavior:
 - it does not create v2 payloads
 - it does not run a migration
 - it does not change localStorage
-- production export/import still uses the existing v1 format
+- production v1 export/import still uses the existing v1 format
 - Google Drive sync still uses the existing v1 remote payload
+
+### Manual v2 Export Foundation
+
+Writer also has a separate manual Writer DB v2 test export action.
+
+Current behavior:
+
+- it creates `schemaVersion: 2`
+- it includes the current Spark records in their storage order
+- it includes the current WriterPackage records in their storage order
+- it derives `sparkCount` and `packageCount` from the actual arrays
+- it validates the created payload before downloading the file
+- it creates `LassiLAB_Writer_DBv002_YYYY-MM-DD.json`
+- it does not change v1 manual export
+- it does not change production import
+- it does not change Google Drive sync
+- it does not change localStorage keys or migrate data
 
 ### Export Rules
 
