@@ -62,17 +62,20 @@ First implementation step for Writer DB v2:
 3. Add a read-only parser that can identify v1 vs v2 without writing anything.
 4. Keep current export/import and Google sync behavior unchanged.
 
-Status: the read-only parser is prepared in `src/writerDb.ts`, and a separate
-manual Writer DB v2 test export can now create and validate v2 payloads. This
+Status: the read-only parser is prepared in `src/writerDb.ts`, a separate
+manual Writer DB v2 test export can create and validate v2 payloads, and a
+local read-only round-trip test harness can check v2 payload behavior. This
 does not change current production v1 import/export or Google Drive sync.
 
 After that:
 
-1. Add manual v1/v2 import with backups.
-2. Add tests for parser validation, export, merge, id conflicts, and tombstones.
-3. Only then plan Google Drive v2 sync rollout.
-4. Only after that begin production creation of WriterPackages.
-5. Only after packages can travel safely build the new workspace UI.
+1. Design the manual v2 import safety path: v2 import parser, preview result,
+   backup Sparks and Packages, merge in memory, then write.
+2. Add manual v1/v2 import with backups.
+3. Add tests for parser validation, export, merge, id conflicts, and tombstones.
+4. Only then plan Google Drive v2 sync rollout.
+5. Only after that begin production creation of WriterPackages.
+6. Only after packages can travel safely build the new workspace UI.
 
 ## Repository Setup Tasks
 
@@ -111,8 +114,8 @@ After that:
   wins and no duplicate spark appears.
 - Test four-notebook stage changes across PC and mobile; confirm newer
   `updatedAt` wins and the stage travels through sync/export/import.
-- Design tests for Writer DB v2 parsing, v1 compatibility, package merge,
-  Spark/Package id conflicts, and deleted tombstones.
+- Extend Writer DB v2 checks from read-only round-trip coverage into merge and
+  backup coverage before enabling v2 import writes.
 - Tune the quiet sync interval if real PC/mobile use shows it is too eager or
   too slow.
 - Consider a gentle sync-on-open pull only if Google can do it without a popup

@@ -116,11 +116,15 @@ Small commits:
    production import/export behavior.
 3. Add manual v2 export. Done as a separate test action; v1 export/import and
    Google Drive sync remain unchanged.
-4. Add manual import that can merge v1 and v2 safely.
-5. Add tests and local backups that cover Sparks and Packages.
-6. Only then design Google Drive v2 sync.
-7. Only after v2 sync is safe, start creating WriterPackages from production UI.
-8. Only after packages exist safely across devices, build the workspace UI.
+4. Add a read-only/local Writer DB v2 round-trip test harness. Done without
+   production UI, import, sync, or storage writes.
+5. Design manual v2 import safety in this order: v2 import parser, preview
+   result, backup Sparks and Packages, merge in memory, then write.
+6. Add manual import that can merge v1 and v2 safely.
+7. Add tests and local backups that cover Sparks and Packages.
+8. Only then design Google Drive v2 sync.
+9. Only after v2 sync is safe, start creating WriterPackages from production UI.
+10. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 
@@ -136,6 +140,9 @@ Rules:
   planned and tested.
 - The parser is read-only and must not persist, migrate, or partially accept a
   corrupted payload as if it were healthy.
+- v2 import must not write while parsing or previewing. It should write only
+  after a valid payload is parsed, the merge result is previewed, local Sparks
+  and WriterPackages are backed up, and the merge has succeeded in memory.
 
 ## Explicit Non-Goals
 

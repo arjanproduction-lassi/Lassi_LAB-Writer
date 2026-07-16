@@ -38,6 +38,23 @@ Expected result:
 - TypeScript checks pass.
 - Vite creates a production build in `dist/`.
 
+## Run Writer DB Checks
+
+Writer DB v2 has a small local read-only check harness. It does not use
+production UI, does not import data, does not write localStorage, and does not
+change Google Drive sync.
+
+```bash
+npm run check:writer-db
+```
+
+Expected result:
+
+- The command exits with code 0.
+- Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
+  invalid JSON, unsupported schema, and corrupted record scenarios are checked.
+- No v2 import merge is performed.
+
 ## Test The Production Build Locally
 
 After a successful build:

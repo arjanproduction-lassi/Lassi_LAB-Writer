@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-16 - Writer DB v2 read-only check harness
+
+- Added a small local Writer DB v2 check harness with no test framework.
+- Added `npm run check:writer-db` for read-only round-trip payload validation.
+- Covered empty payloads, Sparks, staged Sparks, deleted Sparks,
+  WriterPackages, package notes, deleted notes, shared Spark/Package ids,
+  informational count mismatches, invalid JSON, unknown schema versions, and
+  corrupted Spark/WriterPackage records.
+- Checked that v2 payload creation and parsing do not mutate input arrays or
+  payload objects and do not touch localStorage.
+- Kept production UI, v1 export/import, Google Drive sync, storage keys, and
+  runtime behavior unchanged.
+- No v2 import merge, backup flow, migration, or Google sync v2 path exists yet.
+- Next v2 import work should proceed in order: parser, preview result, backup
+  Sparks and Packages, merge in memory, then write.
+
 ## 2026-07-16 - Manual Writer DB v2 test export
 
 - Added a separate manual Writer DB v2 test export action.

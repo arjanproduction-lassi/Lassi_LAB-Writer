@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "check:writer-db": "node scripts/run-writer-db-check.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
