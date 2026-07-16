@@ -125,6 +125,8 @@ Small commits:
    Done with read-only v1/v2 collection counts, warnings, blocking duplicate-id
    checks, and no merge or persistence.
 7. Implement and test pure `mergeWriterDbInMemory` without storage writes.
+   Done with blocked-preview rejection, stable ordering, deep copies, result
+   validation, v1 Packages untouched, and independent v2 collection merges.
 8. Implement and test pure `createWriterDbImportBackup` without persistence.
 9. Add the unified backup storage adapter and a small prepared transaction
    marker, then test rollback and interrupted-write recovery.

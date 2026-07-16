@@ -48,8 +48,8 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- implement pure `mergeWriterDbInMemory` and extend the local check harness,
-  still without UI, backup persistence, or localStorage writes
+- implement pure `createWriterDbImportBackup` plus backup validation, still
+  without UI, backup persistence, or production localStorage writes
 
 ## Next Technical Slice
 
@@ -66,22 +66,25 @@ Status: the read-only parser is prepared in `src/writerDb.ts`, a separate
 manual Writer DB v2 test export can create and validate v2 payloads, and a
 local check harness covers v2 payload behavior. Pure `previewWriterDbImport`
 now compares parsed v1/v2 data with explicit local arrays, reports deterministic
-counts and warnings, and does not merge or write anything. The unified backup,
-in-memory merge, guarded write, and preview UI remain unimplemented. Current
-production v1 import/export and Google Drive sync remain unchanged.
+counts and warnings, and does not write anything. Pure
+`mergeWriterDbInMemory` now rejects blocked previews, merges v1/v2 data into
+deeply detached arrays with stable order, and validates the result without
+persisting it. The unified backup, guarded write coordinator, and preview UI
+remain unimplemented. Current production v1 import/export and Google Drive sync
+remain unchanged.
 
 After that:
 
-1. Implement pure `mergeWriterDbInMemory`, then test timestamp decisions,
-   tombstones, missing records, immutability, and both model orders.
-2. Implement pure `createWriterDbImportBackup` and test detached snapshots of
+1. Implement pure `createWriterDbImportBackup` and test detached snapshots of
    Sparks, WriterPackages, and nested notes.
-3. Add the new unified backup key and prepared import transaction marker with
-   read-back validation, rollback, and interrupted-write recovery checks.
-4. Add the explicit manual v1/v2 preview and confirmation UI.
-5. Only then plan Google Drive v2 sync rollout.
-6. Only after that begin production creation of WriterPackages.
-7. Only after packages can travel safely build the new workspace UI.
+2. Add a safe write coordinator around the new unified backup key and prepared
+   import transaction marker, with no UI yet. Test backup read-back validation,
+   rollback, and interrupted-write recovery.
+3. Add the explicit manual v1/v2 preview and confirmation UI only after the
+   coordinator checks pass.
+4. Only then plan Google Drive v2 sync rollout.
+5. Only after that begin production creation of WriterPackages.
+6. Only after packages can travel safely build the new workspace UI.
 
 ## Repository Setup Tasks
 

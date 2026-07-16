@@ -582,21 +582,39 @@ a clear error without changing either storage model.
 ### Pure In-Memory Merge Contract
 
 ```ts
-type WriterDbInMemoryMerge = {
-  sparks: Spark[];
-  packages: WriterPackage[];
-};
+type WriterDbInMemoryMergeResult =
+  | {
+      ok: true;
+      sparks: Spark[];
+      packages: WriterPackage[];
+      preview: WriterDbImportPreview;
+    }
+  | {
+      ok: false;
+      preview: WriterDbImportPreview;
+      error: string;
+    };
 
 function mergeWriterDbInMemory(
   input: WriterDbImportInput
-): WriterDbInMemoryMerge;
+): WriterDbInMemoryMergeResult;
 ```
 
-The function is pure: it writes nothing, mutates no input, and returns new
-arrays. It applies exactly the preview rules, including `updatedAt`, tombstones,
-v1 Packages remaining untouched, whole-package replacement, no per-note merge,
-and no deletion caused by absence from the import. A blocked preview is not a
-valid merge input.
+This function is implemented as a pure, non-persistent step. It calls preview
+first and returns `ok: false` without merging when preview is blocked. A valid
+merge returns new deeply detached arrays, including copied Spark tags,
+WriterPackage notes, and legacy metadata.
+
+It applies exactly the preview rules, including `updatedAt`, tombstones, v1
+Packages remaining unchanged, whole-package replacement, no per-note merge, and
+no deletion caused by absence from the import. Existing local positions remain
+stable, updates replace records at those positions, and new records are
+appended in incoming order without automatic sorting.
+
+Before returning `ok: true`, it validates every resulting Spark and
+WriterPackage, requires `packageVersion: 1`, and rejects duplicate ids inside a
+result collection. It does not read or write localStorage, create a backup, or
+connect to production import.
 
 ### Future Safe Write Sequence
 

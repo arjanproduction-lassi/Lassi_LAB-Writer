@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-07-16 - Pure Writer DB v1/v2 in-memory merge
+
+- Added discriminated `WriterDbInMemoryMergeResult` and pure
+  `mergeWriterDbInMemory`.
+- Reused import preview and rejected blocked previews before merge.
+- Preserved local record positions, replaced newer records in place, kept
+  equal/older local records, and appended new records in incoming order.
+- Applied the same top-level `updatedAt` rule to active records and tombstones.
+- Kept v1 WriterPackages unchanged and merged v2 Sparks and WriterPackages as
+  independent collections, with no per-note merge.
+- Deep-copied Spark tags, WriterPackage notes, and legacy metadata so result
+  mutation cannot change incoming or local inputs.
+- Validated resulting records, `packageVersion`, and same-collection id
+  uniqueness before returning success.
+- Extended `npm run check:writer-db` from 27 to 47 checks: 13 parser/export, 14
+  preview, and 20 in-memory merge checks.
+- No localStorage access, backup persistence, transaction marker, rollback, UI,
+  production import, migration, or Google Drive sync behavior was added.
+- The next smallest step is a pure backup builder and validator, followed by a
+  guarded write coordinator that is still developed without UI first.
+
 ## 2026-07-16 - Pure Writer DB v1/v2 import preview
 
 - Added pure `previewWriterDbImport` with explicit parsed DB, local Sparks, and

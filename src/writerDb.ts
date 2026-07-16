@@ -87,6 +87,19 @@ export interface WriterDbImportInput {
   localPackages: readonly WriterPackage[];
 }
 
+export type WriterDbInMemoryMergeResult =
+  | {
+      ok: true;
+      sparks: Spark[];
+      packages: WriterPackage[];
+      preview: WriterDbImportPreview;
+    }
+  | {
+      ok: false;
+      preview: WriterDbImportPreview;
+      error: string;
+    };
+
 type WriterDbV2PayloadInput = {
   sparks: Spark[];
   packages: WriterPackage[];
@@ -373,6 +386,109 @@ export function previewWriterDbImport(input: WriterDbImportInput): WriterDbImpor
     packages,
     warnings,
     blockingIssues
+  };
+}
+
+function cloneSpark(spark: Spark): Spark {
+  return {
+    ...spark,
+    tags: [...spark.tags]
+  };
+}
+
+function cloneWriterPackage(writerPackage: WriterPackage): WriterPackage {
+  return {
+    ...writerPackage,
+    notes: writerPackage.notes.map((note) => ({ ...note })),
+    ...(writerPackage.legacy ? { legacy: { ...writerPackage.legacy } } : {})
+  };
+}
+
+function mergeCollection<T extends PreviewRecord>(
+  incoming: readonly T[],
+  local: readonly T[],
+  clone: (record: T) => T
+): T[] {
+  const merged = local.map(clone);
+  const indexById = new Map<string, number>();
+
+  for (const [index, record] of local.entries()) {
+    indexById.set(record.id, index);
+  }
+
+  for (const candidate of incoming) {
+    const existingIndex = indexById.get(candidate.id);
+    if (existingIndex === undefined) {
+      indexById.set(candidate.id, merged.length);
+      merged.push(clone(candidate));
+      continue;
+    }
+
+    const existing = merged[existingIndex];
+    if (Date.parse(candidate.updatedAt) > Date.parse(existing.updatedAt)) {
+      merged[existingIndex] = clone(candidate);
+    }
+  }
+
+  return merged;
+}
+
+function validateMergeResult(
+  sparks: readonly Spark[],
+  packages: readonly WriterPackage[]
+): string | undefined {
+  const sparkResult = validateSparks(sparks);
+  if (!sparkResult.ok) {
+    return `Neplatny Spark vo vysledku merge: ${sparkResult.error}`;
+  }
+
+  const packageResult = validatePackages(packages);
+  if (!packageResult.ok) {
+    return `Neplatny WriterPackage vo vysledku merge: ${packageResult.error}`;
+  }
+
+  if (countDistinctDuplicateIds(sparks) > 0) {
+    return "Vysledok merge obsahuje duplicitne Spark id.";
+  }
+
+  if (countDistinctDuplicateIds(packages) > 0) {
+    return "Vysledok merge obsahuje duplicitne WriterPackage id.";
+  }
+
+  return undefined;
+}
+
+export function mergeWriterDbInMemory(
+  input: WriterDbImportInput
+): WriterDbInMemoryMergeResult {
+  const preview = previewWriterDbImport(input);
+  if (preview.status === "blocked") {
+    return {
+      ok: false,
+      preview,
+      error: "Import preview je blokovany a merge sa nevykonal."
+    };
+  }
+
+  const sparks = mergeCollection(input.incoming.sparks, input.localSparks, cloneSpark);
+  const packages = input.incoming.schemaVersion === WRITER_DB_V2_SCHEMA_VERSION
+    ? mergeCollection(input.incoming.packages, input.localPackages, cloneWriterPackage)
+    : input.localPackages.map(cloneWriterPackage);
+  const validationError = validateMergeResult(sparks, packages);
+
+  if (validationError) {
+    return {
+      ok: false,
+      preview,
+      error: validationError
+    };
+  }
+
+  return {
+    ok: true,
+    sparks,
+    packages,
+    preview
   };
 }
 

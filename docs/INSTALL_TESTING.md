@@ -51,14 +51,17 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summary reports 27 checks: 13 existing parser/export checks and 14 pure
-  import-preview checks.
+- The summary reports 47 checks: 13 existing parser/export checks, 14 pure
+  import-preview checks, and 20 pure in-memory merge checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
   v2 package comparison, warnings, duplicate-id blocking, immutability, and no
   localStorage access.
-- No import merge, backup, or storage write is performed.
+- Merge checks cover blocked preview rejection, stable ordering, tombstone
+  decisions, missing records, whole-package replacement, deep copies, result
+  validation, and no localStorage access.
+- No backup or storage write is performed.
 
 ## Writer DB Import Preview Checks
 
@@ -82,9 +85,36 @@ Current automated checks cover:
 - preview does not touch localStorage or mutate incoming data, local arrays, or
   nested notes
 
-The next harness extension will cover pure in-memory merge behavior. The
-planned unified backup key, rollback, transaction marker, and preview UI remain
+The preview checks now feed the pure in-memory merge checks below. The planned
+unified backup key, rollback, transaction marker, and preview UI remain
 documentation only and are not created by the current runtime or checks.
+
+## Writer DB In-Memory Merge Checks
+
+Pure `mergeWriterDbInMemory` is not connected to production import. It accepts
+the same explicit parsed DB and local arrays as preview, returns a discriminated
+success or failure result, and persists nothing.
+
+Current checks confirm:
+
+- blocked previews return `ok: false` without merging
+- v1 merges only Sparks and returns Packages with unchanged content
+- v2 merges Sparks and WriterPackages independently
+- newer records replace local records at their existing positions
+- equal and older records preserve local content and position
+- new records, including new tombstones, append in incoming order
+- missing incoming ids do not delete local records
+- newer active records can replace older tombstones and vice versa
+- same ids across models preserve both records
+- Packages replace as whole records by top-level `updatedAt`
+- returned arrays, Spark tags, Package notes, and legacy metadata are detached
+  from incoming and local inputs
+- invalid records, invalid `packageVersion`, and duplicate result ids return
+  `ok: false`
+- localStorage is never read or written
+
+The next check layer will cover a pure backup builder and validation. Backup
+persistence and the guarded write coordinator remain unimplemented.
 
 ## Test The Production Build Locally
 

@@ -3,6 +3,7 @@ import type {
   ImportCollectionPreview,
   WriterDb,
   WriterDbImportPreview,
+  WriterDbInMemoryMergeResult,
   WriterDbV1
 } from "./writerDb";
 import {
@@ -10,6 +11,7 @@ import {
   WRITER_DB_V1_SCHEMA_VERSION,
   WRITER_DB_V2_SCHEMA_VERSION,
   createWriterDbV2Payload,
+  mergeWriterDbInMemory,
   parseWriterDbJson,
   parseWriterDbPayload,
   previewWriterDbImport
@@ -157,6 +159,25 @@ function preview(
     localSparks,
     localPackages
   });
+}
+
+function merge(
+  incoming: WriterDb,
+  localSparks: readonly Spark[] = [],
+  localPackages: readonly WriterPackage[] = []
+): WriterDbInMemoryMergeResult {
+  return mergeWriterDbInMemory({
+    incoming,
+    localSparks,
+    localPackages
+  });
+}
+
+function assertMergeOk(
+  result: WriterDbInMemoryMergeResult,
+  message: string
+): asserts result is Extract<WriterDbInMemoryMergeResult, { ok: true }> {
+  assert(result.ok, `${message}: ${result.ok ? "" : result.error}`);
 }
 
 function warningCodes(result: WriterDbImportPreview) {
@@ -648,7 +669,407 @@ const importPreviewTests: TestCase[] = [
   }
 ];
 
-const tests: TestCase[] = [...parserAndExportTests, ...importPreviewTests];
+const inMemoryMergeTests: TestCase[] = [
+  {
+    name: "v1 merge creates a new Spark and preserves Packages",
+    run: () => {
+      const localPackages = [packageWithNotes];
+      const result = merge(createV1([normalSpark]), [], localPackages);
+
+      assertMergeOk(result, "v1 new Spark merge should succeed");
+      assertDeepEqual(result.sparks, [normalSpark], "v1 did not create the incoming Spark");
+      assertDeepEqual(result.packages, localPackages, "v1 changed Package content");
+      assert(result.packages !== localPackages, "v1 should return a new Package array");
+      assertDeepEqual(
+        warningCodes(result.preview),
+        ["v1-packages-untouched"],
+        "v1 merge lost the untouched warning"
+      );
+    }
+  },
+  {
+    name: "v1 merge updates a newer Spark at its local position",
+    run: () => {
+      const incoming: Spark = {
+        ...normalSpark,
+        text: "Updated in place",
+        updatedAt: "2026-07-16T10:05:00.000Z"
+      };
+      const result = merge(createV1([incoming]), [stagedSpark, normalSpark]);
+
+      assertMergeOk(result, "v1 newer Spark merge should succeed");
+      assertDeepEqual(
+        result.sparks.map((spark) => spark.id),
+        [stagedSpark.id, normalSpark.id],
+        "Spark update changed local order"
+      );
+      assert(result.sparks[1].text === "Updated in place", "newer Spark did not replace local data");
+    }
+  },
+  {
+    name: "v1 merge ignores an older Spark",
+    run: () => {
+      const incoming: Spark = {
+        ...normalSpark,
+        text: "Older incoming text",
+        updatedAt: "2026-07-16T09:59:00.000Z"
+      };
+      const result = merge(createV1([incoming]), [normalSpark]);
+
+      assertMergeOk(result, "v1 older Spark merge should succeed");
+      assertDeepEqual(result.sparks, [normalSpark], "older Spark replaced local data");
+    }
+  },
+  {
+    name: "equal updatedAt keeps the local Spark",
+    run: () => {
+      const incoming: Spark = {
+        ...normalSpark,
+        text: "Different incoming text"
+      };
+      const result = merge(createV1([incoming]), [normalSpark]);
+
+      assertMergeOk(result, "equal Spark timestamp merge should succeed");
+      assert(result.sparks[0].text === normalSpark.text, "equal timestamp did not keep local Spark");
+    }
+  },
+  {
+    name: "v2 merge creates a new Spark and Package",
+    run: () => {
+      const result = merge(createV2([normalSpark], [basicPackage]));
+
+      assertMergeOk(result, "v2 new records merge should succeed");
+      assertDeepEqual(result.sparks, [normalSpark], "v2 did not create new Spark");
+      assertDeepEqual(result.packages, [basicPackage], "v2 did not create new Package");
+    }
+  },
+  {
+    name: "v2 merge replaces a whole Package by top-level updatedAt",
+    run: () => {
+      const incomingPackage: WriterPackage = {
+        ...packageWithNotes,
+        title: "Incoming whole Package",
+        notes: [
+          {
+            id: "replacement-note",
+            text: "Replacement note",
+            createdAt: "2026-07-16T11:30:00.000Z",
+            updatedAt: "2026-07-16T11:31:00.000Z"
+          }
+        ],
+        workshopText: "Incoming workshop",
+        updatedAt: "2026-07-16T11:31:00.000Z"
+      };
+      const localPackage: WriterPackage = {
+        ...packageWithNotes,
+        title: "Local Package",
+        updatedAt: "2026-07-16T11:25:00.000Z"
+      };
+      const result = merge(createV2([], [incomingPackage]), [], [localPackage]);
+
+      assertMergeOk(result, "v2 whole Package update should succeed");
+      assertDeepEqual(result.packages, [incomingPackage], "Package was not replaced as one record");
+      assert(result.packages[0].notes.length === 1, "Package notes were merged individually");
+    }
+  },
+  {
+    name: "newer incoming tombstone replaces an active Spark",
+    run: () => {
+      const incoming: Spark = {
+        ...normalSpark,
+        updatedAt: "2026-07-16T10:03:00.000Z",
+        deletedAt: "2026-07-16T10:03:00.000Z"
+      };
+      const result = merge(createV2([incoming], []), [normalSpark]);
+
+      assertMergeOk(result, "newer tombstone merge should succeed");
+      assertDeepEqual(result.sparks, [incoming], "newer tombstone did not replace active Spark");
+    }
+  },
+  {
+    name: "older incoming tombstone is ignored",
+    run: () => {
+      const local: Spark = {
+        ...normalSpark,
+        updatedAt: "2026-07-16T10:05:00.000Z"
+      };
+      const incoming: Spark = {
+        ...normalSpark,
+        updatedAt: "2026-07-16T10:02:00.000Z",
+        deletedAt: "2026-07-16T10:02:00.000Z"
+      };
+      const result = merge(createV2([incoming], []), [local]);
+
+      assertMergeOk(result, "older tombstone merge should succeed");
+      assertDeepEqual(result.sparks, [local], "older tombstone replaced newer active Spark");
+    }
+  },
+  {
+    name: "new tombstone without local id is preserved",
+    run: () => {
+      const result = merge(createV2([deletedSpark], []));
+
+      assertMergeOk(result, "new tombstone merge should succeed");
+      assertDeepEqual(result.sparks, [deletedSpark], "new tombstone was not preserved");
+    }
+  },
+  {
+    name: "newer active Spark replaces an older tombstone",
+    run: () => {
+      const incoming: Spark = {
+        ...deletedSpark,
+        text: "Restored active Spark",
+        updatedAt: "2026-07-16T10:23:00.000Z",
+        deletedAt: undefined
+      };
+      const result = merge(createV2([incoming], []), [deletedSpark]);
+
+      assertMergeOk(result, "newer active Spark merge should succeed");
+      assert(result.sparks[0].text === "Restored active Spark", "active Spark did not replace tombstone");
+      assert(result.sparks[0].deletedAt === undefined, "older tombstone remained active");
+    }
+  },
+  {
+    name: "missing incoming records never delete local records",
+    run: () => {
+      const localSparks = [normalSpark, stagedSpark];
+      const localPackages = [basicPackage, packageWithNotes];
+      const result = merge(createV2([], []), localSparks, localPackages);
+
+      assertMergeOk(result, "empty merge should preserve local records");
+      assertDeepEqual(result.sparks, localSparks, "missing Sparks deleted local records");
+      assertDeepEqual(result.packages, localPackages, "missing Packages deleted local records");
+    }
+  },
+  {
+    name: "same id across models preserves both records",
+    run: () => {
+      const result = merge(createV2([sharedIdSpark], [sharedIdPackage]));
+
+      assertMergeOk(result, "cross-model shared id merge should succeed");
+      assertDeepEqual(result.sparks, [sharedIdSpark], "shared-id Spark was removed");
+      assertDeepEqual(result.packages, [sharedIdPackage], "shared-id Package was removed");
+      assertDeepEqual(
+        warningCodes(result.preview),
+        ["cross-model-id-overlap"],
+        "cross-model warning was lost"
+      );
+    }
+  },
+  {
+    name: "merge preserves local order and appends new records in incoming order",
+    run: () => {
+      const updatedNormal: Spark = {
+        ...normalSpark,
+        text: "Updated normal",
+        updatedAt: "2026-07-16T10:05:00.000Z"
+      };
+      const newSparkA: Spark = {
+        ...normalSpark,
+        id: "spark-new-a",
+        text: "New A",
+        updatedAt: "2026-07-16T12:10:00.000Z"
+      };
+      const newSparkB: Spark = {
+        ...normalSpark,
+        id: "spark-new-b",
+        text: "New B",
+        updatedAt: "2026-07-16T12:20:00.000Z"
+      };
+      const updatedBasic: WriterPackage = {
+        ...basicPackage,
+        title: "Updated basic",
+        updatedAt: "2026-07-16T11:05:00.000Z"
+      };
+      const newPackageA: WriterPackage = {
+        ...basicPackage,
+        id: "package-new-a",
+        title: "New Package A"
+      };
+      const newPackageB: WriterPackage = {
+        ...basicPackage,
+        id: "package-new-b",
+        title: "New Package B"
+      };
+      const result = merge(
+        createV2(
+          [newSparkA, updatedNormal, newSparkB],
+          [newPackageA, updatedBasic, newPackageB]
+        ),
+        [normalSpark, stagedSpark],
+        [basicPackage, packageWithNotes]
+      );
+
+      assertMergeOk(result, "stable-order merge should succeed");
+      assertDeepEqual(
+        result.sparks.map((spark) => spark.id),
+        [normalSpark.id, stagedSpark.id, newSparkA.id, newSparkB.id],
+        "Spark order is not stable"
+      );
+      assertDeepEqual(
+        result.packages.map((writerPackage) => writerPackage.id),
+        [basicPackage.id, packageWithNotes.id, newPackageA.id, newPackageB.id],
+        "Package order is not stable"
+      );
+      assert(result.sparks[0].text === "Updated normal", "Spark update moved or disappeared");
+      assert(result.packages[0].title === "Updated basic", "Package update moved or disappeared");
+    }
+  },
+  {
+    name: "blocked preview prevents merge",
+    run: () => {
+      const duplicate: Spark = {
+        ...normalSpark,
+        text: "Duplicate",
+        updatedAt: "2026-07-16T10:02:00.000Z"
+      };
+      const incoming = createV2([normalSpark, duplicate], []);
+      const incomingBefore = cloneJson(incoming);
+      const result = merge(incoming);
+
+      assert(!result.ok, "duplicate incoming ids should reject merge");
+      assert(result.preview.status === "blocked", "rejected merge lost blocked preview");
+      assertDeepEqual(
+        blockingIssueCodes(result.preview),
+        ["duplicate-spark-id"],
+        "blocked merge lost duplicate issue"
+      );
+      assertDeepEqual(incoming, incomingBefore, "blocked merge mutated incoming DB");
+    }
+  },
+  {
+    name: "mergeWriterDbInMemory does not mutate its inputs",
+    run: () => {
+      const incoming = createV2([deletedSpark], [packageWithNotes]);
+      const localSparks = [normalSpark, stagedSpark];
+      const localPackages = [basicPackage, packageWithNotes];
+      const incomingBefore = cloneJson(incoming);
+      const localSparksBefore = cloneJson(localSparks);
+      const localPackagesBefore = cloneJson(localPackages);
+
+      const result = merge(incoming, localSparks, localPackages);
+
+      assertMergeOk(result, "immutable input merge should succeed");
+      assertDeepEqual(incoming, incomingBefore, "merge mutated incoming DB");
+      assertDeepEqual(localSparks, localSparksBefore, "merge mutated local Sparks");
+      assertDeepEqual(localPackages, localPackagesBefore, "merge mutated local Packages");
+    }
+  },
+  {
+    name: "merge result is deeply detached from incoming and local notes",
+    run: () => {
+      const packageWithLegacy: WriterPackage = {
+        ...packageWithNotes,
+        legacy: {
+          source: "spark",
+          stage: "notes"
+        }
+      };
+      const incoming = createV2([stagedSpark], [packageWithLegacy]);
+      const incomingResult = merge(incoming);
+      assertMergeOk(incomingResult, "incoming deep-clone merge should succeed");
+
+      incomingResult.sparks[0].tags.push("result-only");
+      incomingResult.packages[0].notes[0].text = "Changed only in result";
+      if (incomingResult.packages[0].legacy) {
+        incomingResult.packages[0].legacy.stage = "final";
+      }
+
+      assertDeepEqual(stagedSpark.tags, ["stage"], "result tags mutated incoming Spark");
+      assert(
+        packageWithLegacy.notes[0].text === "First note",
+        "result note mutated incoming Package"
+      );
+      assert(packageWithLegacy.legacy?.stage === "notes", "result mutated incoming legacy metadata");
+
+      const localSparks = [stagedSpark];
+      const localPackages = [packageWithNotes];
+      const localResult = merge(createV1([]), localSparks, localPackages);
+      assertMergeOk(localResult, "local deep-clone merge should succeed");
+      localResult.sparks[0].tags.push("local-result-only");
+      localResult.packages[0].notes[0].text = "Changed local result";
+      assertDeepEqual(localSparks[0].tags, ["stage"], "result tags mutated local Spark");
+      assert(
+        localPackages[0].notes[0].text === "First note",
+        "result note mutated local Package"
+      );
+    }
+  },
+  {
+    name: "mergeWriterDbInMemory does not touch localStorage",
+    run: () => {
+      let localStorageTouches = 0;
+      const throwingStorage = {
+        getItem(_key: string) {
+          localStorageTouches += 1;
+          throw new Error("mergeWriterDbInMemory touched localStorage");
+        },
+        setItem(_key: string, _value: string) {
+          localStorageTouches += 1;
+          throw new Error("mergeWriterDbInMemory touched localStorage");
+        },
+        removeItem(_key: string) {
+          localStorageTouches += 1;
+          throw new Error("mergeWriterDbInMemory touched localStorage");
+        }
+      };
+
+      (globalThis as unknown as { window: { localStorage: typeof throwingStorage } }).window = {
+        localStorage: throwingStorage
+      };
+
+      const result = merge(createV2([normalSpark], [basicPackage]));
+
+      assertMergeOk(result, "localStorage guard merge should succeed");
+      assert(localStorageTouches === 0, "merge touched localStorage");
+    }
+  },
+  {
+    name: "merge validation rejects an invalid resulting Spark",
+    run: () => {
+      const invalidLocal = {
+        ...normalSpark,
+        updatedAt: "not-a-date"
+      } as Spark;
+      const result = merge(createV2([], []), [invalidLocal]);
+
+      assert(!result.ok, "invalid resulting Spark should reject merge");
+      assert(result.error.includes("Neplatny Spark"), "invalid Spark error is unclear");
+    }
+  },
+  {
+    name: "merge validation rejects an invalid resulting packageVersion",
+    run: () => {
+      const invalidLocal = {
+        ...basicPackage,
+        packageVersion: 2
+      } as unknown as WriterPackage;
+      const result = merge(createV2([], []), [], [invalidLocal]);
+
+      assert(!result.ok, "invalid resulting packageVersion should reject merge");
+      assert(result.error.includes("WriterPackage"), "invalid Package error is unclear");
+    }
+  },
+  {
+    name: "merge validation rejects duplicate local ids",
+    run: () => {
+      const duplicateLocal: Spark = {
+        ...normalSpark,
+        text: "Duplicate local Spark"
+      };
+      const result = merge(createV2([], []), [normalSpark, duplicateLocal]);
+
+      assert(!result.ok, "duplicate local ids should reject merge result");
+      assert(result.error.includes("duplicitne Spark id"), "duplicate result error is unclear");
+    }
+  }
+];
+
+const tests: TestCase[] = [
+  ...parserAndExportTests,
+  ...importPreviewTests,
+  ...inMemoryMergeTests
+];
 
 export function runWriterDbChecks() {
   let passed = 0;
@@ -661,7 +1082,8 @@ export function runWriterDbChecks() {
 
   console.log(
     `Writer DB checks passed: ${passed}/${tests.length} ` +
-      `(${parserAndExportTests.length} existing, ${importPreviewTests.length} import preview)`
+      `(${parserAndExportTests.length} existing, ${importPreviewTests.length} import preview, ` +
+      `${inMemoryMergeTests.length} in-memory merge)`
   );
 }
 
