@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-07-16 - Writer DB v1/v2 import safety contract (docs only)
+
+- Documented a deterministic read-only preview model for manual Writer DB v1
+  and v2 imports.
+- Defined create, update, unchanged, ignored-older, and tombstone rules using
+  top-level `updatedAt`; v1 leaves WriterPackages untouched and v2 evaluates
+  both models independently.
+- Defined informational warnings for count mismatch, tombstones, empty imports,
+  v1 untouched Packages, and cross-model id overlap.
+- Defined duplicate ids inside one incoming collection as a blocking ambiguity.
+- Defined a complete Sparks plus WriterPackages backup envelope and recommended
+  `lassilab-writer:v0.1:writer-db:backup-before-import`, preserving the existing
+  Spark-only backup key and payload.
+- Documented pure preview, backup-builder, and in-memory merge boundaries.
+- Documented a minimal localStorage recovery journal using a validated backup,
+  prepared transaction marker, read-back validation, and explicit recovery.
+- No runtime code, UI, production import, storage key, migration, or Google
+  Drive sync behavior changed in this documentation-only step.
+- The smallest implementation step is pure preview logic plus local checks,
+  still without storage writes or UI changes.
+
 ## 2026-07-16 - Writer DB v2 read-only check harness
 
 - Added a small local Writer DB v2 check harness with no test framework.

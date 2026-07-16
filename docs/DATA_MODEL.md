@@ -367,6 +367,131 @@ export or read-only fallback.
 - A local backup must be created before applying import changes.
 - Invalid payloads must leave local data untouched.
 
+### Read-Only Import Preview Contract
+
+The future manual v1/v2 import must parse and preview the selected file without
+writing to localStorage. Preview receives the parsed `WriterDb`, local Sparks,
+and local WriterPackages as explicit inputs.
+
+Proposed types:
+
+```ts
+type ImportCollectionPreview = {
+  mode: "merge" | "untouched";
+  incoming: number;
+  create: number;
+  update: number;
+  unchanged: number;
+  ignoredOlder: number;
+  tombstones: number;
+};
+
+type WriterDbImportWarning =
+  | { code: "v1-packages-untouched"; message: string }
+  | {
+      code: "count-mismatch";
+      collection: "sparks" | "packages";
+      declared: number;
+      actual: number;
+      message: string;
+    }
+  | { code: "cross-model-id-overlap"; count: number; message: string }
+  | {
+      code: "contains-tombstones";
+      sparks: number;
+      packages: number;
+      message: string;
+    }
+  | { code: "empty-import"; message: string };
+
+type WriterDbImportBlockingIssue = {
+  code: "duplicate-spark-id" | "duplicate-package-id";
+  count: number;
+  message: string;
+};
+
+type WriterDbImportPreview = {
+  schemaVersion: 1 | 2;
+  status: "ready" | "blocked";
+  source: {
+    declaredSparkCount: number;
+    actualSparkCount: number;
+    declaredPackageCount: number | null;
+    actualPackageCount: number;
+  };
+  sparks: ImportCollectionPreview;
+  packages: ImportCollectionPreview;
+  warnings: WriterDbImportWarning[];
+  blockingIssues: WriterDbImportBlockingIssue[];
+};
+```
+
+`actualSparkCount` and `actualPackageCount` come from the arrays and are the
+source of truth. For v1, `declaredPackageCount` is `null`,
+`actualPackageCount` is `0`, and the package preview has `mode: "untouched"`
+with all numeric fields set to zero.
+
+Preview rules:
+
+- A new id is `create`.
+- For the same id, a newer incoming `updatedAt` is `update`.
+- Equal `updatedAt` instants are `unchanged`, even if their original string
+  representations differ.
+- An older incoming `updatedAt` is `ignoredOlder`.
+- Dates are compared by their parsed timestamp after the DB parser has already
+  validated them.
+- An incoming record with `deletedAt` is also counted in `tombstones`, but its
+  action is still decided by `updatedAt`.
+- A new tombstone is stored as a new record so an older live copy cannot revive
+  it later.
+- `create + update + unchanged + ignoredOlder` equals `incoming`.
+  `tombstones` overlaps those actions and is not added to that total.
+- A record missing from the incoming file does not delete a local record.
+- v1 evaluates only Sparks and leaves WriterPackages untouched.
+- v2 evaluates Sparks and WriterPackages independently.
+- The same id in a Spark and a WriterPackage is not a conflict or migration.
+- WriterPackages are compared as whole records by top-level `updatedAt`.
+- Notes are not merged individually.
+- Existing local order is preserved. Updates replace the record at its current
+  index, and genuinely new records are appended in incoming order.
+- Inputs and their nested records are never mutated.
+
+Warnings are informational. Their deterministic order is: v1 Packages
+untouched, Spark count mismatch, Package count mismatch, cross-model id
+overlap, incoming tombstones, then empty import. Count mismatches produce one
+warning per affected collection. Cross-model overlap is the distinct-id
+intersection between all local plus incoming Spark ids and all local plus
+incoming WriterPackage ids. Tombstone warning counts include incoming records
+only. Empty import means no incoming Sparks and, for v2, no incoming Packages.
+None of these warnings automatically blocks import.
+
+Duplicate ids inside the same incoming collection are different: the current
+read-only envelope parser validates record shapes but does not guarantee id
+uniqueness. Preview must report them as `blockingIssues`; no backup, merge, or
+write may proceed until the ambiguity is resolved. Cross-model id overlap
+remains only a warning. Spark duplicate issues are listed before Package
+duplicate issues, `count` is the number of distinct duplicated ids, and
+`status` is `blocked` exactly when `blockingIssues` is non-empty. Collection
+action counts are still calculated per incoming array element for diagnostics,
+but a blocked preview can never become merge input.
+
+Proposed pure boundary:
+
+```ts
+type WriterDbImportInput = {
+  incoming: WriterDb;
+  localSparks: readonly Spark[];
+  localPackages: readonly WriterPackage[];
+};
+
+function previewWriterDbImport(
+  input: WriterDbImportInput
+): WriterDbImportPreview;
+```
+
+This function does not read or write localStorage, does not migrate data, and
+does not call the current production v1 importer.
+
 ### ID Conflicts
 
 The same id may temporarily exist as both a legacy Spark and a real
@@ -402,20 +527,119 @@ editing on different devices.
 
 ### Backup And Recovery
 
-Before v2 import or v2 sync merge, Writer should create a backup that contains
-both local Sparks and local Writer Packages.
+The previewed manual importer needs one detached backup containing the complete
+local state of both storage models, even when the incoming DB is v1 and only
+Sparks can change.
 
-Recommended backup contents:
+```ts
+type WriterDbImportBackup = {
+  backupVersion: 1;
+  createdAt: string;
+  reason: "before-import";
+  sourceSchemaVersion: 1 | 2;
+  sparks: Spark[];
+  packages: WriterPackage[];
+};
+```
 
-- app name
-- backup schema/version marker
-- backup timestamp
-- Spark storage key and Sparks
-- Package storage key and Packages
+Proposed pure builder:
 
-If a v2 payload is malformed, invalid, or only partially valid, it must not
-overwrite local data. Invalid individual records can be skipped only when the
-payload envelope itself is trustworthy and a backup already exists.
+```ts
+function createWriterDbImportBackup(input: {
+  createdAt: string;
+  sourceSchemaVersion: 1 | 2;
+  sparks: readonly Spark[];
+  packages: readonly WriterPackage[];
+}): WriterDbImportBackup;
+```
+
+The builder returns a detached snapshot, including nested package notes, and
+does not persist it. The storage adapter must validate the serialized backup
+before and after writing it.
+
+Recommended localStorage key for the future previewed v1/v2 importer:
+
+```text
+lassilab-writer:v0.1:writer-db:backup-before-import
+```
+
+This new shared key is safer than changing the existing Spark-only key:
+
+```text
+lassilab-writer:v0.1:sparks:backup-before-import
+```
+
+The existing key and its legacy payload must remain unchanged while the current
+v1 importer exists. A new valid unified backup may replace the previous unified
+`backup-before-import` value, but it must not overwrite or migrate the legacy
+Spark-only backup. The unified backup is local only, is not sent to Google
+Drive, and is not included in normal v1 or v2 DB exports.
+
+A malformed backup must never be restored automatically. Recovery first parses
+and validates the complete backup; an invalid backup blocks recovery and shows
+a clear error without changing either storage model.
+
+### Pure In-Memory Merge Contract
+
+```ts
+type WriterDbInMemoryMerge = {
+  sparks: Spark[];
+  packages: WriterPackage[];
+};
+
+function mergeWriterDbInMemory(
+  input: WriterDbImportInput
+): WriterDbInMemoryMerge;
+```
+
+The function is pure: it writes nothing, mutates no input, and returns new
+arrays. It applies exactly the preview rules, including `updatedAt`, tombstones,
+v1 Packages remaining untouched, whole-package replacement, no per-note merge,
+and no deletion caused by absence from the import. A blocked preview is not a
+valid merge input.
+
+### Future Safe Write Sequence
+
+Selecting a file performs only parse and preview. The required logical order is
+parser, preview, detached backup snapshot, in-memory merge, result validation,
+and only then guarded storage writes. After the user explicitly confirms
+import, the future implementation should:
+
+1. Create a detached backup snapshot of the current Sparks and WriterPackages
+   in memory.
+2. Compute the complete merge in memory without changing storage.
+3. Validate every resulting Spark and WriterPackage and abort on any failure.
+4. Serialize, validate, persist, read back, and revalidate the backup under the
+   unified backup key. If this fails, abort before production writes.
+5. Write a small prepared transaction marker under
+   `lassilab-writer:v0.1:writer-db:import-transaction` that references the valid
+   backup.
+6. For v2, write and read back both Spark and WriterPackage storage. For v1,
+   write and read back only Sparks; WriterPackage storage remains untouched.
+7. Remove the transaction marker only after all required writes and read-back
+   validations succeed.
+
+localStorage makes each `setItem` synchronous, but it does not provide one
+transaction across the Spark and WriterPackage keys. The backup plus a small
+prepared marker is the minimum safe recovery journal. If a write fails, the
+same operation should immediately restore every storage key it changed from the
+validated backup and verify the rollback. If the app is interrupted or rollback
+also fails, the marker remains; the next app start must block another import and
+offer explicit recovery from the validated backup rather than restoring data
+silently.
+
+### Future Import Preview UI
+
+The future dialog title reflects the parsed source, for example `Import DB v2`.
+It shows Sparks and Creative Packages separately with counts for new, updated,
+older ignored, and tombstone records. v1 shows Creative Packages as untouched.
+Warnings are visible but non-blocking; blocking issues disable the import
+action.
+
+The only commands are `Importovať` and `Zrušiť`. Choosing a file never starts
+an import by itself. The import command is available only after a successful
+parse and ready preview; it then runs backup, in-memory merge validation, and
+the guarded write sequence above.
 
 ### Version Meanings
 

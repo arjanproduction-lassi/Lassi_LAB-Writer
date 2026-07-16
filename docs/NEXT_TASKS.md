@@ -48,8 +48,8 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- design the next Writer DB/export/sync payload that can carry
-  `WriterPackage` records while preserving legacy Spark compatibility
+- implement the pure read-only `previewWriterDbImport` contract and extend the
+  local check harness without adding UI or storage writes
 
 ## Next Technical Slice
 
@@ -64,18 +64,23 @@ First implementation step for Writer DB v2:
 
 Status: the read-only parser is prepared in `src/writerDb.ts`, a separate
 manual Writer DB v2 test export can create and validate v2 payloads, and a
-local read-only round-trip test harness can check v2 payload behavior. This
-does not change current production v1 import/export or Google Drive sync.
+local read-only round-trip test harness can check v2 payload behavior. The
+manual v1/v2 import preview, unified backup, in-memory merge, and guarded write
+contracts are now documented, but none is implemented at runtime. Current
+production v1 import/export and Google Drive sync remain unchanged.
 
 After that:
 
-1. Design the manual v2 import safety path: v2 import parser, preview result,
-   backup Sparks and Packages, merge in memory, then write.
-2. Add manual v1/v2 import with backups.
-3. Add tests for parser validation, export, merge, id conflicts, and tombstones.
-4. Only then plan Google Drive v2 sync rollout.
-5. Only after that begin production creation of WriterPackages.
-6. Only after packages can travel safely build the new workspace UI.
+1. Implement pure `previewWriterDbImport` and add deterministic checks for v1,
+   v2, warnings, tombstones, timestamp decisions, and blocking duplicate ids.
+2. Implement pure `createWriterDbImportBackup` and
+   `mergeWriterDbInMemory`, then test immutability and both model orders.
+3. Add the new unified backup key and prepared import transaction marker with
+   read-back validation, rollback, and interrupted-write recovery checks.
+4. Add the explicit manual v1/v2 preview and confirmation UI.
+5. Only then plan Google Drive v2 sync rollout.
+6. Only after that begin production creation of WriterPackages.
+7. Only after packages can travel safely build the new workspace UI.
 
 ## Repository Setup Tasks
 
@@ -114,8 +119,10 @@ After that:
   wins and no duplicate spark appears.
 - Test four-notebook stage changes across PC and mobile; confirm newer
   `updatedAt` wins and the stage travels through sync/export/import.
-- Extend Writer DB v2 checks from read-only round-trip coverage into merge and
-  backup coverage before enabling v2 import writes.
+- Extend Writer DB checks first with pure preview coverage, then backup and
+  in-memory merge coverage, before enabling any v2 import writes.
+- Test prepared-transaction recovery for failure before the Spark write,
+  between Spark and WriterPackage writes, and during rollback.
 - Tune the quiet sync interval if real PC/mobile use shows it is too eager or
   too slow.
 - Consider a gentle sync-on-open pull only if Google can do it without a popup

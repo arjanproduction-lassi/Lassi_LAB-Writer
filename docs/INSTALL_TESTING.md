@@ -55,6 +55,41 @@ Expected result:
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - No v2 import merge is performed.
 
+## Future Previewed Import Checks (Not Implemented)
+
+The manual v1/v2 import contract is documented but has no runtime path yet.
+Selecting a file must eventually perform only parsing and read-only preview. It
+must not write until the user explicitly confirms import and a complete local
+backup can be validated.
+
+Future automated checks must cover:
+
+- v1 previews Sparks while WriterPackages report `untouched` with zero changes
+- v2 previews Sparks and WriterPackages independently
+- newer, equal, and older `updatedAt` values map to update, unchanged, and
+  ignored-older counts
+- tombstones follow the same timestamp rule and do not imply hard deletion
+- missing incoming ids leave local records unchanged
+- count mismatch and cross-model id overlap remain informational warnings
+- duplicate ids inside one incoming collection block import
+- WriterPackages merge as whole records; notes are not merged individually
+- preview, backup creation, and in-memory merge do not touch localStorage or
+  mutate their inputs
+- both model orders are preserved, with new incoming records appended in source
+  order
+- a validated backup exists before production writes
+- failure between the Spark and WriterPackage writes restores the prior state or
+  leaves a prepared marker for explicit recovery
+
+The planned unified backup key is:
+
+```text
+lassilab-writer:v0.1:writer-db:backup-before-import
+```
+
+The current production v1 import continues to use its existing Spark-only
+backup key until the previewed importer is implemented and separately tested.
+
 ## Test The Production Build Locally
 
 After a successful build:

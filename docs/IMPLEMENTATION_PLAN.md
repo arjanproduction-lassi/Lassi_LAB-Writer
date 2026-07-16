@@ -118,13 +118,19 @@ Small commits:
    Google Drive sync remain unchanged.
 4. Add a read-only/local Writer DB v2 round-trip test harness. Done without
    production UI, import, sync, or storage writes.
-5. Design manual v2 import safety in this order: v2 import parser, preview
-   result, backup Sparks and Packages, merge in memory, then write.
-6. Add manual import that can merge v1 and v2 safely.
-7. Add tests and local backups that cover Sparks and Packages.
-8. Only then design Google Drive v2 sync.
-9. Only after v2 sync is safe, start creating WriterPackages from production UI.
-10. Only after packages exist safely across devices, build the workspace UI.
+5. Design manual v1/v2 import preview, backup, in-memory merge, validation, and
+   guarded write contracts. Done as documentation only; no runtime import path
+   changed.
+6. Implement and test pure `previewWriterDbImport` without UI or storage access.
+7. Implement and test pure `createWriterDbImportBackup` and
+   `mergeWriterDbInMemory` without storage writes.
+8. Add the unified backup storage adapter and a small prepared transaction
+   marker, then test rollback and interrupted-write recovery.
+9. Add an explicit manual v1/v2 import preview UI only after the pure and
+   persistence layers pass their checks.
+10. Only then design Google Drive v2 sync.
+11. Only after v2 sync is safe, start creating WriterPackages from production UI.
+12. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 
@@ -143,6 +149,14 @@ Rules:
 - v2 import must not write while parsing or previewing. It should write only
   after a valid payload is parsed, the merge result is previewed, local Sparks
   and WriterPackages are backed up, and the merge has succeeded in memory.
+- Count mismatches and Spark/WriterPackage cross-model id overlap are warnings;
+  duplicate ids inside one incoming collection block import as ambiguous.
+- The future unified import backup uses
+  `lassilab-writer:v0.1:writer-db:backup-before-import`; it must not change the
+  existing Spark-only import backup key or payload.
+- Because localStorage cannot atomically write both model keys, a prepared
+  transaction marker and validated rollback backup are required before v2
+  import can write production data.
 
 ## Explicit Non-Goals
 
