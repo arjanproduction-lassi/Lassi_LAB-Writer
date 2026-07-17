@@ -131,7 +131,9 @@ Small commits:
    Done with complete two-model snapshots, input validation, canonical ISO time,
    duplicate-id rejection, and deep-copy isolation.
 9. Add the unified backup storage adapter and a small prepared transaction
-   marker, then test rollback and interrupted-write recovery.
+   marker, then test rollback and interrupted-write recovery. Prepared locally
+   as an injected, headless persistence coordinator; production import remains
+   unchanged.
 10. Add an explicit manual v1/v2 import preview UI only after the pure and
    persistence layers pass their checks.
 11. Only then design Google Drive v2 sync.
@@ -163,6 +165,9 @@ Rules:
 - Because localStorage cannot atomically write both model keys, a prepared
   transaction marker and validated rollback backup are required before v2
   import can write production data.
+- The coordinator must validate the backup before the marker, validate every
+  critical write by reading it back, restore both collections after a partial
+  failure, and preserve the marker when rollback fails.
 
 ## Explicit Non-Goals
 

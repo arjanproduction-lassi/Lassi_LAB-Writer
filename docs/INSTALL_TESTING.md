@@ -481,6 +481,23 @@ Google popup rule:
   **Pripojiť Google** or **Synchronizovať teraz**.
 - Quiet sync must not open Google by itself while the author is writing.
 
+## Writer DB Persistence Checks
+
+Run:
+
+```text
+npm run check:writer-db
+```
+
+The persistence checks use an injected in-memory storage double. They cover
+write order, backup and marker read-back validation, Sparks and WriterPackages
+read-back validation, rollback, failed rollback marker retention, tombstones,
+tags, notes, legacy metadata, and input immutability.
+
+The persistence coordinator is not connected to the production import button,
+the current export/import contract, real localStorage keys, or Google Drive
+sync. Recovery from a remaining transaction marker is not automatic.
+
 ## Add To Home Screen On Android
 
 In Chrome on Android:

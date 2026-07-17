@@ -127,6 +127,9 @@ After that:
   in-memory merge coverage, before enabling any v2 import writes.
 - Test prepared-transaction recovery for failure before the Spark write,
   between Spark and WriterPackage writes, and during rollback.
+- Add a read-only parser for a remaining prepared transaction marker. Keep it
+  headless, without recovery UI, automatic rollback, production storage wiring,
+  or Google Drive v2 sync.
 - Tune the quiet sync interval if real PC/mobile use shows it is too eager or
   too slow.
 - Consider a gentle sync-on-open pull only if Google can do it without a popup

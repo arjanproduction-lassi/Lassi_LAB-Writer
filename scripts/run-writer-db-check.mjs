@@ -26,7 +26,8 @@ try {
       "--esModuleInterop",
       "--outDir",
       outputDir,
-      "src/writerDbChecks.ts"
+      "src/writerDbChecks.ts",
+      "src/writerDbPersistenceChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -42,6 +43,15 @@ try {
 
   if (run.status !== 0) {
     process.exit(run.status ?? 1);
+  }
+
+  const persistenceRun = spawnSync(process.execPath, [join(outputDir, "writerDbPersistenceChecks.js")], {
+    cwd: repoRoot,
+    stdio: "inherit"
+  });
+
+  if (persistenceRun.status !== 0) {
+    process.exit(persistenceRun.status ?? 1);
   }
 } finally {
   rmSync(outputDir, { recursive: true, force: true });

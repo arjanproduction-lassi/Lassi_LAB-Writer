@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-07-17 - Writer DB persistence coordinator foundation
+
+- Added `src/writerDbPersistence.ts` with injected key-value storage and
+  explicit Sparks, Packages, backup, and transaction keys.
+- The coordinator validates all inputs and serializes all values before the
+  first write.
+- It writes and validates the complete backup before creating a prepared
+  transaction marker.
+- Sparks and WriterPackages are written separately and validated by read-back.
+- Partial failures attempt to restore both collections from the backup. A
+  failed rollback leaves the transaction marker for a future recovery step.
+- Added 21 in-memory persistence checks without using browser localStorage.
+- Production import, App.tsx, Google Drive sync, and automatic migration remain
+  unchanged and disconnected from this coordinator.
+
 ## 2026-07-16 - Pure Writer DB import backup factory
 
 - Added `WriterDbImportBackup`, `CreateWriterDbImportBackupInput`, and the

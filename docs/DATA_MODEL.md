@@ -835,3 +835,27 @@ Possible targets:
   metadata.
 - Export bridges should copy or transform selected material. They should not
   depend on direct shared database access.
+
+## Persistence Coordinator Foundation
+
+`src/writerDbPersistence.ts` contains a testable persistence coordinator for a
+future v1/v2 import write. It is not connected to production import, App.tsx,
+or Google Drive sync.
+
+The coordinator receives a small key-value storage interface and all storage
+keys by injection. Tests use only an in-memory storage double; the coordinator
+does not read or write `window.localStorage` directly.
+
+Required operation order:
+
+1. Validate the backup, target Sparks, and target WriterPackages.
+2. Serialize all values in memory.
+3. Write and read-back validate the complete two-model backup.
+4. Write and read-back validate a prepared transaction marker.
+5. Write and read-back validate Sparks.
+6. Write and read-back validate WriterPackages.
+7. Remove the transaction marker after success.
+
+The marker contains only operation metadata, never creative text, tokens, or
+secrets. A partial failure restores both collections from the backup. A failed
+rollback leaves the marker for a future read-only recovery parser.
