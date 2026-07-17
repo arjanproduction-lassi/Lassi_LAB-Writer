@@ -70,21 +70,21 @@ counts and warnings, and does not write anything. Pure
 `mergeWriterDbInMemory` now rejects blocked previews, merges v1/v2 data into
 deeply detached arrays with stable order, and validates the result without
 persisting it. Pure `createWriterDbImportBackup` now validates and deep-copies
-the complete local Sparks and WriterPackages state for both source versions.
-Backup persistence, the guarded write coordinator, and preview UI remain
-unimplemented. Current production v1 import/export and Google Drive sync remain
-unchanged.
+the complete local Sparks and WriterPackages state for both source versions. An
+injected persistence coordinator now covers backup and marker writes,
+read-back validation, rollback, and failed-rollback marker retention. A
+read-only recovery inspection now diagnoses remaining prepared markers as
+`clean`, `recoverable`, or `blocked` without writing, rollback, UI, or runtime
+localStorage access. Preview UI remains unimplemented. Current production v1
+import/export and Google Drive sync remain unchanged.
 
 After that:
 
-1. Add a safe write coordinator around the new unified backup key and prepared
-   import transaction marker, with no UI yet. Test backup read-back validation,
-   rollback, and interrupted-write recovery.
-2. Add the explicit manual v1/v2 preview and confirmation UI only after the
-   coordinator checks pass.
-3. Only then plan Google Drive v2 sync rollout.
-4. Only after that begin production creation of WriterPackages.
-5. Only after packages can travel safely build the new workspace UI.
+1. Add the explicit manual v1/v2 preview and confirmation UI only after the
+   pure, persistence, and recovery checks keep passing.
+2. Only then plan Google Drive v2 sync rollout.
+3. Only after that begin production creation of WriterPackages.
+4. Only after packages can travel safely build the new workspace UI.
 
 ## Repository Setup Tasks
 
@@ -123,13 +123,13 @@ After that:
   wins and no duplicate spark appears.
 - Test four-notebook stage changes across PC and mobile; confirm newer
   `updatedAt` wins and the stage travels through sync/export/import.
-- Extend Writer DB checks first with pure preview coverage, then backup and
-  in-memory merge coverage, before enabling any v2 import writes.
-- Test prepared-transaction recovery for failure before the Spark write,
-  between Spark and WriterPackage writes, and during rollback.
-- Add a read-only parser for a remaining prepared transaction marker. Keep it
-  headless, without recovery UI, automatic rollback, production storage wiring,
-  or Google Drive v2 sync.
+- Keep extending Writer DB checks before enabling any production v2 import
+  writes.
+- Test the future production import wiring against failures before the Spark
+  write, between Spark and WriterPackage writes, and during rollback.
+- Keep recovery inspection headless, without recovery UI, automatic rollback,
+  production storage wiring, or Google Drive v2 sync until an explicit manual
+  recovery design exists.
 - Tune the quiet sync interval if real PC/mobile use shows it is too eager or
   too slow.
 - Consider a gentle sync-on-open pull only if Google can do it without a popup

@@ -859,3 +859,31 @@ Required operation order:
 The marker contains only operation metadata, never creative text, tokens, or
 secrets. A partial failure restores both collections from the backup. A failed
 rollback leaves the marker for a future read-only recovery parser.
+
+## Read-Only Recovery Inspection
+
+`src/writerDbRecovery.ts` inspects an interrupted import without changing any
+stored value. It returns `clean` when no marker exists, `recoverable` when the
+marker and backup are valid and compatible, and `blocked` when that recovery
+foundation is missing, damaged, unsupported, or inconsistent.
+
+Current Sparks and WriterPackages are diagnostic inputs. Invalid current data
+or read failures can still be recoverable from a valid backup and produce
+stable warnings. Target count differences are warnings because counts are not
+the source of truth.
+
+Warnings:
+
+- `current-sparks-invalid`
+- `current-packages-invalid`
+- `target-count-mismatch`
+
+Blocking conditions:
+
+- damaged, unsupported, or unreadable transaction marker
+- missing, damaged, unsupported, or unusable backup
+- duplicate ids inside backup Sparks or WriterPackages
+- marker and backup `sourceSchemaVersion` mismatch
+
+Inspection never writes, removes the marker, creates a backup, performs
+rollback, or repairs data automatically.

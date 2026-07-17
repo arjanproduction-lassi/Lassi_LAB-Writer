@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-17 - Read-only Writer DB recovery inspection
+
+- Added `inspectWriterDbRecovery` with explicit `clean`, `recoverable`, and
+  `blocked` results.
+- The inspection reads only injected storage and never calls `setItem` or
+  `removeItem`.
+- A valid marker and complete backup remain recoverable even when current
+  Sparks or WriterPackages are damaged; those conditions produce warnings.
+- Unknown marker/backup versions, missing or invalid backup data, duplicate
+  backup ids, and source-schema mismatch block recovery inspection.
+- Added 20 recovery checks while preserving all previous 87 checks.
+- Covered matching v1 marker/backup recovery, duplicate backup id blocking,
+  and current collection read failures as warnings.
+- No recovery UI, rollback, marker removal, production storage wiring,
+  migration, or Google Drive sync change was added.
+
 ## 2026-07-17 - Writer DB persistence coordinator foundation
 
 - Added `src/writerDbPersistence.ts` with injected key-value storage and

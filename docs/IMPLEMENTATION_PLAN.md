@@ -134,11 +134,15 @@ Small commits:
    marker, then test rollback and interrupted-write recovery. Prepared locally
    as an injected, headless persistence coordinator; production import remains
    unchanged.
-10. Add an explicit manual v1/v2 import preview UI only after the pure and
+10. Add a read-only recovery inspection for a remaining prepared marker. Done
+   as an injected, headless diagnostic function with `clean`, `recoverable`,
+   and `blocked` results; it does not write, rollback, remove markers, touch UI,
+   or use runtime localStorage directly.
+11. Add an explicit manual v1/v2 import preview UI only after the pure and
    persistence layers pass their checks.
-11. Only then design Google Drive v2 sync.
-12. Only after v2 sync is safe, start creating WriterPackages from production UI.
-13. Only after packages exist safely across devices, build the workspace UI.
+12. Only then design Google Drive v2 sync.
+13. Only after v2 sync is safe, start creating WriterPackages from production UI.
+14. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 
@@ -168,6 +172,10 @@ Rules:
 - The coordinator must validate the backup before the marker, validate every
   critical write by reading it back, restore both collections after a partial
   failure, and preserve the marker when rollback fails.
+- Recovery inspection is diagnostic only. A missing marker is `clean`; a valid
+  marker plus compatible valid backup is `recoverable`; damaged marker or
+  backup state is `blocked`. Damaged current collections and target-count
+  mismatches are warnings when the backup remains valid.
 
 ## Explicit Non-Goals
 

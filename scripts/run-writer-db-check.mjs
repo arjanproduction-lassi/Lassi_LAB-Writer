@@ -27,7 +27,8 @@ try {
       "--outDir",
       outputDir,
       "src/writerDbChecks.ts",
-      "src/writerDbPersistenceChecks.ts"
+      "src/writerDbPersistenceChecks.ts",
+      "src/writerDbRecoveryChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -52,6 +53,15 @@ try {
 
   if (persistenceRun.status !== 0) {
     process.exit(persistenceRun.status ?? 1);
+  }
+
+  const recoveryRun = spawnSync(process.execPath, [join(outputDir, "writerDbRecoveryChecks.js")], {
+    cwd: repoRoot,
+    stdio: "inherit"
+  });
+
+  if (recoveryRun.status !== 0) {
+    process.exit(recoveryRun.status ?? 1);
   }
 } finally {
   rmSync(outputDir, { recursive: true, force: true });

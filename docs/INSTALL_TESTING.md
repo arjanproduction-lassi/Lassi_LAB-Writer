@@ -40,9 +40,9 @@ Expected result:
 
 ## Run Writer DB Checks
 
-Writer DB v2 has a small local read-only check harness. It does not use
-production UI, does not import data, does not write localStorage, and does not
-change Google Drive sync.
+Writer DB v2 has a small local check harness. It does not use production UI,
+does not import data through the app, does not write runtime localStorage, and
+does not change Google Drive sync.
 
 ```bash
 npm run check:writer-db
@@ -51,9 +51,9 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summary reports 66 checks: 13 existing parser/export checks, 14 pure
-  import-preview checks, 20 pure in-memory merge checks, and 19 pure backup
-  factory checks.
+- The summaries report 107 checks total: 66 parser/export, import-preview,
+  in-memory merge, and backup-factory checks; 21 injected persistence
+  coordinator checks; and 20 read-only recovery inspection checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -65,7 +65,13 @@ Expected result:
 - Backup checks cover complete two-model snapshots, source versions, canonical
   time, tombstones, nested data, invalid inputs, duplicate ids, deep-copy
   isolation, and no localStorage access.
-- No backup persistence or production storage write is performed.
+- Persistence checks cover injected backup and marker writes, read-back
+  validation, rollback, failed rollback marker retention, and no real
+  localStorage access.
+- Recovery checks cover `clean`, `recoverable`, and `blocked` results, warning
+  cases, blocking backup/marker damage, and read-only behavior.
+- No production storage write, production import, export, UI, or Google Drive
+  sync change is performed.
 
 ## Writer DB Import Preview Checks
 
@@ -117,8 +123,8 @@ Current checks confirm:
   `ok: false`
 - localStorage is never read or written
 
-The next check layer will cover backup persistence and the guarded write
-coordinator. Both remain unimplemented.
+The persistence checks below cover the guarded write coordinator. It remains
+disconnected from production import and UI.
 
 ## Writer DB Import Backup Factory Checks
 
@@ -139,9 +145,10 @@ Current checks confirm:
   directions
 - localStorage is never read or written
 
-The planned unified backup key remains documentation only. Save/load backup,
-prepared transaction marker, rollback, and guarded production writes are not
-implemented.
+The planned unified backup key remains disconnected from production runtime.
+Save/load backup, prepared transaction marker, rollback, and guarded writes are
+covered only by injected checks until a later UI/import slice explicitly wires
+them in.
 
 ## Test The Production Build Locally
 
@@ -497,6 +504,26 @@ tags, notes, legacy metadata, and input immutability.
 The persistence coordinator is not connected to the production import button,
 the current export/import contract, real localStorage keys, or Google Drive
 sync. Recovery from a remaining transaction marker is not automatic.
+
+## Writer DB Recovery Inspection Checks
+
+Run:
+
+```text
+npm run check:writer-db
+```
+
+The recovery inspection checks use injected storage only. They cover:
+
+- no marker -> `clean`
+- valid marker plus compatible valid backup -> `recoverable`
+- damaged marker, missing backup, damaged backup, unsupported backup version,
+  duplicate backup ids, and source-schema mismatch -> `blocked`
+- damaged or unreadable current Sparks/WriterPackages -> `recoverable` with
+  warnings when the backup is still valid
+- target Spark/Package count mismatch -> warning only
+- no `setItem`, no `removeItem`, no real `window.localStorage`, no marker
+  cleanup, no rollback, and no automatic repair
 
 ## Add To Home Screen On Android
 
