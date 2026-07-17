@@ -1,5 +1,24 @@
 # Worklog
 
+## 2026-07-16 - Pure Writer DB import backup factory
+
+- Added `WriterDbImportBackup`, `CreateWriterDbImportBackupInput`, and the
+  discriminated `WriterDbImportBackupResult`.
+- Added pure `createWriterDbImportBackup` with no storage access or persistence.
+- Backed up complete local Sparks and WriterPackages for both v1 and v2 source
+  versions, including tombstones, stage, tags, notes, deleted notes,
+  workshop/final text, and legacy metadata.
+- Validated source schema, optional deterministic time, every record,
+  `packageVersion`, and same-collection id uniqueness before creating a backup.
+- Deep-copied arrays and nested values in both directions so later mutation of
+  backup or input cannot affect the other side.
+- Extended `npm run check:writer-db` from 47 to 66 checks: 13 parser/export, 14
+  preview, 20 in-memory merge, and 19 backup factory checks.
+- No backup persistence, runtime storage key, transaction marker, rollback, UI,
+  production import, migration, or Google Drive sync behavior was added.
+- The next smallest step is a guarded persistence coordinator with validated
+  backup write/read-back and a prepared transaction marker, still without UI.
+
 ## 2026-07-16 - Pure Writer DB v1/v2 in-memory merge
 
 - Added discriminated `WriterDbInMemoryMergeResult` and pure

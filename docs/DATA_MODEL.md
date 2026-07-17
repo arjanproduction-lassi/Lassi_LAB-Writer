@@ -542,20 +542,35 @@ type WriterDbImportBackup = {
 };
 ```
 
-Proposed pure builder:
+Implemented pure builder contract:
 
 ```ts
-function createWriterDbImportBackup(input: {
-  createdAt: string;
+type CreateWriterDbImportBackupInput = {
   sourceSchemaVersion: 1 | 2;
-  sparks: readonly Spark[];
-  packages: readonly WriterPackage[];
-}): WriterDbImportBackup;
+  localSparks: readonly Spark[];
+  localPackages: readonly WriterPackage[];
+  now?: string;
+};
+
+type WriterDbImportBackupResult =
+  | { ok: true; backup: WriterDbImportBackup }
+  | { ok: false; error: string };
+
+function createWriterDbImportBackup(
+  input: CreateWriterDbImportBackupInput
+): WriterDbImportBackupResult;
 ```
 
-The builder returns a detached snapshot, including nested package notes, and
-does not persist it. The storage adapter must validate the serialized backup
-before and after writing it.
+The builder validates `sourceSchemaVersion`, optional `now`, every Spark, every
+WriterPackage, `packageVersion`, and same-collection id uniqueness before
+returning a backup. Without `now`, it creates the current ISO timestamp; a
+valid supplied `now` is normalized to canonical ISO for deterministic checks.
+
+A successful backup is a detached snapshot of both complete local models even
+for a v1 source. It includes tombstones, Spark stage and tags, WriterPackage
+notes and deleted notes, workshop/final text, and legacy metadata. The builder
+does not persist anything. The future storage adapter must validate the
+serialized backup before and after writing it.
 
 Recommended localStorage key for the future previewed v1/v2 importer:
 
@@ -574,6 +589,9 @@ v1 importer exists. A new valid unified backup may replace the previous unified
 `backup-before-import` value, but it must not overwrite or migrate the legacy
 Spark-only backup. The unified backup is local only, is not sent to Google
 Drive, and is not included in normal v1 or v2 DB exports.
+
+The unified key above is still documentation only. The pure backup factory does
+not read or write it and no save/load backup API exists yet.
 
 A malformed backup must never be restored automatically. Recovery first parses
 and validates the complete backup; an invalid backup blocks recovery and shows

@@ -2,6 +2,7 @@ import type { Spark, WriterPackage } from "./types";
 import type {
   ImportCollectionPreview,
   WriterDb,
+  WriterDbImportBackupResult,
   WriterDbImportPreview,
   WriterDbInMemoryMergeResult,
   WriterDbV1
@@ -10,6 +11,7 @@ import {
   WRITER_DB_APP_NAME,
   WRITER_DB_V1_SCHEMA_VERSION,
   WRITER_DB_V2_SCHEMA_VERSION,
+  createWriterDbImportBackup,
   createWriterDbV2Payload,
   mergeWriterDbInMemory,
   parseWriterDbJson,
@@ -177,6 +179,27 @@ function assertMergeOk(
   result: WriterDbInMemoryMergeResult,
   message: string
 ): asserts result is Extract<WriterDbInMemoryMergeResult, { ok: true }> {
+  assert(result.ok, `${message}: ${result.ok ? "" : result.error}`);
+}
+
+function createBackup(
+  sourceSchemaVersion: WriterDb["schemaVersion"],
+  localSparks: readonly Spark[] = [],
+  localPackages: readonly WriterPackage[] = [],
+  now?: string
+): WriterDbImportBackupResult {
+  return createWriterDbImportBackup({
+    sourceSchemaVersion,
+    localSparks,
+    localPackages,
+    ...(now === undefined ? {} : { now })
+  });
+}
+
+function assertBackupOk(
+  result: WriterDbImportBackupResult,
+  message: string
+): asserts result is Extract<WriterDbImportBackupResult, { ok: true }> {
   assert(result.ok, `${message}: ${result.ok ? "" : result.error}`);
 }
 
@@ -1065,10 +1088,386 @@ const inMemoryMergeTests: TestCase[] = [
   }
 ];
 
+const backupFactoryTests: TestCase[] = [
+  {
+    name: "backup factory captures an empty state with current ISO time",
+    run: () => {
+      const result = createBackup(WRITER_DB_V2_SCHEMA_VERSION);
+
+      assertBackupOk(result, "empty backup should succeed");
+      assert(result.backup.backupVersion === 1, "backupVersion should be 1");
+      assert(result.backup.reason === "before-import", "backup reason is wrong");
+      assertDeepEqual(result.backup.sparks, [], "empty backup has Sparks");
+      assertDeepEqual(result.backup.packages, [], "empty backup has Packages");
+      assert(
+        new Date(result.backup.createdAt).toISOString() === result.backup.createdAt,
+        "default createdAt is not canonical ISO"
+      );
+      assert(
+        Math.abs(Date.now() - Date.parse(result.backup.createdAt)) < 5000,
+        "default createdAt is not current"
+      );
+    }
+  },
+  {
+    name: "backup factory preserves sourceSchemaVersion 1",
+    run: () => {
+      const result = createBackup(WRITER_DB_V1_SCHEMA_VERSION, [], [], EXPORTED_AT);
+
+      assertBackupOk(result, "v1 backup should succeed");
+      assert(result.backup.sourceSchemaVersion === 1, "v1 sourceSchemaVersion changed");
+    }
+  },
+  {
+    name: "backup factory preserves sourceSchemaVersion 2",
+    run: () => {
+      const result = createBackup(WRITER_DB_V2_SCHEMA_VERSION, [], [], EXPORTED_AT);
+
+      assertBackupOk(result, "v2 backup should succeed");
+      assert(result.backup.sourceSchemaVersion === 2, "v2 sourceSchemaVersion changed");
+    }
+  },
+  {
+    name: "v1 backup includes both local Sparks and Packages",
+    run: () => {
+      const result = createBackup(
+        WRITER_DB_V1_SCHEMA_VERSION,
+        [normalSpark],
+        [basicPackage],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "v1 full-state backup should succeed");
+      assertDeepEqual(result.backup.sparks, [normalSpark], "v1 backup lost Sparks");
+      assertDeepEqual(result.backup.packages, [basicPackage], "v1 backup lost Packages");
+    }
+  },
+  {
+    name: "backup preserves record and note tombstones",
+    run: () => {
+      const deletedPackage: WriterPackage = {
+        ...packageWithNotes,
+        updatedAt: "2026-07-16T12:00:00.000Z",
+        deletedAt: "2026-07-16T12:00:00.000Z"
+      };
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [deletedSpark],
+        [deletedPackage],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "tombstone backup should succeed");
+      assert(result.backup.sparks[0].deletedAt === deletedSpark.deletedAt, "Spark tombstone changed");
+      assert(
+        result.backup.packages[0].deletedAt === deletedPackage.deletedAt,
+        "Package tombstone changed"
+      );
+      assert(
+        result.backup.packages[0].notes[1].deletedAt === packageWithNotes.notes[1].deletedAt,
+        "deleted note tombstone changed"
+      );
+    }
+  },
+  {
+    name: "backup preserves Spark stage and tags",
+    run: () => {
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [stagedSpark],
+        [],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "staged Spark backup should succeed");
+      assert(result.backup.sparks[0].stage === "workshop", "Spark stage changed");
+      assertDeepEqual(result.backup.sparks[0].tags, ["stage"], "Spark tags changed");
+    }
+  },
+  {
+    name: "backup preserves Package notes including deleted notes",
+    run: () => {
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [],
+        [packageWithNotes],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "Package notes backup should succeed");
+      assertDeepEqual(
+        result.backup.packages[0].notes,
+        packageWithNotes.notes,
+        "Package notes changed"
+      );
+    }
+  },
+  {
+    name: "backup preserves workshopText and finalText",
+    run: () => {
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [],
+        [basicPackage],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "Package text backup should succeed");
+      assert(
+        result.backup.packages[0].workshopText === basicPackage.workshopText,
+        "workshopText changed"
+      );
+      assert(result.backup.packages[0].finalText === basicPackage.finalText, "finalText changed");
+    }
+  },
+  {
+    name: "backup preserves legacy metadata",
+    run: () => {
+      const packageWithLegacy: WriterPackage = {
+        ...basicPackage,
+        legacy: {
+          source: "spark",
+          stage: "final"
+        }
+      };
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [],
+        [packageWithLegacy],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "legacy metadata backup should succeed");
+      assertDeepEqual(
+        result.backup.packages[0].legacy,
+        packageWithLegacy.legacy,
+        "legacy metadata changed"
+      );
+    }
+  },
+  {
+    name: "backup factory uses deterministic createdAt from now",
+    run: () => {
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [normalSpark],
+        [basicPackage],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "deterministic backup should succeed");
+      assert(result.backup.createdAt === EXPORTED_AT, "deterministic createdAt changed");
+    }
+  },
+  {
+    name: "backup factory rejects invalid now",
+    run: () => {
+      const result = createBackup(WRITER_DB_V2_SCHEMA_VERSION, [], [], "not-a-date");
+
+      assert(!result.ok, "invalid now should reject backup");
+      assert(result.error.includes("createdAt"), "invalid now error is unclear");
+    }
+  },
+  {
+    name: "backup factory rejects invalid Spark",
+    run: () => {
+      const invalidSpark = {
+        ...normalSpark,
+        updatedAt: "not-a-date"
+      } as Spark;
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [invalidSpark],
+        [],
+        EXPORTED_AT
+      );
+
+      assert(!result.ok, "invalid Spark should reject backup");
+      assert(result.error.includes("Spark"), "invalid Spark backup error is unclear");
+    }
+  },
+  {
+    name: "backup factory rejects invalid Package",
+    run: () => {
+      const invalidPackage = {
+        ...basicPackage,
+        packageVersion: 2
+      } as unknown as WriterPackage;
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [],
+        [invalidPackage],
+        EXPORTED_AT
+      );
+
+      assert(!result.ok, "invalid Package should reject backup");
+      assert(result.error.includes("WriterPackage"), "invalid Package backup error is unclear");
+    }
+  },
+  {
+    name: "backup factory rejects duplicate Spark ids",
+    run: () => {
+      const duplicate: Spark = {
+        ...normalSpark,
+        text: "Duplicate Spark"
+      };
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [normalSpark, duplicate],
+        [],
+        EXPORTED_AT
+      );
+
+      assert(!result.ok, "duplicate Spark ids should reject backup");
+      assert(result.error.includes("duplicitne id"), "duplicate Spark backup error is unclear");
+    }
+  },
+  {
+    name: "backup factory rejects duplicate Package ids",
+    run: () => {
+      const duplicate: WriterPackage = {
+        ...basicPackage,
+        title: "Duplicate Package"
+      };
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [],
+        [basicPackage, duplicate],
+        EXPORTED_AT
+      );
+
+      assert(!result.ok, "duplicate Package ids should reject backup");
+      assert(result.error.includes("duplicitne id"), "duplicate Package backup error is unclear");
+    }
+  },
+  {
+    name: "mutating backup cannot mutate local inputs",
+    run: () => {
+      const localSparks = cloneJson([stagedSpark]);
+      const packageWithLegacy: WriterPackage = {
+        ...cloneJson(packageWithNotes),
+        legacy: {
+          source: "spark",
+          stage: "notes"
+        }
+      };
+      const localPackages = [packageWithLegacy];
+      const result = createBackup(
+        WRITER_DB_V1_SCHEMA_VERSION,
+        localSparks,
+        localPackages,
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "backup-to-input immutability setup should succeed");
+      result.backup.sparks[0].tags.push("backup-only");
+      result.backup.packages[0].notes[0].text = "Changed in backup";
+      if (result.backup.packages[0].legacy) {
+        result.backup.packages[0].legacy.stage = "final";
+      }
+      result.backup.sparks.push(cloneJson(normalSpark));
+
+      assertDeepEqual(localSparks[0].tags, ["stage"], "backup tags mutated local Spark");
+      assert(
+        localPackages[0].notes[0].text === "First note",
+        "backup note mutated local Package"
+      );
+      assert(localPackages[0].legacy?.stage === "notes", "backup mutated local legacy metadata");
+      assert(localSparks.length === 1, "backup array mutation changed local Spark array");
+    }
+  },
+  {
+    name: "mutating local inputs cannot mutate created backup",
+    run: () => {
+      const localSparks = cloneJson([stagedSpark]);
+      const localPackages: WriterPackage[] = cloneJson([
+        {
+          ...packageWithNotes,
+          legacy: {
+            source: "spark" as const,
+            stage: "notes" as const
+          }
+        }
+      ]);
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        localSparks,
+        localPackages,
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "input-to-backup immutability setup should succeed");
+      localSparks[0].tags.push("input-only");
+      localPackages[0].notes[0].text = "Changed in input";
+      if (localPackages[0].legacy) {
+        localPackages[0].legacy.stage = "final";
+      }
+      localPackages.push(cloneJson(basicPackage));
+
+      assertDeepEqual(result.backup.sparks[0].tags, ["stage"], "input tags mutated backup");
+      assert(
+        result.backup.packages[0].notes[0].text === "First note",
+        "input note mutated backup"
+      );
+      assert(result.backup.packages[0].legacy?.stage === "notes", "input mutated backup legacy");
+      assert(result.backup.packages.length === 1, "input array mutation changed backup array");
+    }
+  },
+  {
+    name: "backup factory does not touch localStorage",
+    run: () => {
+      let localStorageTouches = 0;
+      const throwingStorage = {
+        getItem(_key: string) {
+          localStorageTouches += 1;
+          throw new Error("createWriterDbImportBackup touched localStorage");
+        },
+        setItem(_key: string, _value: string) {
+          localStorageTouches += 1;
+          throw new Error("createWriterDbImportBackup touched localStorage");
+        },
+        removeItem(_key: string) {
+          localStorageTouches += 1;
+          throw new Error("createWriterDbImportBackup touched localStorage");
+        }
+      };
+
+      (globalThis as unknown as { window: { localStorage: typeof throwingStorage } }).window = {
+        localStorage: throwingStorage
+      };
+
+      const result = createBackup(
+        WRITER_DB_V2_SCHEMA_VERSION,
+        [normalSpark],
+        [basicPackage],
+        EXPORTED_AT
+      );
+
+      assertBackupOk(result, "localStorage guard backup should succeed");
+      assert(localStorageTouches === 0, "backup factory touched localStorage");
+    }
+  },
+  {
+    name: "backup factory rejects unsupported sourceSchemaVersion",
+    run: () => {
+      const result = createWriterDbImportBackup({
+        sourceSchemaVersion: 3 as WriterDb["schemaVersion"],
+        localSparks: [],
+        localPackages: [],
+        now: EXPORTED_AT
+      });
+
+      assert(!result.ok, "unsupported sourceSchemaVersion should reject backup");
+      assert(result.error.includes("sourceSchemaVersion"), "schema version error is unclear");
+    }
+  }
+];
+
 const tests: TestCase[] = [
   ...parserAndExportTests,
   ...importPreviewTests,
-  ...inMemoryMergeTests
+  ...inMemoryMergeTests,
+  ...backupFactoryTests
 ];
 
 export function runWriterDbChecks() {
@@ -1083,7 +1482,7 @@ export function runWriterDbChecks() {
   console.log(
     `Writer DB checks passed: ${passed}/${tests.length} ` +
       `(${parserAndExportTests.length} existing, ${importPreviewTests.length} import preview, ` +
-      `${inMemoryMergeTests.length} in-memory merge)`
+      `${inMemoryMergeTests.length} in-memory merge, ${backupFactoryTests.length} backup factory)`
   );
 }
 

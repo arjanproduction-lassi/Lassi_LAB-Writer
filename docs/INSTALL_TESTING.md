@@ -51,8 +51,9 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summary reports 47 checks: 13 existing parser/export checks, 14 pure
-  import-preview checks, and 20 pure in-memory merge checks.
+- The summary reports 66 checks: 13 existing parser/export checks, 14 pure
+  import-preview checks, 20 pure in-memory merge checks, and 19 pure backup
+  factory checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -61,7 +62,10 @@ Expected result:
 - Merge checks cover blocked preview rejection, stable ordering, tombstone
   decisions, missing records, whole-package replacement, deep copies, result
   validation, and no localStorage access.
-- No backup or storage write is performed.
+- Backup checks cover complete two-model snapshots, source versions, canonical
+  time, tombstones, nested data, invalid inputs, duplicate ids, deep-copy
+  isolation, and no localStorage access.
+- No backup persistence or production storage write is performed.
 
 ## Writer DB Import Preview Checks
 
@@ -113,8 +117,31 @@ Current checks confirm:
   `ok: false`
 - localStorage is never read or written
 
-The next check layer will cover a pure backup builder and validation. Backup
-persistence and the guarded write coordinator remain unimplemented.
+The next check layer will cover backup persistence and the guarded write
+coordinator. Both remain unimplemented.
+
+## Writer DB Import Backup Factory Checks
+
+Pure `createWriterDbImportBackup` is not connected to production import or
+storage. It returns either a validated, detached backup or a clear error.
+
+Current checks confirm:
+
+- `backupVersion` is `1` and `reason` is `before-import`
+- source schema versions 1 and 2 are preserved
+- v1 and v2 backups both contain complete local Sparks and WriterPackages
+- default `createdAt` is current canonical ISO and optional `now` is deterministic
+- tombstones, stage, tags, notes, deleted notes, workshop/final text, and legacy
+  metadata are preserved
+- invalid time, source schema, Spark, Package, `packageVersion`, and duplicate
+  same-collection ids return `ok: false`
+- backup arrays and nested values are detached from inputs in both mutation
+  directions
+- localStorage is never read or written
+
+The planned unified backup key remains documentation only. Save/load backup,
+prepared transaction marker, rollback, and guarded production writes are not
+implemented.
 
 ## Test The Production Build Locally
 

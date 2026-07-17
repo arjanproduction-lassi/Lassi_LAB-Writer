@@ -128,6 +128,8 @@ Small commits:
    Done with blocked-preview rejection, stable ordering, deep copies, result
    validation, v1 Packages untouched, and independent v2 collection merges.
 8. Implement and test pure `createWriterDbImportBackup` without persistence.
+   Done with complete two-model snapshots, input validation, canonical ISO time,
+   duplicate-id rejection, and deep-copy isolation.
 9. Add the unified backup storage adapter and a small prepared transaction
    marker, then test rollback and interrupted-write recovery.
 10. Add an explicit manual v1/v2 import preview UI only after the pure and

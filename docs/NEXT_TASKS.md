@@ -48,8 +48,8 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- implement pure `createWriterDbImportBackup` plus backup validation, still
-  without UI, backup persistence, or production localStorage writes
+- design and implement the guarded persistence coordinator around a validated
+  backup and prepared transaction marker, still without production UI
 
 ## Next Technical Slice
 
@@ -69,22 +69,22 @@ now compares parsed v1/v2 data with explicit local arrays, reports deterministic
 counts and warnings, and does not write anything. Pure
 `mergeWriterDbInMemory` now rejects blocked previews, merges v1/v2 data into
 deeply detached arrays with stable order, and validates the result without
-persisting it. The unified backup, guarded write coordinator, and preview UI
-remain unimplemented. Current production v1 import/export and Google Drive sync
-remain unchanged.
+persisting it. Pure `createWriterDbImportBackup` now validates and deep-copies
+the complete local Sparks and WriterPackages state for both source versions.
+Backup persistence, the guarded write coordinator, and preview UI remain
+unimplemented. Current production v1 import/export and Google Drive sync remain
+unchanged.
 
 After that:
 
-1. Implement pure `createWriterDbImportBackup` and test detached snapshots of
-   Sparks, WriterPackages, and nested notes.
-2. Add a safe write coordinator around the new unified backup key and prepared
+1. Add a safe write coordinator around the new unified backup key and prepared
    import transaction marker, with no UI yet. Test backup read-back validation,
    rollback, and interrupted-write recovery.
-3. Add the explicit manual v1/v2 preview and confirmation UI only after the
+2. Add the explicit manual v1/v2 preview and confirmation UI only after the
    coordinator checks pass.
-4. Only then plan Google Drive v2 sync rollout.
-5. Only after that begin production creation of WriterPackages.
-6. Only after packages can travel safely build the new workspace UI.
+3. Only then plan Google Drive v2 sync rollout.
+4. Only after that begin production creation of WriterPackages.
+5. Only after packages can travel safely build the new workspace UI.
 
 ## Repository Setup Tasks
 

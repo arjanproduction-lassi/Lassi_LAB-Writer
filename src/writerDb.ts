@@ -100,6 +100,26 @@ export type WriterDbInMemoryMergeResult =
       error: string;
     };
 
+export interface WriterDbImportBackup {
+  backupVersion: 1;
+  createdAt: string;
+  reason: "before-import";
+  sourceSchemaVersion: typeof WRITER_DB_V1_SCHEMA_VERSION | typeof WRITER_DB_V2_SCHEMA_VERSION;
+  sparks: Spark[];
+  packages: WriterPackage[];
+}
+
+export interface CreateWriterDbImportBackupInput {
+  sourceSchemaVersion: typeof WRITER_DB_V1_SCHEMA_VERSION | typeof WRITER_DB_V2_SCHEMA_VERSION;
+  localSparks: readonly Spark[];
+  localPackages: readonly WriterPackage[];
+  now?: string;
+}
+
+export type WriterDbImportBackupResult =
+  | { ok: true; backup: WriterDbImportBackup }
+  | { ok: false; error: string };
+
 type WriterDbV2PayloadInput = {
   sparks: Spark[];
   packages: WriterPackage[];
@@ -489,6 +509,55 @@ export function mergeWriterDbInMemory(
     sparks,
     packages,
     preview
+  };
+}
+
+export function createWriterDbImportBackup(
+  input: CreateWriterDbImportBackupInput
+): WriterDbImportBackupResult {
+  if (
+    input.sourceSchemaVersion !== WRITER_DB_V1_SCHEMA_VERSION &&
+    input.sourceSchemaVersion !== WRITER_DB_V2_SCHEMA_VERSION
+  ) {
+    return { ok: false, error: "Nepodporovana sourceSchemaVersion backupu." };
+  }
+
+  const createdAtSource = input.now ?? new Date().toISOString();
+  if (!isValidDateString(createdAtSource)) {
+    return { ok: false, error: "Neplatny createdAt pre Writer DB import backup." };
+  }
+
+  const sparkResult = validateSparks(input.localSparks);
+  if (!sparkResult.ok) {
+    return { ok: false, error: `Neplatny lokalny Spark pre backup: ${sparkResult.error}` };
+  }
+
+  const packageResult = validatePackages(input.localPackages);
+  if (!packageResult.ok) {
+    return {
+      ok: false,
+      error: `Neplatny lokalny WriterPackage pre backup: ${packageResult.error}`
+    };
+  }
+
+  if (countDistinctDuplicateIds(input.localSparks) > 0) {
+    return { ok: false, error: "Lokalne Sparks obsahuju duplicitne id." };
+  }
+
+  if (countDistinctDuplicateIds(input.localPackages) > 0) {
+    return { ok: false, error: "Lokalne WriterPackages obsahuju duplicitne id." };
+  }
+
+  return {
+    ok: true,
+    backup: {
+      backupVersion: 1,
+      createdAt: new Date(Date.parse(createdAtSource)).toISOString(),
+      reason: "before-import",
+      sourceSchemaVersion: input.sourceSchemaVersion,
+      sparks: input.localSparks.map(cloneSpark),
+      packages: input.localPackages.map(cloneWriterPackage)
+    }
   };
 }
 
