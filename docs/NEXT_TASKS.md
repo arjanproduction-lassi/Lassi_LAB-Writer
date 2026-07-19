@@ -48,8 +48,9 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- implement the documented runtime import state transitions as a pure helper
-  with tests, without wiring `App.tsx` or enabling an active import action
+- add a separate adapter between `App.tsx` and the pure import state machine,
+  initially without calling `executeWriterDbImport` or enabling an active
+  import action
 
 ## Next Technical Slice
 
@@ -95,11 +96,18 @@ React state. The preferred rollout replaces the legacy importer with this
 coordinated path in one later reviewed change rather than maintaining two
 active import behaviors.
 
+The discriminated runtime state machine is now prepared locally as a pure
+helper. Invalid transitions are explicit rejections, imported preview revisions
+bind confirmation deterministically, importing blocks a second start/reset/new
+file, and coordinator results can terminate only an active importing state.
+The helper has no React, storage, recovery, execution, or persistence wiring.
+
 After that:
 
-1. Implement and test the final discriminated UI state transitions as a pure
-   helper. Keep App.tsx disconnected and preserve the current production v1
-   importer until the coordinated replacement is explicitly reviewed.
+1. Implement and test a thin adapter between App.tsx events and the pure state
+   machine, still without calling the coordinator. Keep the active import
+   action absent and preserve the current production v1 importer until the
+   coordinated replacement is explicitly reviewed.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

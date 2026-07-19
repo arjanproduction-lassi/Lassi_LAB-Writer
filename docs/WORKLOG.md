@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-07-19 - Pure Writer DB import UI state machine
+
+- Added a React-free discriminated state/event helper with explicit accepted or
+  rejected transition results.
+- Preview and confirmed revisions are deterministic caller inputs. A stale,
+  blocked, reset, or new-file transition drops confirmation, and an old
+  revision cannot start importing.
+- Importing accepts only coordinator result events and rejects a second start,
+  file selection, reset, preview events, and preflight events.
+- Success can arise only from importing plus a typed coordinator success.
+  Stale/blocked return to preview states and failure keeps the typed coordinator
+  result.
+- Safe close is derived from persistence stage, rollback truth, and definitely
+  absent marker state; verification, failed rollback, remaining marker, and
+  unknown marker remain unsafe.
+- Added 34 pure state checks while preserving all existing 198 checks.
+- No App.tsx, CSS, coordinator, persistence, recovery, storage, import/export,
+  Google Drive, active import action, or runtime side effect was added.
+- The next smallest step is a thin App.tsx-to-state-machine adapter tested
+  without calling `executeWriterDbImport`.
+
 ## 2026-07-19 - Final manual Writer DB runtime confirmation contract
 
 - Documented the final file -> preview -> readiness -> confirmed import ->

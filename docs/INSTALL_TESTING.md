@@ -51,12 +51,13 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summaries report 198 checks total: 66 parser/export, import-preview,
+- The summaries report 232 checks total: 66 parser/export, import-preview,
   in-memory merge, and backup-factory checks; 21 injected persistence
   coordinator checks; 20 read-only recovery inspection checks; 15 pure
   file-to-preview preparation checks; 16 pure confirmation preflight checks;
   10 pure preview UI transition checks; 26 pure import execution checks; and
-  24 injected-storage import coordinator checks.
+  24 injected-storage import coordinator checks; and 34 pure import UI state
+  transition checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -89,6 +90,10 @@ Expected result:
   one original-state backup, independent read-back verification, summary
   timing, injected identifiers and times, rollback reporting, marker retention,
   input immutability, and injected-key-only storage access.
+- UI state checks cover every allowed state transition, explicit rejection,
+  deterministic revision matching, confirmation invalidation, importing locks,
+  coordinator result mapping, safe/unsafe failure closing, immutability,
+  repeatability, and absence of runtime side effects.
 - No production storage write, production import, export, UI, or Google Drive
   sync change is performed.
 
@@ -102,6 +107,25 @@ original local arrays while the merged arrays are returned separately.
 The helper does not call the persistence coordinator, write a transaction
 marker, touch browser storage, or produce a success summary. A ready result
 therefore confirms only a prepared in-memory plan, not a completed import.
+
+## Writer DB Pure Import UI State Checks
+
+`transitionWriterDbImportUiState` is a React-free state machine. It accepts an
+explicit state and event and returns either an accepted new state or a rejected
+result with the original state and a reason. Preview revisions are injected
+deterministic strings; matching preflight and import-start events are required
+before `importing` can be reached.
+
+While importing, a second start, file selection, reset, preview event, or
+preflight event is rejected. Only coordinator success, stale, blocked, or
+failed result events can finish the operation. Success is reachable only from
+importing. Stale and blocked drop confirmation. Failed reset is allowed only
+when the coordinator result proves no marker remains and rollback was either
+unneeded or successful.
+
+The helper imports no React or runtime storage API and performs no parse,
+recovery, merge, backup, persistence, rollback, coordinator, network, or import
+operation.
 
 ## Writer DB Import Coordinator Checks
 

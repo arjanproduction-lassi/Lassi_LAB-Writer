@@ -167,12 +167,16 @@ Small commits:
    state model, confirmed-preview invalidation, one-click execution lock,
    truthful coordinator result copy, and reload/recovery rules.
 18. Implement and test the final UI state transitions as a pure helper, still
-   without App.tsx execution wiring.
-19. Replace the legacy production importer with the coordinated path in one
+   without App.tsx execution wiring. Prepared locally with explicit
+   accepted/rejected results, deterministic preview revisions, importing
+   guards, coordinator-result mapping, and safe-close derivation.
+19. Add a separate adapter between App.tsx and the pure state machine, first
+   without calling `executeWriterDbImport` or exposing an active import action.
+20. Replace the legacy production importer with the coordinated path in one
    explicitly reviewed runtime change; do not keep two active import truths.
-20. Only then design Google Drive v2 sync.
-21. Only after v2 sync is safe, start creating WriterPackages from production UI.
-22. Only after packages exist safely across devices, build the workspace UI.
+21. Only then design Google Drive v2 sync.
+22. Only after v2 sync is safe, start creating WriterPackages from production UI.
+23. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 

@@ -701,40 +701,46 @@ type WriterDbImportUiState =
   | {
       status: "preview-ready";
       fileName: string;
-      parsedDb: WriterDb;
+      db: WriterDb;
       preview: WriterDbImportPreview;
+      previewRevision: string;
     }
   | {
       status: "preview-blocked";
       fileName: string;
       error: string;
       blockingIssues: WriterDbImportBlockingIssue[];
+      reason?: WriterDbImportUiBlockedReason;
+      preview?: WriterDbImportPreview;
     }
   | {
       status: "preview-stale";
       fileName: string;
-      parsedDb: WriterDb;
+      db: WriterDb;
       preview: WriterDbImportPreview;
+      previewRevision: string;
+      message: string;
     }
   | {
       status: "import-confirm-ready";
       fileName: string;
-      parsedDb: WriterDb;
-      preview: WriterDbImportPreview;
-      recoveryStatus: "clean";
-      previewRevision: number;
-      confirmedPreviewFingerprint: string;
+      db: WriterDb;
+      confirmedPreview: WriterDbImportPreview;
+      confirmedRevision: string;
     }
-  | { status: "importing"; fileName: string; preview: WriterDbImportPreview }
-  | { status: "success"; fileName: string; result: WriterDbImportSuccessSummary }
+  | {
+      status: "importing";
+      fileName: string;
+      db: WriterDb;
+      confirmedPreview: WriterDbImportPreview;
+      confirmedRevision: string;
+    }
+  | { status: "success"; fileName: string; result: ExecuteWriterDbImportSuccessResult }
   | {
       status: "failed";
       fileName: string;
-      stage: "persistence" | "verification";
-      error: string;
-      rollbackAttempted: boolean;
-      rollbackSucceeded: boolean;
-      transactionMarkerRemaining: boolean | null;
+      result: ExecuteWriterDbImportFailedResult;
+      canSafelyClose: boolean;
     };
 ```
 
@@ -753,6 +759,26 @@ uses the persistence/verification stage, rollback flags, and truthfully read
 marker state. A remaining marker blocks another import, but verification
 failure does not always leave one because persistence may already have removed
 it after its own successful verification.
+
+`transitionWriterDbImportUiState(state, event)` now implements this model as a
+pure helper. Revisions are explicit deterministic strings supplied by its
+caller; the helper never hashes, reads time, or generates identity. A matching
+`preflight-ready` moves the current preview revision to
+`import-confirm-ready`. `import-started` must present that exact confirmed
+revision or it is rejected.
+
+Every transition returns either `{ accepted: true, state }` or
+`{ accepted: false, state, reason }`. Rejection returns the original state and
+never silently coerces an invalid event. While importing, only coordinator
+success, stale, blocked, or failed result events are accepted. Reset, another
+file, another import start, and preview/preflight events are rejected.
+
+`canSafelyClose` is derived from the coordinator failure: only a persistence
+failure with a definitely absent marker and either no required rollback or a
+successful rollback can close. Verification failure, failed rollback, a
+remaining marker, or unknown marker state cannot reset to idle. Reset also
+recomputes the guard from the result, so a manually forged boolean cannot
+bypass it. The state machine does not call the coordinator or touch runtime.
 
 ### Pure Import Confirmation Preflight
 
