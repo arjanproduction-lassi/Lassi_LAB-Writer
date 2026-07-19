@@ -147,11 +147,14 @@ Small commits:
    path. Prepared locally with separate idle/reading/ready/blocked states,
    complete local Sparks, real WriterPackages, no active import command, and no
    merge, persistence, recovery action, or production storage write.
-13. Add the explicit **Importovať** execution only after a recovery gate and a
-   fresh preview recomputation can be enforced before merge and persistence.
-14. Only then design Google Drive v2 sync.
-15. Only after v2 sync is safe, start creating WriterPackages from production UI.
-16. Only after packages exist safely across devices, build the workspace UI.
+13. Add a pure confirmation preflight with recovery gate, fresh preview
+   recomputation, and meaningful stale detection. Prepared locally without UI,
+   storage access, merge, backup, persistence, or rollback.
+14. Wire recovery-gated ready/stale/blocked results into the preview shell,
+   still without exposing import execution or persistence.
+15. Only then design Google Drive v2 sync.
+16. Only after v2 sync is safe, start creating WriterPackages from production UI.
+17. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 

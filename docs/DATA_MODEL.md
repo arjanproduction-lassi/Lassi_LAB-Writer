@@ -741,6 +741,27 @@ before producing the success summary. A remaining `recoverable` or `blocked`
 transaction marker blocks starting any new import, but recovery UI is not part
 of this import state model yet.
 
+### Pure Import Confirmation Preflight
+
+`prepareWriterDbImportPreflight` is the pure boundary before any future import
+confirmation. It accepts the parsed DB, the previous preview, fresh local
+Sparks and WriterPackages, and an already computed recovery inspection. It does
+not inspect storage itself.
+
+- `clean` recovery recomputes preview from the fresh local arrays.
+- `recoverable` blocks with `recovery-required`.
+- `blocked` recovery blocks with `recovery-blocked`.
+- A newly blocked preview returns `preview-blocked`.
+- An equivalent refreshed preview returns `ready`.
+- Any meaningful difference returns `stale` with both previews and requires a
+  new explicit user confirmation.
+
+Preview equivalence includes schema version, status, declared and actual source
+counts, both collection modes and counts, ordered warnings, and ordered
+blocking issues. The preflight does not merge, create a backup, persist, roll
+back, write a marker, touch localStorage, or mutate any input. It is not wired
+to the current preview UI or production import yet.
+
 ### Version Meanings
 
 These versions are different and must not be mixed:

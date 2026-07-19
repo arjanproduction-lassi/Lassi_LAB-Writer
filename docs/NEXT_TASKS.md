@@ -48,9 +48,9 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- connect an explicit **Importovať** action only after the UI first enforces the
-  recovery gate and recomputes preview from fresh local Sparks and real
-  WriterPackages; do not bypass renewed confirmation when preview changes
+- wire the pure recovery-gated `ready` / `stale` / `blocked` preflight result
+  into the existing preview shell, still without exposing an active
+  **Importovať** action or connecting merge, backup, or persistence
 
 ## Next Technical Slice
 
@@ -83,9 +83,9 @@ Google Drive sync remain unchanged.
 
 After that:
 
-1. Add the recovery gate and fresh-preview confirmation boundary before
-   exposing an active import action. Keep the action disconnected until both
-   can be proven without changing the current production v1 importer.
+1. Add only the recovery and stale-result UI states around the existing
+   read-only shell. Keep execution disconnected and preserve the current
+   production v1 importer.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

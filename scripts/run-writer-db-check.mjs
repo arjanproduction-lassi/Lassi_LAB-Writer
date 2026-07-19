@@ -29,7 +29,8 @@ try {
       "src/writerDbChecks.ts",
       "src/writerDbPersistenceChecks.ts",
       "src/writerDbRecoveryChecks.ts",
-      "src/writerDbImportPreviewChecks.ts"
+      "src/writerDbImportPreviewChecks.ts",
+      "src/writerDbImportPreflightChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -73,6 +74,16 @@ try {
 
   if (previewPreparationRun.status !== 0) {
     process.exit(previewPreparationRun.status ?? 1);
+  }
+
+  const preflightRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerDbImportPreflightChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (preflightRun.status !== 0) {
+    process.exit(preflightRun.status ?? 1);
   }
 } finally {
   rmSync(outputDir, { recursive: true, force: true });

@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-07-19 - Pure Writer DB import confirmation preflight
+
+- Added a pure preflight that receives recovery inspection and fresh local
+  collections as inputs without reading storage.
+- `recoverable` and `blocked` recovery states prevent a new import preparation;
+  `clean` recomputes preview from current Sparks and WriterPackages.
+- Meaningful preview comparison returns `ready`, `stale`, or `blocked` and
+  includes counts, modes, warnings, and blocking issues.
+- A stale result carries previous and refreshed previews and requires renewed
+  confirmation before any future execution.
+- Added 16 preflight checks while preserving the existing 122 checks.
+- No App.tsx wiring, active import action, merge, backup, persistence, rollback,
+  marker write, storage key, migration, or Google Drive change was added.
+
 ## 2026-07-19 - Read-only Writer DB import preview shell
 
 - Added a separate **Náhľad importu DB v1/v2** action without changing the
