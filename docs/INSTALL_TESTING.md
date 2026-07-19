@@ -51,11 +51,12 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summaries report 174 checks total: 66 parser/export, import-preview,
+- The summaries report 198 checks total: 66 parser/export, import-preview,
   in-memory merge, and backup-factory checks; 21 injected persistence
   coordinator checks; 20 read-only recovery inspection checks; 15 pure
   file-to-preview preparation checks; 16 pure confirmation preflight checks;
-  10 pure preview UI transition checks; and 26 pure import execution checks.
+  10 pure preview UI transition checks; 26 pure import execution checks; and
+  24 injected-storage import coordinator checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -84,6 +85,10 @@ Expected result:
   original-state backup creation, deterministic time, real merge and backup
   failures, deep-copy isolation, repeatability, and absence of storage or
   persistence side effects.
+- Coordinator checks cover stale/blocked write prevention, v1/v2 persistence,
+  one original-state backup, independent read-back verification, summary
+  timing, injected identifiers and times, rollback reporting, marker retention,
+  input immutability, and injected-key-only storage access.
 - No production storage write, production import, export, UI, or Google Drive
   sync change is performed.
 
@@ -97,6 +102,20 @@ original local arrays while the merged arrays are returned separately.
 The helper does not call the persistence coordinator, write a transaction
 marker, touch browser storage, or produce a success summary. A ready result
 therefore confirms only a prepared in-memory plan, not a completed import.
+
+## Writer DB Import Coordinator Checks
+
+`executeWriterDbImport` is tested only with in-memory injected storage. It is
+the only planned path from the pure execution result to the existing
+persistence coordinator. It does not duplicate backup creation, marker writes,
+or rollback.
+
+Success requires a second read of both stored collections. The coordinator
+parses and validates that combined state through the existing Writer DB parser,
+then compares both collections with the prepared merge result. Persistence and
+verification failures are separate. Rollback flags come directly from the
+persistence result, and a marker left after failed rollback is never removed by
+the coordinator.
 
 ## Writer DB Import Preview Checks
 

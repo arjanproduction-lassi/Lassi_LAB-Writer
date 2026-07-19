@@ -158,10 +158,15 @@ Small commits:
    deterministic preflight -> merge -> original-state backup plan. It returns
    ready/stale/blocked data but performs no persistence and creates no marker.
 16. Add a separate import execution coordinator with injected storage, first
-   only in harness checks and still without App.tsx wiring.
-17. Only then design Google Drive v2 sync.
-18. Only after v2 sync is safe, start creating WriterPackages from production UI.
-19. Only after packages exist safely across devices, build the workspace UI.
+   only in harness checks and still without App.tsx wiring. Prepared locally:
+   it reuses the execution plan and persistence coordinator, verifies both
+   stored collections before success, and preserves persistence rollback
+   ownership and reporting.
+17. Design the manual runtime confirmation and success/failure UI contract
+   without enabling it yet.
+18. Only then design Google Drive v2 sync.
+19. Only after v2 sync is safe, start creating WriterPackages from production UI.
+20. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 

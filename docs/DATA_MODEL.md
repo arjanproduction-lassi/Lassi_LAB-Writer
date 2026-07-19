@@ -783,6 +783,29 @@ calculated. It does not mean an import was performed: the persistence
 coordinator is not called, no transaction marker is created, and no success
 summary exists before a future write and read-back verification.
 
+### Import Execution Coordinator
+
+`executeWriterDbImport` is the single future boundary that connects the pure
+execution plan to `persistWriterDbImport`. It receives storage, persistence
+keys, backup and transaction times, and the transaction ID as explicit inputs.
+It never reaches production localStorage directly and creates no storage keys.
+
+- `stale` and `blocked` execution results return before persistence.
+- Only an execution `ready` result passes its existing backup and merged
+  collections to the persistence coordinator; no second backup is created.
+- Persistence remains the sole owner of marker writes and rollback.
+- A persistence failure is returned with its original persistence stage and
+  rollback flags. The coordinator never removes a remaining marker.
+- After persistence succeeds, the coordinator reads both stored collections
+  through the injected storage, validates them with the existing Writer DB
+  parser, and compares them with the prepared merged arrays.
+- `success` and its summary exist only after that independent read-back passes.
+
+The summary reports the confirmed preview counts. Its tombstone fields retain
+the preview meaning (incoming tombstone records), not a claim that every one
+became a newly deleted record. Runtime confirmation and success/failure UI are
+still disconnected.
+
 ### Version Meanings
 
 These versions are different and must not be mixed:

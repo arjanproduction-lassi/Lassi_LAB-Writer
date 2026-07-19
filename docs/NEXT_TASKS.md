@@ -48,9 +48,8 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- add a separate import execution coordinator with injected storage, initially
-  only in harness checks and without `App.tsx`, an active import action, or
-  production runtime wiring
+- design the manual runtime confirmation and success/failure UI contract
+  without enabling it, wiring `App.tsx`, or adding an active import action
 
 ## Next Technical Slice
 
@@ -81,14 +80,18 @@ documented, and the separate read-only file-to-preview shell is prepared
 locally with no active import command. A pure execution plan now enforces
 preflight first, merges only when ready, and creates a deterministic backup
 from the original local collections. Its ready result is still read-only and
-does not call persistence or mean that an import completed. Current production
-v1 import/export and Google Drive sync remain unchanged.
+does not call persistence or mean that an import completed. A separate
+injected-storage coordinator now connects that plan to the existing persistence
+coordinator in harness tests only. It returns success only after independently
+reading, parsing, and comparing both stored collections. Rollback remains owned
+by persistence. Current production v1 import/export and Google Drive sync
+remain unchanged.
 
 After that:
 
-1. Specify and test an import execution coordinator with injected storage,
-   first only in the harness. Keep App.tsx disconnected and preserve the
-   current production v1 importer.
+1. Specify the manual runtime confirmation and success/failure UI contract,
+   but do not enable it yet. Keep App.tsx disconnected and preserve the current
+   production v1 importer.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

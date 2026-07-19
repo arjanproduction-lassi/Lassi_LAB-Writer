@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-19 - Injected-storage Writer DB import coordinator
+
+- Added `executeWriterDbImport` as the single future connection between the
+  pure execution plan and the existing persistence coordinator.
+- Stale and blocked plans return before persistence. Ready passes the existing
+  original-state backup and merged collections without creating another backup.
+- Persistence remains the sole owner of transaction marker writes and rollback;
+  its stage and rollback flags are preserved in coordinator failures.
+- Success now requires an independent injected-storage read-back, existing
+  Writer DB parser validation, and equality with both prepared merged arrays.
+- Success summary is created only after verification and retains the confirmed
+  preview semantics, including incoming tombstone counts.
+- Added 24 coordinator checks while preserving all existing 174 checks.
+- No App.tsx, CSS, production storage, import/export, Google Drive sync, runtime
+  storage key, or active import action was changed.
+- The next smallest step is designing manual confirmation and success/failure UI
+  behavior without enabling runtime execution.
+
 ## 2026-07-19 - Pure Writer DB import execution plan
 
 - Added `prepareWriterDbImportExecution`, a pure orchestration of confirmation

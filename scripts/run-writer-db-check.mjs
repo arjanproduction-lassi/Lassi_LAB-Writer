@@ -32,7 +32,8 @@ try {
       "src/writerDbImportPreviewChecks.ts",
       "src/writerDbImportPreflightChecks.ts",
       "src/writerDbImportPreviewUiChecks.ts",
-      "src/writerDbImportExecutionChecks.ts"
+      "src/writerDbImportExecutionChecks.ts",
+      "src/writerDbImportCoordinatorChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -106,6 +107,16 @@ try {
 
   if (executionRun.status !== 0) {
     process.exit(executionRun.status ?? 1);
+  }
+
+  const coordinatorRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerDbImportCoordinatorChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (coordinatorRun.status !== 0) {
+    process.exit(coordinatorRun.status ?? 1);
   }
 } finally {
   rmSync(outputDir, { recursive: true, force: true });
