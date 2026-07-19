@@ -32,10 +32,17 @@ import {
 import { prepareWriterDbImportPreview } from "./writerDbImportPreview";
 import { prepareWriterDbImportPreflight } from "./writerDbImportPreflight";
 import {
-  applyWriterDbImportPreflightResult,
-  resetWriterDbImportPreviewUiState,
-  type WriterDbImportPreviewUiState
-} from "./writerDbImportPreviewUi";
+  applyWriterDbFileSelected,
+  applyWriterDbPreflightResult,
+  applyWriterDbPreparedPreview,
+  resetWriterDbImportUi
+} from "./writerDbImportUiAdapter";
+import { createWriterDbImportPreviewRevision } from "./writerDbImportPreviewRevision";
+import type {
+  WriterDbImportUiBlockedReason,
+  WriterDbImportUiState,
+  WriterDbImportUiTransitionResult
+} from "./writerDbImportUiState";
 import { inspectWriterDbRecovery } from "./writerDbRecovery";
 import {
   createManualWriterDbV2Export,
@@ -132,6 +139,35 @@ function previewRows(preview: ImportCollectionPreview) {
   ] as const;
 }
 
+function reportRejectedWriterDbImportUiTransition(
+  result: WriterDbImportUiTransitionResult
+) {
+  if (!result.accepted && import.meta.env.DEV) {
+    console.warn("Writer DB import UI transition rejected:", result.reason);
+  }
+}
+
+function writerDbImportBlockedMessage(
+  reason: "recovery-required" | "recovery-blocked" | "preview-blocked"
+) {
+  switch (reason) {
+    case "recovery-required":
+      return "Predchádzajúca databázová operácia zostala nedokončená. Pred novým importom bude potrebné vykonať kontrolu obnovy.";
+    case "recovery-blocked":
+      return "Predchádzajúcu databázovú operáciu nemožno bezpečne vyhodnotiť. Nový import je zablokovaný.";
+    case "preview-blocked":
+      return "Aktualizovaný náhľad importu už nie je bezpečne použiteľný. Nič nebolo zmenené.";
+  }
+}
+
+function isWriterDbPreflightBlockedReason(
+  reason: WriterDbImportUiBlockedReason | undefined
+): reason is "recovery-required" | "recovery-blocked" | "preview-blocked" {
+  return reason === "recovery-required" ||
+    reason === "recovery-blocked" ||
+    reason === "preview-blocked";
+}
+
 function googleSyncUnavailableMessage() {
   return "Google Drive sync ešte nie je nastavený. Chýba VITE_GOOGLE_CLIENT_ID.";
 }
@@ -186,7 +222,7 @@ export default function App() {
   const [savedMessage, setSavedMessage] = useState("");
   const [dataMessage, setDataMessage] = useState("");
   const [importPreviewState, setImportPreviewState] =
-    useState<WriterDbImportPreviewUiState>({ status: "idle" });
+    useState<WriterDbImportUiState>({ status: "idle" });
   const [newSparkDraft, setNewSparkDraft] = useState<NewSparkDraft | undefined>(() =>
     readNewSparkDraft()
   );
@@ -224,23 +260,29 @@ export default function App() {
     [sparks, stageFilter]
   );
   const displayedImportPreview =
-    importPreviewState.status === "preview-ready" ||
-    importPreviewState.status === "preview-confirmed-ready"
+    importPreviewState.status === "preview-ready"
       ? importPreviewState.preview
+      : importPreviewState.status === "import-confirm-ready"
+        ? importPreviewState.confirmedPreview
       : importPreviewState.status === "preview-stale"
-        ? importPreviewState.refreshedPreview
+        ? importPreviewState.preview
         : undefined;
   const displayedImportDb =
     importPreviewState.status === "preview-ready" ||
-    importPreviewState.status === "preview-confirmed-ready" ||
+    importPreviewState.status === "import-confirm-ready" ||
     importPreviewState.status === "preview-stale"
       ? importPreviewState.db
       : undefined;
   const displayedImportFileName =
     importPreviewState.status === "preview-ready" ||
-    importPreviewState.status === "preview-confirmed-ready" ||
+    importPreviewState.status === "import-confirm-ready" ||
     importPreviewState.status === "preview-stale"
       ? importPreviewState.fileName
+      : undefined;
+  const importPreviewPreflightBlockedReason =
+    importPreviewState.status === "preview-blocked" &&
+    isWriterDbPreflightBlockedReason(importPreviewState.reason)
+      ? importPreviewState.reason
       : undefined;
 
   const isEditing = Boolean(editor?.id);
@@ -718,19 +760,27 @@ export default function App() {
   }
 
   function openImportPreviewPicker() {
+    if (importPreviewInputRef.current) {
+      importPreviewInputRef.current.value = "";
+    }
     importPreviewInputRef.current?.click();
   }
 
   function closeImportPreview() {
-    setImportPreviewState(resetWriterDbImportPreviewUiState());
+    const transition = resetWriterDbImportUi(importPreviewState);
+    if (!transition.accepted) {
+      reportRejectedWriterDbImportUiTransition(transition);
+      return;
+    }
+
+    setImportPreviewState(transition.state);
     if (importPreviewInputRef.current) {
       importPreviewInputRef.current.value = "";
     }
   }
 
   function chooseAnotherImportPreviewFile() {
-    closeImportPreview();
-    importPreviewInputRef.current?.click();
+    openImportPreviewPicker();
   }
 
   function handleCheckImportReadiness() {
@@ -741,9 +791,7 @@ export default function App() {
       return;
     }
 
-    const previousPreview = importPreviewState.status === "preview-ready"
-      ? importPreviewState.preview
-      : importPreviewState.refreshedPreview;
+    const previousPreview = importPreviewState.preview;
     const recoveryInspection = inspectWriterDbRecovery({
       storage: {
         getItem: (key) => window.localStorage.getItem(key)
@@ -757,8 +805,22 @@ export default function App() {
       currentLocalPackages: loadWriterPackages(),
       recoveryInspection
     });
+    const revision = result.status === "ready"
+      ? createWriterDbImportPreviewRevision(result.preview)
+      : result.status === "stale"
+        ? createWriterDbImportPreviewRevision(result.refreshedPreview)
+        : importPreviewState.previewRevision;
+    const transition = applyWriterDbPreflightResult(importPreviewState, {
+      result,
+      revision
+    });
 
-    setImportPreviewState(applyWriterDbImportPreflightResult(importPreviewState, result));
+    if (!transition.accepted) {
+      reportRejectedWriterDbImportUiTransition(transition);
+      return;
+    }
+
+    setImportPreviewState(transition.state);
   }
 
   async function handleImportPreviewFile(event: ChangeEvent<HTMLInputElement>) {
@@ -769,7 +831,13 @@ export default function App() {
       return;
     }
 
-    setImportPreviewState({ status: "reading-file", fileName: file.name });
+    const selectedTransition = applyWriterDbFileSelected(importPreviewState, file.name);
+    if (!selectedTransition.accepted) {
+      reportRejectedWriterDbImportUiTransition(selectedTransition);
+      return;
+    }
+
+    setImportPreviewState(selectedTransition.state);
 
     try {
       const result = prepareWriterDbImportPreview({
@@ -778,28 +846,28 @@ export default function App() {
         localPackages: loadWriterPackages()
       });
 
-      if (!result.ok) {
-        setImportPreviewState({
-          status: "preview-blocked",
+      setImportPreviewState((currentState) => {
+        const transition = applyWriterDbPreparedPreview(currentState, {
           fileName: file.name,
-          error: result.error,
-          blockingIssues: result.blockingIssues
+          result,
+          revision: result.ok ? createWriterDbImportPreviewRevision(result.preview) : ""
         });
-        return;
-      }
-
-      setImportPreviewState({
-        status: "preview-ready",
-        fileName: file.name,
-        db: result.db,
-        preview: result.preview
+        reportRejectedWriterDbImportUiTransition(transition);
+        return transition.accepted ? transition.state : currentState;
       });
     } catch {
-      setImportPreviewState({
-        status: "preview-blocked",
-        fileName: file.name,
-        error: "Súbor sa nepodarilo načítať.",
-        blockingIssues: []
+      setImportPreviewState((currentState) => {
+        const transition = applyWriterDbPreparedPreview(currentState, {
+          fileName: file.name,
+          result: {
+            ok: false,
+            error: "Súbor sa nepodarilo načítať.",
+            blockingIssues: []
+          },
+          revision: ""
+        });
+        reportRejectedWriterDbImportUiTransition(transition);
+        return transition.accepted ? transition.state : currentState;
       });
     }
   }
@@ -1129,9 +1197,11 @@ export default function App() {
               </div>
             ) : null}
             {importPreviewState.status === "preview-stale" ||
-            importPreviewState.status === "preview-confirmed-ready" ? (
+            importPreviewState.status === "import-confirm-ready" ? (
               <p className="import-preview-status" data-status={importPreviewState.status}>
-                {importPreviewState.message}
+                {importPreviewState.status === "preview-stale"
+                  ? "Miestne dáta sa medzitým zmenili. Skontrolujte aktualizovaný náhľad."
+                  : "Náhľad je aktuálny. Miestne dáta sa od jeho vytvorenia nezmenili."}
               </p>
             ) : null}
             <p className="data-copy">
@@ -1155,7 +1225,8 @@ export default function App() {
           </section>
         ) : null}
 
-        {importPreviewState.status === "preview-blocked" ? (
+        {importPreviewState.status === "preview-blocked" &&
+        !importPreviewPreflightBlockedReason ? (
           <section className="import-preview import-preview-blocked" aria-live="polite">
             <h3>Tento súbor sa nedá importovať</h3>
             <p>Nič nebolo zmenené.</p>
@@ -1178,10 +1249,11 @@ export default function App() {
           </section>
         ) : null}
 
-        {importPreviewState.status === "preflight-blocked" ? (
+        {importPreviewState.status === "preview-blocked" &&
+        importPreviewPreflightBlockedReason ? (
           <section className="import-preview import-preview-blocked" aria-live="polite">
             <h3>Pripravenosť importu je zablokovaná</h3>
-            <p>{importPreviewState.message}</p>
+            <p>{writerDbImportBlockedMessage(importPreviewPreflightBlockedReason)}</p>
             <p>Nič nebolo zmenené.</p>
             <div className="import-preview-actions">
               <button className="data-action" type="button" onClick={chooseAnotherImportPreviewFile}>

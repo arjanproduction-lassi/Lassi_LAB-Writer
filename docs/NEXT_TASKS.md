@@ -104,14 +104,17 @@ The helper has no React, storage, recovery, execution, or persistence wiring.
 
 The thin typed UI adapter is now prepared locally. It maps existing preview,
 preflight, coordinator, file, start, and reset outcomes into the state machine
-without calling those layers or bypassing transition rejection. It is not
-wired to App.tsx and does not expose an active import action.
+without calling those layers or bypassing transition rejection. The existing
+read-only App.tsx preview/readiness path now uses its file, preview, preflight,
+and reset mappings with deterministic semantic revisions. It does not expose an
+active import action or call `executeWriterDbImport`.
 
 After that:
 
-1. Review the pure adapter boundary before any App.tsx wiring. Keep the active
-   import action absent and preserve the current production v1 importer until
-   the coordinated replacement is explicitly reviewed.
+1. Perform a separate final runtime cutover review: replace the legacy importer
+   with the coordinated route and activate exactly one import action, without
+   leaving two active import truths. Until that review, keep the legacy importer
+   unchanged and the new action absent.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

@@ -179,6 +179,13 @@ show an active import command and does not merge, back up, persist, migrate, or
 sync anything. The confirmation and result states below remain the future
 execution contract.
 
+This read-only path now uses `WriterDbImportUiState` as its single UI state.
+File selection, prepared preview, preflight result, and reset are mapped through
+the typed adapter and accepted only by the pure state machine. Preview revisions
+are canonical deterministic strings derived from semantic preview content; no
+time, randomness, storage, or object identity is involved. Rejected transitions
+leave the current state unchanged.
+
 The preview now also offers **Skontrolovať pripravenosť**. This read-only action
 reloads current Sparks and real WriterPackages, inspects recovery through an
 injected get-only storage adapter, and runs the pure preflight. A ready result
@@ -201,8 +208,9 @@ The visible flow is:
 4. A blocked file shows a human-readable error and only **Vybrať iný súbor**
    and **Zavrieť**.
 5. A ready preview offers **Skontrolovať pripravenosť** and **Zrušiť**.
-6. Only `preview-confirmed-ready` reveals the active **Importovať databázu**
-   action. One press is the explicit confirmation; do not use `window.confirm`.
+6. The current read-only runtime stops at `import-confirm-ready` and still shows
+   no active **Importovať databázu** action. Activating that one future action
+   requires a separate final runtime cutover review; do not use `window.confirm`.
 7. The coordinator rechecks fresh local data. A stale result writes nothing,
    displays the refreshed preview, and requires another readiness check.
 8. Only a still-confirmed ready preview proceeds through merge, backup,

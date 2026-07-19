@@ -51,13 +51,14 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summaries report 254 checks total: 66 parser/export, import-preview,
+- The summaries report 269 checks total: 66 parser/export, import-preview,
   in-memory merge, and backup-factory checks; 21 injected persistence
   coordinator checks; 20 read-only recovery inspection checks; 15 pure
   file-to-preview preparation checks; 16 pure confirmation preflight checks;
   10 pure preview UI transition checks; 26 pure import execution checks; and
   24 injected-storage import coordinator checks; 34 pure import UI state
-  transition checks; and 22 pure import UI adapter checks.
+  transition checks; 22 pure import UI adapter checks; and 15 read-only runtime
+  UI integration and revision checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -98,8 +99,12 @@ Expected result:
   and reset mappings; explicit stale revisions; preserved failure details;
   state-machine rejection guards; immutability; determinism; and absence of an
   import callback.
-- No production storage write, production import, export, UI, or Google Drive
-  sync change is performed.
+- Read-only runtime UI checks cover file selection, ready/blocked preparation,
+  ready/stale/blocked preflight, reset and same-file selection, deterministic
+  semantic revisions, rejected-state preservation, no execution/write calls,
+  unchanged legacy import ownership, and get-only recovery injection.
+- No production storage write, active new import, export, or Google Drive sync
+  change is performed.
 
 ## Writer DB Pure Import Execution Checks
 
@@ -137,7 +142,18 @@ operation.
 state-machine events. It never calls the parser, preflight, coordinator,
 execution, merge, backup, persistence, recovery, rollback, storage, or network.
 Its start helper only requests the guarded `import-started` transition; it does
-not execute an import. The adapter is not imported by App.tsx.
+not execute an import. App.tsx imports only its read-only file, preview,
+preflight, and reset mappings; it does not import the start or coordinator-result
+mappings.
+
+## Writer DB Read-only Runtime UI Checks
+
+The existing file-to-preview and readiness runtime uses the typed adapter and
+state machine as its single state authority. A canonical semantic preview
+revision is created without time, randomness, browser APIs, or storage access.
+The checks also inspect the App boundary to ensure no execution, merge, backup,
+persistence, rollback, or storage write entered the read-only handlers and that
+the separate legacy `importWriterDb(parsed)` handler remains in place.
 
 ## Writer DB Import Coordinator Checks
 
@@ -646,10 +662,8 @@ technical stack trace is exposed. While execution remains disconnected, keep
 the existing production import/export, storage keys, Google Drive sync, and
 recovery runtime wiring unchanged.
 
-The pure preparation helper adds 15 checks to `npm run check:writer-db` for a
-total of 122. They cover valid v1/v2 previews, parser failures, damaged records,
-duplicate same-collection ids, every warning family, input immutability, and no
-localStorage access.
+The read-only state-machine runtime integration adds 15 checks to
+`npm run check:writer-db`, bringing the current harness total to 269.
 
 ## Add To Home Screen On Android
 

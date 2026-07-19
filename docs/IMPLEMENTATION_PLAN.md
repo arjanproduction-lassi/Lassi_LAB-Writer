@@ -173,9 +173,12 @@ Small commits:
 19. Add a separate adapter between App.tsx and the pure state machine, first
    without calling `executeWriterDbImport` or exposing an active import action.
    Prepared locally as a pure typed result-to-event mapper with explicit stale
-   revisions and state-machine rejection guards; it is not wired to App.tsx.
+   revisions and state-machine rejection guards. The existing read-only
+   preview/readiness runtime is now wired to it with one authoritative UI state,
+   canonical semantic preview revisions, and no import execution.
 20. Replace the legacy production importer with the coordinated path in one
-   explicitly reviewed runtime change; do not keep two active import truths.
+   explicitly reviewed final runtime cutover; activate one import action and do
+   not keep two active import truths.
 21. Only then design Google Drive v2 sync.
 22. Only after v2 sync is safe, start creating WriterPackages from production UI.
 23. Only after packages exist safely across devices, build the workspace UI.

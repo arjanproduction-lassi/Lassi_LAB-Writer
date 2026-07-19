@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-07-19 - Read-only Writer DB state-machine runtime wiring
+
+- Replaced the preview/readiness path's parallel ad-hoc React state with the
+  published `WriterDbImportUiState` and typed adapter mappings.
+- File selection, preview preparation, readiness results, and reset now pass
+  through state-machine transitions; rejected transitions keep current state.
+- Added a pure canonical semantic preview revision with no time, randomness,
+  storage, browser API, or input mutation.
+- Added 15 read-only runtime integration checks, bringing the harness to 269.
+- Preserved the current preview layout and copy, same-file reselection, get-only
+  recovery inspection, and fresh Sparks plus real WriterPackages preflight.
+- No `executeWriterDbImport`, active import action, merge, backup, persistence,
+  rollback, new storage key, legacy import change, or Google Drive sync change
+  was added.
+
 ## 2026-07-19 - Pure Writer DB import UI adapter
 
 - Added a typed, React-free adapter from file/preview/preflight/start/coordinator
