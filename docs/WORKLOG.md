@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-19 - Manual Writer DB import UX contract
+
+- Documented the manual v1/v2 path from file selection through read-only
+  preview, explicit confirmation, guarded execution, and human-readable result.
+- File selection and cancellation never change data; blocked previews never
+  expose an import action.
+- Confirmation must reload current Sparks and WriterPackages and recompute the
+  preview. A stale preview returns to review without writing.
+- Defined a discriminated UI state model plus Slovak copy for ready, blocked,
+  success, pre-write failure, successful rollback, and failed rollback states.
+- Defined PC two-column and mobile single-panel layouts without wide tables.
+- A remaining recoverable or blocked transaction marker will prevent a new
+  import, but recovery UI and automatic rollback remain future work.
+- Documentation only: no App.tsx, runtime component, production import/export,
+  storage key, Google Drive sync, migration, or per-note merge change.
+
 ## 2026-07-17 - Read-only Writer DB recovery inspection
 
 - Added `inspectWriterDbRecovery` with explicit `clean`, `recoverable`, and

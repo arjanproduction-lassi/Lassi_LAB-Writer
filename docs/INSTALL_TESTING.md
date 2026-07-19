@@ -525,6 +525,33 @@ The recovery inspection checks use injected storage only. They cover:
 - no `setItem`, no `removeItem`, no real `window.localStorage`, no marker
   cleanup, no rollback, and no automatic repair
 
+## Future Manual Import UX Acceptance
+
+This is a documentation contract, not an implemented production test yet. When
+the manual v1/v2 import UI is added, verify on both PC and mobile that:
+
+1. Selecting a file only reads, parses, and previews it; storage, backup,
+   import, sync, and recovery remain untouched.
+2. **Zrušiť** from a ready preview leaves all data byte-for-byte unchanged.
+3. Invalid JSON, unsupported schema, damaged records, and duplicate ids inside
+   one collection show a blocked preview with no **Importovať** action.
+4. A ready preview shows separate Iskra and Tvorivý balík counts, stable
+   warnings, and the sentence **Výber súboru zatiaľ nič nezmenil.**
+5. v1 clearly reports that WriterPackages remain untouched.
+6. Confirmation reloads fresh local collections and recomputes preview. A
+   changed preview returns to review without backup, merge, or storage writes.
+7. Success counts match the validated stored result and confirm backup
+   creation.
+8. Failures distinguish no production write, successful rollback, and failed
+   rollback without exposing stack traces.
+9. A recoverable or blocked transaction marker prevents a new import before
+   file selection; no automatic recovery runs.
+10. PC can use two count columns. Mobile uses one vertical panel with reachable
+    actions and no horizontal table or zoom requirement.
+
+Until this UI exists, keep `App.tsx`, production import/export, storage keys,
+Google Drive sync, and recovery runtime wiring unchanged.
+
 ## Add To Home Screen On Android
 
 In Chrome on Android:

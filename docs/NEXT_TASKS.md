@@ -48,12 +48,13 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- design and implement the guarded persistence coordinator around a validated
-  backup and prepared transaction marker, still without production UI
+- implement only the explicit import UI state shell and read-only
+  file-to-preview path described in `UX_NOTES.md`; do not connect merge,
+  persistence, recovery actions, or production storage yet
 
 ## Next Technical Slice
 
-Do not start with Google sync or UI.
+Do not start with Google sync or production writes.
 
 First implementation step for Writer DB v2:
 
@@ -75,13 +76,15 @@ injected persistence coordinator now covers backup and marker writes,
 read-back validation, rollback, and failed-rollback marker retention. A
 read-only recovery inspection now diagnoses remaining prepared markers as
 `clean`, `recoverable`, or `blocked` without writing, rollback, UI, or runtime
-localStorage access. Preview UI remains unimplemented. Current production v1
-import/export and Google Drive sync remain unchanged.
+localStorage access. The manual preview and confirmation UX contract is now
+documented, including fresh-preview confirmation, blocked states, result copy,
+and responsive layout. Preview UI remains unimplemented. Current production
+v1 import/export and Google Drive sync remain unchanged.
 
 After that:
 
-1. Add the explicit manual v1/v2 preview and confirmation UI only after the
-   pure, persistence, and recovery checks keep passing.
+1. Add the smallest discriminated UI state shell and read-only file-to-preview
+   path. Stop before merge, backup, persistence, recovery UI, or runtime keys.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

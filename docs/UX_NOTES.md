@@ -169,6 +169,116 @@ The recovery UX should feel like a quiet note on the table:
 - Clear the draft after the spark is saved.
 - Keep the draft local only; it is not synced and not part of export/import.
 
+## Manual Writer DB Import Preview
+
+The future v1/v2 importer is a deliberate administrative flow, not an instant
+file action. Selecting a JSON file only reads, parses, and previews it. Until
+the author presses **Importovať**, no backup, merge, storage write, migration,
+sync, or recovery action may run. **Zrušiť** closes the preview and leaves all
+data unchanged.
+
+The visible flow is:
+
+1. **Vybrať súbor** opens the platform file picker.
+2. While reading, show **Načítavam súbor…** and its file name.
+3. A valid file opens a read-only **Import databázy** preview.
+4. A blocked file shows a human-readable error and only **Vybrať iný súbor**
+   and **Zavrieť**.
+5. A ready preview offers **Importovať** and **Zrušiť**. One explicit
+   **Importovať** press is enough; do not use `window.confirm` or a second
+   generic confirmation.
+6. On confirmation, refresh local data and recompute the preview. If anything
+   changed, do not write; show **Miestne dáta sa medzitým zmenili. Skontrolujte
+   aktualizovaný náhľad a potvrďte import znova.**
+7. Only an unchanged, ready preview proceeds through merge, backup, guarded
+   persistence, read-back validation, and a success or failure result.
+
+### Ready preview copy
+
+Title: **Import databázy**
+
+- **Súbor:** `{fileName}`
+- **Verzia databázy:** `Writer DB v1` or `Writer DB v2`
+- Safety note: **Výber súboru zatiaľ nič nezmenil. Skontrolujte náhľad a až
+  potom potvrďte import.**
+
+Show separate **Iskry** and **Tvorivé balíky** sections. Each section lists
+**Nové**, **Aktualizované**, **Nezmenené**, **Staršie – ignorované**, and
+**Zmazania v súbore**. The last value is the number of incoming tombstones; it
+does not claim that every tombstone will change local data. For v1, replace the
+package counts with **Tvorivé balíky zostanú nedotknuté.**
+
+Map preview warnings to calm Slovak copy:
+
+- `v1-packages-untouched`: **Tento Writer DB v1 súbor nemení tvorivé balíky.**
+- `count-mismatch`: **Počty uvedené v súbore nesedia s jeho obsahom. Rozhodujú
+  overené záznamy v súbore.**
+- `cross-model-id-overlap`: **Rovnaké ID sa nachádza medzi Iskrou a Tvorivým
+  balíkom. Sú to samostatné typy záznamov a oba zostanú zachované.**
+- `contains-tombstones`: **Súbor obsahuje záznamy o zmazaní. Novšie zmazania
+  môžu nahradiť staršie miestne záznamy.**
+- `empty-import`: **Súbor neobsahuje žiadne záznamy na import.**
+
+Tombstones or a large update count get a stronger warning panel inside the
+same preview, not another modal. Suggested copy: **Tento import obsahuje
+zmazania alebo väčší počet zmien. Pred importom si pozorne skontrolujte súhrn.**
+The action remains one deliberate **Importovať** press.
+
+### Blocked preview copy
+
+Title: **Tento súbor sa nedá importovať**
+
+Lead text: **Nič nebolo zmenené. Skontrolujte súbor alebo vyberte iný.** Never
+show an enabled import action. Translate the blocking reason without a stack
+trace, for example:
+
+- invalid JSON: **Súbor nie je platný JSON.**
+- unsupported schema: **Táto verzia Writer DB zatiaľ nie je podporovaná.**
+- invalid Spark: **Súbor obsahuje poškodenú Iskru.**
+- invalid WriterPackage: **Súbor obsahuje poškodený Tvorivý balík.**
+- duplicate same-collection ID: **Súbor obsahuje duplicitné ID v rovnakej
+  kolekcii, preto sa nedá bezpečne zlúčiť.**
+
+Actions: **Vybrať iný súbor** and **Zavrieť**.
+
+### Result copy
+
+Success title: **Import dokončený**
+
+Show **Iskry** and **Tvorivé balíky** with **Vytvorené**, **Aktualizované**, and
+**Staršie – ignorované** counts. Add **Backup pôvodných dát bol vytvorený.**
+For v1 add **Tvorivé balíky zostali nedotknuté.** The only action is
+**Hotovo**.
+
+Failure states must be visibly distinct:
+
+- Before any production write: **Import sa nepodarilo pripraviť. Nič nebolo
+  zmenené. Môžete súbor skontrolovať a skúsiť znova.**
+- Write failed, rollback succeeded: **Import sa nepodarilo dokončiť. Pôvodné
+  dáta boli bezpečne obnovené a backup zostal k dispozícii.**
+- Write failed, rollback failed: **Import sa nepodarilo dokončiť a pôvodné dáta
+  sa nepodarilo úplne obnoviť. Nič ďalšie automaticky neurobíme. Pred ďalším
+  importom bude potrebná kontrola obnovy.**
+
+Use **Zavrieť** for a safe pre-write or successfully rolled-back failure. For
+failed rollback add **Nový import zostane zablokovaný, kým sa predchádzajúca
+operácia nevyrieši.** Do not add recovery controls in this slice.
+
+### Recovery gate and responsive layout
+
+Before opening a future import flow, recovery inspection must run. `clean` may
+continue. A `recoverable` or `blocked` transaction marker must stop the new
+import before file selection and explain: **Predchádzajúci import nebol úplne
+dokončený. Najprv treba skontrolovať jeho obnovu.** Recovery UI and automatic
+rollback remain separate future work.
+
+On PC, use a modal or large centered card; Iskry and Tvorivé balíky may sit in
+two columns with warnings and actions spanning the full width. On mobile, use
+one vertical panel: file and safety note, Iskry, Tvorivé balíky, warnings, then
+large actions that remain clearly reachable. Never use a wide table or require
+horizontal scrolling or zooming. The flow may be denser than the Iskra editor,
+but headings, spacing, and one primary action must keep it calm.
+
 ## Existing Spark Editing
 
 Saved sparks should remain easy to revisit without turning Writer into a large

@@ -138,11 +138,17 @@ Small commits:
    as an injected, headless diagnostic function with `clean`, `recoverable`,
    and `blocked` results; it does not write, rollback, remove markers, touch UI,
    or use runtime localStorage directly.
-11. Add an explicit manual v1/v2 import preview UI only after the pure and
-   persistence layers pass their checks.
-12. Only then design Google Drive v2 sync.
-13. Only after v2 sync is safe, start creating WriterPackages from production UI.
-14. Only after packages exist safely across devices, build the workspace UI.
+11. Specify the explicit manual v1/v2 import preview and confirmation flow.
+   Done as documentation only: file selection is read-only, confirmation is
+   explicit, preview is recomputed against fresh local data before any write,
+   and failure copy distinguishes no write, successful rollback, and failed
+   rollback. Runtime UI remains unimplemented.
+12. Implement the smallest import UI state shell and read-only file-to-preview
+   path, without connecting merge, persistence, recovery actions, or production
+   storage writes.
+13. Only then design Google Drive v2 sync.
+14. Only after v2 sync is safe, start creating WriterPackages from production UI.
+15. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 
@@ -176,6 +182,15 @@ Rules:
   marker plus compatible valid backup is `recoverable`; damaged marker or
   backup state is `blocked`. Damaged current collections and target-count
   mismatches are warnings when the backup remains valid.
+- File selection must never trigger import. A blocked preview has no import
+  action, cancellation changes nothing, and one explicit in-preview
+  confirmation replaces browser confirmation dialogs.
+- Confirmation must reload local collections and recompute preview. If the
+  preview differs, return to the updated preview without merging, backing up,
+  or writing.
+- A remaining recoverable or blocked transaction marker must prevent a new
+  import until the earlier operation is resolved; this rule does not authorize
+  recovery UI or automatic rollback.
 
 ## Explicit Non-Goals
 

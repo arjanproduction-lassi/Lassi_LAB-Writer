@@ -636,24 +636,30 @@ connect to production import.
 
 ### Future Safe Write Sequence
 
-Selecting a file performs only parse and preview. The required logical order is
-parser, preview, detached backup snapshot, in-memory merge, result validation,
-and only then guarded storage writes. After the user explicitly confirms
-import, the future implementation should:
+Selecting a file performs only parse and preview. After the user explicitly
+confirms import, the future implementation should:
 
-1. Create a detached backup snapshot of the current Sparks and WriterPackages
-   in memory.
-2. Compute the complete merge in memory without changing storage.
-3. Validate every resulting Spark and WriterPackage and abort on any failure.
-4. Serialize, validate, persist, read back, and revalidate the backup under the
-   unified backup key. If this fails, abort before production writes.
-5. Write a small prepared transaction marker under
+1. Verify that the UI still holds a ready preview and parsed source DB.
+2. Read fresh local Sparks and WriterPackages because they may have changed
+   while the preview was open.
+3. Recompute the preview against that fresh state. If its meaningful counts,
+   warnings, or blocking issues differ, return to the refreshed preview and
+   require a new explicit confirmation without writing anything.
+4. Compute the complete merge in memory and validate every resulting Spark and
+   WriterPackage. Abort before storage access on any failure.
+5. Create and validate a detached backup snapshot from the same fresh local
+   state used by the confirmed merge.
+6. Serialize, persist, read back, and revalidate the backup under the unified
+   backup key. If this fails, abort before production writes.
+7. Write a small prepared transaction marker under
    `lassilab-writer:v0.1:writer-db:import-transaction` that references the valid
    backup.
-6. For v2, write and read back both Spark and WriterPackage storage. For v1,
+8. For v2, write and read back both Spark and WriterPackage storage. For v1,
    write and read back only Sparks; WriterPackage storage remains untouched.
-7. Remove the transaction marker only after all required writes and read-back
+9. Remove the transaction marker only after all required writes and read-back
    validations succeed.
+10. Reload the stored collections, validate the final state, and build the
+    success summary from the verified result.
 
 localStorage makes each `setItem` synchronous, but it does not provide one
 transaction across the Spark and WriterPackage keys. The backup plus a small
@@ -676,6 +682,64 @@ The only commands are `Importovať` and `Zrušiť`. Choosing a file never starts
 an import by itself. The import command is available only after a successful
 parse and ready preview; it then runs backup, in-memory merge validation, and
 the guarded write sequence above.
+
+The UI should use one discriminated state instead of independent booleans:
+
+```ts
+type WriterDbImportSuccessSummary = {
+  sourceSchemaVersion: 1 | 2;
+  sparks: { created: number; updated: number; ignoredOlder: number };
+  packages: { created: number; updated: number; ignoredOlder: number };
+  packagesUntouched: boolean;
+  backupCreated: true;
+};
+
+type WriterDbImportUiState =
+  | { status: "idle" }
+  | { status: "reading-file"; fileName: string }
+  | {
+      status: "preview-ready";
+      fileName: string;
+      parsedDb: WriterDb;
+      preview: WriterDbImportPreview;
+    }
+  | {
+      status: "preview-blocked";
+      fileName: string;
+      error: string;
+      blockingIssues: WriterDbImportBlockingIssue[];
+    }
+  | {
+      status: "preview-stale";
+      fileName: string;
+      parsedDb: WriterDb;
+      preview: WriterDbImportPreview;
+    }
+  | { status: "importing"; fileName: string; preview: WriterDbImportPreview }
+  | { status: "success"; fileName: string; result: WriterDbImportSuccessSummary }
+  | {
+      status: "failed";
+      fileName: string;
+      stage: "before-write" | "write" | "rollback";
+      error: string;
+      rollbackAttempted: boolean;
+      rollbackSucceeded: boolean;
+    };
+```
+
+`preview-stale` means fresh local collections produced a different preview at
+confirmation time. It never writes and requires the author to inspect and
+confirm the refreshed preview again. `failed` presentation derives from the
+stage and rollback flags: no write, restored safely, or unresolved transaction.
+
+After **Importovať**, the future application must recheck that the state is
+`preview-ready`, read fresh local Sparks and WriterPackages, and recompute the
+preview. Only an unchanged ready preview may proceed to
+`mergeWriterDbInMemory`, `createWriterDbImportBackup`, and the persistence
+coordinator. After persistence, reload and validate both stored collections
+before producing the success summary. A remaining `recoverable` or `blocked`
+transaction marker blocks starting any new import, but recovery UI is not part
+of this import state model yet.
 
 ### Version Meanings
 
