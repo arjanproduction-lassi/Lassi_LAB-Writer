@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-07-19 - Final manual Writer DB runtime confirmation contract
+
+- Documented the final file -> preview -> readiness -> confirmed import ->
+  coordinator result flow without enabling runtime execution.
+- Only `import-confirm-ready` may expose **Importovať databázu**. It owns the
+  confirmed preview revision/fingerprint; any stale, blocked, reset, file, or
+  recovery change discards confirmation.
+- The first press enters locked `importing` synchronously, disables cancel and
+  file actions, and prevents a second coordinator call.
+- Success is created only from coordinator success after final read-back.
+  Stale, blocked, persistence, rollback, and verification copy never pretends
+  that an import succeeded.
+- Documented that verification failure does not always leave a marker. Reload
+  authority comes from recovery inspection and the truthfully reported marker
+  state, never React state alone.
+- Added PC/mobile behavior, the complete manual scenario plan, and the rollout
+  recommendation to replace the legacy importer with the coordinated path in
+  one reviewed runtime change.
+- Documentation only: no App.tsx, CSS, TypeScript, storage, import/export,
+  persistence, recovery, or Google Drive change.
+
 ## 2026-07-19 - Injected-storage Writer DB import coordinator
 
 - Added `executeWriterDbImport` as the single future connection between the

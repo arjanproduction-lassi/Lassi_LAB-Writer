@@ -173,10 +173,11 @@ The recovery UX should feel like a quiet note on the table:
 
 Current implementation boundary: the separate **Náhľad importu DB v1/v2**
 action now covers file selection, file reading, `parseWriterDbJson`, pure
-preview, ready/blocked presentation, and cancellation. It reads complete local
-Sparks plus real WriterPackages. It does not show an active import command and
-does not merge, back up, persist, inspect recovery, migrate, or sync anything.
-The confirmation and result states below remain the future execution contract.
+preview, ready/blocked presentation, cancellation, and a read-only readiness
+check. It reads complete local Sparks plus real WriterPackages. It does not
+show an active import command and does not merge, back up, persist, migrate, or
+sync anything. The confirmation and result states below remain the future
+execution contract.
 
 The preview now also offers **Skontrolovať pripravenosť**. This read-only action
 reloads current Sparks and real WriterPackages, inspects recovery through an
@@ -199,14 +200,13 @@ The visible flow is:
 3. A valid file opens a read-only **Import databázy** preview.
 4. A blocked file shows a human-readable error and only **Vybrať iný súbor**
    and **Zavrieť**.
-5. A ready preview offers **Importovať** and **Zrušiť**. One explicit
-   **Importovať** press is enough; do not use `window.confirm` or a second
-   generic confirmation.
-6. On confirmation, refresh local data and recompute the preview. If anything
-   changed, do not write; show **Miestne dáta sa medzitým zmenili. Skontrolujte
-   aktualizovaný náhľad a potvrďte import znova.**
-7. Only an unchanged, ready preview proceeds through merge, backup, guarded
-   persistence, read-back validation, and a success or failure result.
+5. A ready preview offers **Skontrolovať pripravenosť** and **Zrušiť**.
+6. Only `preview-confirmed-ready` reveals the active **Importovať databázu**
+   action. One press is the explicit confirmation; do not use `window.confirm`.
+7. The coordinator rechecks fresh local data. A stale result writes nothing,
+   displays the refreshed preview, and requires another readiness check.
+8. Only a still-confirmed ready preview proceeds through merge, backup,
+   guarded persistence, read-back validation, and a truthful result.
 
 ### Ready preview copy
 
@@ -258,12 +258,13 @@ Actions: **Vybrať iný súbor** and **Zavrieť**.
 
 ### Result copy
 
-Success title: **Import dokončený**
+Success title: **Import databázy bol dokončený.**
 
-Show **Iskry** and **Tvorivé balíky** with **Vytvorené**, **Aktualizované**, and
-**Staršie – ignorované** counts. Add **Backup pôvodných dát bol vytvorený.**
-For v1 add **Tvorivé balíky zostali nedotknuté.** The only action is
-**Hotovo**.
+Show **Iskry** and **Tvorivé balíky** with **Vytvorené**, **Aktualizované**,
+**Nezmenené**, **Staršie ignorované**, and **Záznamy obsahujúce tombstone**.
+Also show the Writer DB version and **Backup bol vytvorený.** For v1 add
+**Tvorivé balíky zostali nedotknuté.** The only action is **Hotovo**. This card
+may be created only from coordinator `success`, after read-back validation.
 
 Failure states must be visibly distinct:
 
@@ -293,6 +294,153 @@ one vertical panel: file and safety note, Iskry, Tvorivé balíky, warnings, the
 large actions that remain clearly reachable. Never use a wide table or require
 horizontal scrolling or zooming. The flow may be denser than the Iskra editor,
 but headings, spacing, and one primary action must keep it calm.
+
+## Final Runtime Import Confirmation Contract
+
+This section is the authoritative UX and integration contract for the future
+manual Writer DB v1/v2 import. It does not enable runtime execution.
+
+### Exact flow and activation gate
+
+1. The author selects a file.
+2. Writer shows a read-only preview.
+3. The author presses **Skontrolovať pripravenosť**.
+4. The result must become `import-confirm-ready` (the UI presentation of
+   `preview-confirmed-ready`).
+5. Only then does **Importovať databázu** become available.
+6. One press is the single explicit confirmation.
+7. The state changes synchronously to `importing` before coordinator work
+   begins, preventing a second press.
+8. The app calls `executeWriterDbImport` exactly once for that confirmed state.
+9. The coordinator result maps to `success`, refreshed stale preview, blocked
+   preview, `failed/persistence`, or `failed/verification`.
+
+The import action is enabled only when the file parsed successfully, preview is
+not blocked, recovery was `clean`, the currently displayed preview is exactly
+the confirmed preview, and no import is running. Do not model these conditions
+as unrelated `isReady`, `isImporting`, or `hasError` booleans.
+
+`import-confirm-ready` owns a deterministic `confirmedPreviewFingerprint` and
+`previewRevision` for the displayed parsed DB and comparable preview. They are
+not security credentials. Any new file, refreshed preview, stale or blocked
+result, reset, or recovery-state change transitions out of this state and drops
+both values. The button handler accepts only `import-confirm-ready` whose
+confirmed revision/fingerprint still matches the displayed preview. The
+coordinator preflight remains the final authoritative stale check.
+
+### Discriminated UI states and transitions
+
+```ts
+type WriterDbImportRuntimeUiState =
+  | { status: "idle" }
+  | { status: "reading-file"; fileName: string }
+  | { status: "preview-ready"; fileName: string; parsedDb: WriterDb; preview: WriterDbImportPreview }
+  | { status: "preview-blocked"; fileName: string; error: string; preview?: WriterDbImportPreview }
+  | { status: "preview-stale"; fileName: string; parsedDb: WriterDb; preview: WriterDbImportPreview }
+  | {
+      status: "import-confirm-ready";
+      fileName: string;
+      parsedDb: WriterDb;
+      preview: WriterDbImportPreview;
+      recoveryStatus: "clean";
+      previewRevision: number;
+      confirmedPreviewFingerprint: string;
+    }
+  | { status: "importing"; fileName: string; preview: WriterDbImportPreview }
+  | { status: "success"; fileName: string; result: WriterDbImportSuccessSummary }
+  | { status: "failed"; fileName: string; result: Extract<ExecuteWriterDbImportResult, { status: "failed" }> };
+```
+
+Allowed transitions:
+
+- `idle -> reading-file`.
+- `reading-file -> preview-ready | preview-blocked | idle`.
+- `preview-ready -> import-confirm-ready | preview-stale | preview-blocked | reading-file | idle`.
+- `preview-stale -> import-confirm-ready | preview-stale | preview-blocked | reading-file | idle` after a new readiness check.
+- `import-confirm-ready -> importing` on the single import press; it may also
+  return to `reading-file` or `idle` before the press.
+- `importing -> success | preview-stale | preview-blocked | failed` only.
+- `success -> idle` through **Hotovo**.
+- `failed -> idle` only when closing is safe; an unresolved marker continues
+  to block another import through recovery inspection.
+
+No transition leaves `importing` through Cancel, file selection, card close, or
+a second import action.
+
+### Importing, reload, and page lifecycle
+
+While importing, disable file selection and **Zrušiť**, prevent card closing,
+and show **Importujem databázu a vytváram bezpečnostný backup…** Do not show
+invented percentages. A best-effort `beforeunload` warning may discourage
+navigation, but must never claim that leaving cancels a synchronous storage
+operation safely.
+
+`pagehide`, reload, browser termination, and a new tab discard React state, so
+`importing` is not authoritative after reload. On startup, run recovery
+inspection before enabling any import. The transaction marker determines
+`clean`, `recoverable`, or `blocked`; a remaining marker blocks a new import.
+React state alone must never announce that an interrupted import succeeded or
+failed, and recovery UI remains a separate future slice.
+
+Coordinator verification failure does **not** always leave a marker. Current
+persistence removes the marker after its own write verification, before the
+coordinator's independent final read. Use `transactionMarkerRemaining` as
+reported: `true` requires recovery gating, `false` means no prepared marker
+remains, and `null` means its presence could not be read safely. A clean
+inspection after reload means only that no prepared transaction is recoverable;
+it does not retroactively turn an unverified result into success.
+
+### Stale, blocked, and failure copy
+
+Stale:
+
+**Miestne dáta sa medzitým zmenili. Import nebol spustený. Skontrolujte
+aktualizovaný náhľad a potvrďte ho znova.**
+
+Show `refreshedPreview`, discard the old confirmation, and require another
+**Skontrolovať pripravenosť**.
+
+Blocked reasons:
+
+- `recovery-required`: **Predchádzajúca databázová operácia zostala
+  nedokončená. Nový import nebol spustený.**
+- `recovery-blocked`: **Stav predchádzajúcej databázovej operácie sa nedá
+  bezpečne vyhodnotiť. Nový import je zablokovaný.**
+- `preview-blocked`: **Aktualizovaný náhľad už nie je bezpečne použiteľný.
+  Import nebol spustený.**
+- `merge-failed`: **Dáta sa nepodarilo bezpečne pripraviť na import. Nič nebolo
+  zapísané.**
+- `backup-failed`: **Bezpečnostný backup sa nepodarilo pripraviť. Nič nebolo
+  zapísané.**
+
+Failure presentation:
+
+- Persistence failed before rollback was needed: **Import sa nepodarilo
+  zapísať. Pôvodné dáta zostali nezmenené.**
+- Persistence failed and rollback succeeded: **Import sa nepodarilo dokončiť.
+  Pôvodné dáta boli bezpečne obnovené a backup zostal k dispozícii.**
+- Persistence failed and rollback failed: **Import sa nepodarilo dokončiť a
+  pôvodné dáta sa nepodarilo úplne obnoviť. Nič ďalšie automaticky neurobíme.
+  Pred ďalším importom je potrebná kontrola obnovy.**
+- Verification failed: **Dáta boli zapísané, ale výsledok sa nepodarilo
+  bezpečne overiť. Writer nebude tento stav označovať ako úspešný import. Pred
+  ďalšou operáciou je potrebná kontrola obnovy.**
+
+The verification message does not claim a marker remains. Follow the reported
+marker state and the next startup recovery inspection.
+
+### Legacy transition and responsive behavior
+
+Before enabling this flow, replace the old `importWriterDb(parsed)` action with
+the coordinated route instead of keeping two active import truths. Do not
+silently migrate it in this documentation slice; preserve the old action until
+the replacement passes automated and manual gates, then switch in one explicit
+runtime change.
+
+On PC, preview counts may remain in two columns, with confirmation and import
+status below them. On mobile, keep one vertical flow, a large **Importovať
+databázu** button well separated from **Zrušiť**, and result cards without wide
+tables or horizontal scrolling. Neither layout shows technical logs.
 
 ## Existing Spark Editing
 

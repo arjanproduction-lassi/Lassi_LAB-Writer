@@ -163,10 +163,16 @@ Small commits:
    stored collections before success, and preserves persistence rollback
    ownership and reporting.
 17. Design the manual runtime confirmation and success/failure UI contract
-   without enabling it yet.
-18. Only then design Google Drive v2 sync.
-19. Only after v2 sync is safe, start creating WriterPackages from production UI.
-20. Only after packages exist safely across devices, build the workspace UI.
+   without enabling it yet. Documented locally with a single discriminated
+   state model, confirmed-preview invalidation, one-click execution lock,
+   truthful coordinator result copy, and reload/recovery rules.
+18. Implement and test the final UI state transitions as a pure helper, still
+   without App.tsx execution wiring.
+19. Replace the legacy production importer with the coordinated path in one
+   explicitly reviewed runtime change; do not keep two active import truths.
+20. Only then design Google Drive v2 sync.
+21. Only after v2 sync is safe, start creating WriterPackages from production UI.
+22. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 

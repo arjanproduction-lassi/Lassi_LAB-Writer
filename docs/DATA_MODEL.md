@@ -654,8 +654,9 @@ confirms import, the future implementation should:
 7. Write a small prepared transaction marker under
    `lassilab-writer:v0.1:writer-db:import-transaction` that references the valid
    backup.
-8. For v2, write and read back both Spark and WriterPackage storage. For v1,
-   write and read back only Sparks; WriterPackage storage remains untouched.
+8. Write and read back the prepared Spark and WriterPackage collections. For
+   v1, the prepared WriterPackages are a detached copy of the original local
+   content, so their content remains untouched.
 9. Remove the transaction marker only after all required writes and read-back
    validations succeed.
 10. Reload the stored collections, validate the final state, and build the
@@ -678,18 +679,18 @@ older ignored, and tombstone records. v1 shows Creative Packages as untouched.
 Warnings are visible but non-blocking; blocking issues disable the import
 action.
 
-The only commands are `Importovať` and `Zrušiť`. Choosing a file never starts
-an import by itself. The import command is available only after a successful
-parse and ready preview; it then runs backup, in-memory merge validation, and
-the guarded write sequence above.
+Choosing a file never starts an import by itself. A ready preview first offers
+`Skontrolovať pripravenosť`. The `Importovať databázu` command is available
+only from `import-confirm-ready`, after clean recovery and confirmation of the
+currently displayed preview. It then calls the coordinator once.
 
 The UI should use one discriminated state instead of independent booleans:
 
 ```ts
 type WriterDbImportSuccessSummary = {
   sourceSchemaVersion: 1 | 2;
-  sparks: { created: number; updated: number; ignoredOlder: number };
-  packages: { created: number; updated: number; ignoredOlder: number };
+  sparks: { created: number; updated: number; unchanged: number; ignoredOlder: number; tombstones: number };
+  packages: { created: number; updated: number; unchanged: number; ignoredOlder: number; tombstones: number };
   packagesUntouched: boolean;
   backupCreated: true;
 };
@@ -715,31 +716,43 @@ type WriterDbImportUiState =
       parsedDb: WriterDb;
       preview: WriterDbImportPreview;
     }
+  | {
+      status: "import-confirm-ready";
+      fileName: string;
+      parsedDb: WriterDb;
+      preview: WriterDbImportPreview;
+      recoveryStatus: "clean";
+      previewRevision: number;
+      confirmedPreviewFingerprint: string;
+    }
   | { status: "importing"; fileName: string; preview: WriterDbImportPreview }
   | { status: "success"; fileName: string; result: WriterDbImportSuccessSummary }
   | {
       status: "failed";
       fileName: string;
-      stage: "before-write" | "write" | "rollback";
+      stage: "persistence" | "verification";
       error: string;
       rollbackAttempted: boolean;
       rollbackSucceeded: boolean;
+      transactionMarkerRemaining: boolean | null;
     };
 ```
 
 `preview-stale` means fresh local collections produced a different preview at
 confirmation time. It never writes and requires the author to inspect and
-confirm the refreshed preview again. `failed` presentation derives from the
-stage and rollback flags: no write, restored safely, or unresolved transaction.
+confirm the refreshed preview again. Only `import-confirm-ready` contains a
+confirmed preview revision/fingerprint and may transition to `importing`. Any
+new file, refreshed preview, stale/blocked result, reset, or recovery change
+drops that confirmation. Independent readiness booleans are forbidden.
 
-After **Importovať**, the future application must recheck that the state is
-`preview-ready`, read fresh local Sparks and WriterPackages, and recompute the
-preview. Only an unchanged ready preview may proceed to
-`mergeWriterDbInMemory`, `createWriterDbImportBackup`, and the persistence
-coordinator. After persistence, reload and validate both stored collections
-before producing the success summary. A remaining `recoverable` or `blocked`
-transaction marker blocks starting any new import, but recovery UI is not part
-of this import state model yet.
+The coordinator rechecks fresh local collections after **Importovať databázu**.
+`importing` may transition only to `success`, refreshed stale/blocked preview,
+or `failed`. Success is constructed only from coordinator success after both
+stored collections pass independent read-back validation. Failure presentation
+uses the persistence/verification stage, rollback flags, and truthfully read
+marker state. A remaining marker blocks another import, but verification
+failure does not always leave one because persistence may already have removed
+it after its own successful verification.
 
 ### Pure Import Confirmation Preflight
 

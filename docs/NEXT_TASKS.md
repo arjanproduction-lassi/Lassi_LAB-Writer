@@ -48,8 +48,8 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- design the manual runtime confirmation and success/failure UI contract
-  without enabling it, wiring `App.tsx`, or adding an active import action
+- implement the documented runtime import state transitions as a pure helper
+  with tests, without wiring `App.tsx` or enabling an active import action
 
 ## Next Technical Slice
 
@@ -87,11 +87,19 @@ reading, parsing, and comparing both stored collections. Rollback remains owned
 by persistence. Current production v1 import/export and Google Drive sync
 remain unchanged.
 
+The final runtime confirmation contract is now documented: only a confirmed
+ready preview can expose the future import action; the first click enters a
+locked importing state; stale invalidates confirmation; success comes only from
+coordinator success; and reload authority comes from recovery inspection, not
+React state. The preferred rollout replaces the legacy importer with this
+coordinated path in one later reviewed change rather than maintaining two
+active import behaviors.
+
 After that:
 
-1. Specify the manual runtime confirmation and success/failure UI contract,
-   but do not enable it yet. Keep App.tsx disconnected and preserve the current
-   production v1 importer.
+1. Implement and test the final discriminated UI state transitions as a pure
+   helper. Keep App.tsx disconnected and preserve the current production v1
+   importer until the coordinated replacement is explicitly reviewed.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

@@ -572,31 +572,43 @@ The recovery inspection checks use injected storage only. They cover:
 ## Future Manual Import UX Acceptance
 
 The read-only file-to-preview shell is implemented as a separate action in the
-Data section. Import execution is still not connected. Verify on both PC and
-mobile that:
+Data section. Import execution is still not connected. When the coordinated
+runtime route is implemented, verify these scenarios on both PC and mobile:
 
-1. Selecting a file only reads, parses, and previews it; storage, backup,
-   import, sync, and recovery remain untouched.
-2. **Zrušiť** from a ready preview leaves all data byte-for-byte unchanged.
-3. Invalid JSON, unsupported schema, damaged records, and duplicate ids inside
-   one collection show a blocked preview with no **Importovať** action.
-4. A ready preview shows separate Iskra and Tvorivý balík counts, stable
-   warnings, and the sentence **Výber súboru zatiaľ nič nezmenil.**
-5. v1 clearly reports that WriterPackages remain untouched.
-6. Confirmation reloads fresh local collections and recomputes preview. A
-   changed preview returns to review without backup, merge, or storage writes.
-7. Success counts match the validated stored result and confirm backup
-   creation.
-8. Failures distinguish no production write, successful rollback, and failed
-   rollback without exposing stack traces.
-9. A recoverable or blocked transaction marker prevents a new import before
-   file selection; no automatic recovery runs.
-10. PC can use two count columns. Mobile uses one vertical panel with reachable
-    actions and no horizontal table or zoom requirement.
+1. Successful v1 import updates Sparks, preserves WriterPackages content,
+   reports `packagesUntouched`, and shows success only after read-back.
+2. Successful v2 import verifies and reports both collections.
+3. Local data changing between readiness and import returns stale, writes
+   nothing, shows the refreshed preview, and invalidates confirmation.
+4. `recovery-required` prevents execution with the documented human copy.
+5. `recovery-blocked` prevents execution with no automatic repair.
+6. `merge-failed` writes nothing and does not proceed to backup or persistence.
+7. `backup-failed` writes nothing and does not proceed to persistence.
+8. A persistence failure before the first production collection write reports
+   that original data remained unchanged.
+9. A failure after the Sparks write invokes persistence-owned rollback.
+10. Successful rollback reports restored original data and retained backup.
+11. Failed rollback reports the unresolved state and leaves marker handling to
+    recovery inspection.
+12. Corrupted final read-back produces `failed/verification`, never success,
+    and does not claim that a marker always remains.
+13. Double-clicking **Importovať databázu** invokes the coordinator once because
+    the first click synchronously enters `importing`.
+14. Reload during import does not restore authority from React state; startup
+    recovery inspection decides whether a marker is clean, recoverable, or
+    blocked.
+15. Mobile uses one vertical layout, separated primary/cancel actions, no wide
+    table, and no horizontal scrolling; PC may use two preview columns.
+16. Selecting the same file again resets the file input and creates a new
+    preview revision rather than reusing old confirmation.
+17. Success copy, counts, Writer DB version, and backup confirmation appear only
+    after coordinator read-back validation.
 
-While import execution remains disconnected, keep the existing production
-import/export, storage keys, Google Drive sync, and recovery runtime wiring
-unchanged.
+Also verify that file selection remains read-only, blocked previews never show
+an active import action, **Zrušiť** is disabled during `importing`, and no
+technical stack trace is exposed. While execution remains disconnected, keep
+the existing production import/export, storage keys, Google Drive sync, and
+recovery runtime wiring unchanged.
 
 The pure preparation helper adds 15 checks to `npm run check:writer-db` for a
 total of 122. They cover valid v1/v2 previews, parser failures, damaged records,
