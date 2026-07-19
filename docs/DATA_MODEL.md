@@ -780,6 +780,15 @@ remaining marker, or unknown marker state cannot reset to idle. Reset also
 recomputes the guard from the result, so a manually forged boolean cannot
 bypass it. The state machine does not call the coordinator or touch runtime.
 
+`writerDbImportUiAdapter` is the pure typed boundary for future runtime event
+handlers. It maps file selection, prepared preview, preflight, requested start,
+coordinator result, and reset inputs to the state machine's existing events.
+It preserves errors, blocking issues, rollback facts, refreshed previews, and
+explicit revisions. A stale coordinator result requires its caller to provide
+the refreshed revision; the adapter never generates one. The adapter only
+calls `transitionWriterDbImportUiState` and does not parse, inspect recovery,
+merge, create a backup, persist, roll back, execute an import, or touch runtime.
+
 ### Pure Import Confirmation Preflight
 
 `prepareWriterDbImportPreflight` is the pure boundary before any future import

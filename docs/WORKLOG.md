@@ -1,5 +1,18 @@
 # Worklog
 
+## 2026-07-19 - Pure Writer DB import UI adapter
+
+- Added a typed, React-free adapter from file/preview/preflight/start/coordinator
+  results and reset requests to the existing UI state-machine events.
+- Stale results carry an explicit refreshed revision; blocked and failed
+  results preserve reasons, issues, rollback facts, and marker truth.
+- Added 22 adapter checks, bringing the Writer DB harness to 254 checks.
+- The adapter delegates every transition to the state machine, so revision,
+  importing, and safe-close guards remain authoritative.
+- No App.tsx wiring, active import, parser call, merge, backup, persistence,
+  recovery, rollback, storage, network, production import/export, or Google
+  Drive sync change was added.
+
 ## 2026-07-19 - Pure Writer DB import UI state machine
 
 - Added a React-free discriminated state/event helper with explicit accepted or

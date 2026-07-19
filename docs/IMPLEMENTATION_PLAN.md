@@ -172,6 +172,8 @@ Small commits:
    guards, coordinator-result mapping, and safe-close derivation.
 19. Add a separate adapter between App.tsx and the pure state machine, first
    without calling `executeWriterDbImport` or exposing an active import action.
+   Prepared locally as a pure typed result-to-event mapper with explicit stale
+   revisions and state-machine rejection guards; it is not wired to App.tsx.
 20. Replace the legacy production importer with the coordinated path in one
    explicitly reviewed runtime change; do not keep two active import truths.
 21. Only then design Google Drive v2 sync.

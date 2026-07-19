@@ -102,12 +102,16 @@ bind confirmation deterministically, importing blocks a second start/reset/new
 file, and coordinator results can terminate only an active importing state.
 The helper has no React, storage, recovery, execution, or persistence wiring.
 
+The thin typed UI adapter is now prepared locally. It maps existing preview,
+preflight, coordinator, file, start, and reset outcomes into the state machine
+without calling those layers or bypassing transition rejection. It is not
+wired to App.tsx and does not expose an active import action.
+
 After that:
 
-1. Implement and test a thin adapter between App.tsx events and the pure state
-   machine, still without calling the coordinator. Keep the active import
-   action absent and preserve the current production v1 importer until the
-   coordinated replacement is explicitly reviewed.
+1. Review the pure adapter boundary before any App.tsx wiring. Keep the active
+   import action absent and preserve the current production v1 importer until
+   the coordinated replacement is explicitly reviewed.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

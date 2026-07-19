@@ -51,13 +51,13 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summaries report 232 checks total: 66 parser/export, import-preview,
+- The summaries report 254 checks total: 66 parser/export, import-preview,
   in-memory merge, and backup-factory checks; 21 injected persistence
   coordinator checks; 20 read-only recovery inspection checks; 15 pure
   file-to-preview preparation checks; 16 pure confirmation preflight checks;
   10 pure preview UI transition checks; 26 pure import execution checks; and
-  24 injected-storage import coordinator checks; and 34 pure import UI state
-  transition checks.
+  24 injected-storage import coordinator checks; 34 pure import UI state
+  transition checks; and 22 pure import UI adapter checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -94,6 +94,10 @@ Expected result:
   deterministic revision matching, confirmation invalidation, importing locks,
   coordinator result mapping, safe/unsafe failure closing, immutability,
   repeatability, and absence of runtime side effects.
+- UI adapter checks cover typed preview, preflight, start, coordinator-result,
+  and reset mappings; explicit stale revisions; preserved failure details;
+  state-machine rejection guards; immutability; determinism; and absence of an
+  import callback.
 - No production storage write, production import, export, UI, or Google Drive
   sync change is performed.
 
@@ -126,6 +130,14 @@ unneeded or successful.
 The helper imports no React or runtime storage API and performs no parse,
 recovery, merge, backup, persistence, rollback, coordinator, network, or import
 operation.
+
+## Writer DB Pure Import UI Adapter Checks
+
+`writerDbImportUiAdapter` translates already computed layer results into typed
+state-machine events. It never calls the parser, preflight, coordinator,
+execution, merge, backup, persistence, recovery, rollback, storage, or network.
+Its start helper only requests the guarded `import-started` transition; it does
+not execute an import. The adapter is not imported by App.tsx.
 
 ## Writer DB Import Coordinator Checks
 
