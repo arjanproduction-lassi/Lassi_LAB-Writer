@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-07-19 - Read-only Writer DB import preview shell
+
+- Added a separate **Náhľad importu DB v1/v2** action without changing the
+  existing production import action.
+- Added a pure helper that parses JSON and returns a ready or blocked preview
+  without merge, backup, persistence, recovery inspection, or localStorage.
+- Preview compares incoming records with complete local Sparks and real
+  WriterPackages, not the legacy-adapted package catalog.
+- Added idle, reading, ready, and blocked UI states with resettable file input,
+  human-readable warnings, responsive counts, and no active import command.
+- Added 15 preparation checks while preserving the previous 107 checks.
+- Import execution, recovery gate, fresh-preview confirmation, success,
+  rollback, storage keys, migration, and Google Drive v2 sync remain unconnected.
+
 ## 2026-07-19 - Manual Writer DB import UX contract
 
 - Documented the manual v1/v2 path from file selection through read-only

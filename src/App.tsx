@@ -11,6 +11,7 @@ import {
   deleteSpark,
   getWriterDbExportFileName,
   importWriterDb,
+  loadWriterDbExportSparks,
   listSparks,
   normalizeSparkStage,
   readNewSparkDraft,
@@ -20,11 +21,20 @@ import {
   updateSparkStage,
   updateGoogleSyncPreferences
 } from "./storage";
-import { parseWriterDbPayload } from "./writerDb";
+import {
+  parseWriterDbPayload,
+  type ImportCollectionPreview,
+  type WriterDb,
+  type WriterDbImportBlockingIssue,
+  type WriterDbImportPreview,
+  type WriterDbImportWarning
+} from "./writerDb";
+import { prepareWriterDbImportPreview } from "./writerDbImportPreview";
 import {
   createManualWriterDbV2Export,
   getManualWriterDbV2ExportFileName
 } from "./writerDbExport";
+import { loadWriterPackages } from "./writerPackageStorage";
 import type {
   GoogleSyncPreferences,
   NewSparkDraft,
@@ -39,6 +49,22 @@ type EditorState = {
 };
 
 type StageFilter = "all" | SparkStage;
+
+type WriterDbImportPreviewUiState =
+  | { status: "idle" }
+  | { status: "reading-file"; fileName: string }
+  | {
+      status: "preview-ready";
+      fileName: string;
+      db: WriterDb;
+      preview: WriterDbImportPreview;
+    }
+  | {
+      status: "preview-blocked";
+      fileName: string;
+      error: string;
+      blockingIssues: WriterDbImportBlockingIssue[];
+    };
 
 const QUIET_SYNC_DEBOUNCE_MS = 4000;
 const STALE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
@@ -81,6 +107,32 @@ function sparkPreview(spark: Spark) {
 
 function sparkStageLabel(spark: Spark) {
   return STAGE_LABELS[normalizeSparkStage(spark.stage)];
+}
+
+function writerDbWarningText(warning: WriterDbImportWarning) {
+  switch (warning.code) {
+    case "v1-packages-untouched":
+      return "Tento Writer DB v1 súbor nemení tvorivé balíky.";
+    case "count-mismatch":
+      return "Počty uvedené v súbore nesedia s jeho obsahom. Rozhodujú overené záznamy.";
+    case "cross-model-id-overlap":
+      return "Rovnaké ID sa nachádza medzi Iskrou a Tvorivým balíkom. Oba typy zostanú samostatné.";
+    case "contains-tombstones":
+      return "Súbor obsahuje záznamy o zmazaní (tombstones).";
+    case "empty-import":
+      return "Súbor neobsahuje žiadne záznamy na import.";
+  }
+}
+
+function previewRows(preview: ImportCollectionPreview) {
+  return [
+    ["Prichádza", preview.incoming],
+    ["Nové", preview.create],
+    ["Aktualizované", preview.update],
+    ["Nezmenené", preview.unchanged],
+    ["Staršie – ignorované", preview.ignoredOlder],
+    ["Tombstones", preview.tombstones]
+  ] as const;
 }
 
 function googleSyncUnavailableMessage() {
@@ -136,6 +188,8 @@ export default function App() {
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [savedMessage, setSavedMessage] = useState("");
   const [dataMessage, setDataMessage] = useState("");
+  const [importPreviewState, setImportPreviewState] =
+    useState<WriterDbImportPreviewUiState>({ status: "idle" });
   const [newSparkDraft, setNewSparkDraft] = useState<NewSparkDraft | undefined>(() =>
     readNewSparkDraft()
   );
@@ -153,6 +207,7 @@ export default function App() {
     googleSyncAvailable ? "" : googleSyncUnavailableMessage()
   );
   const importInputRef = useRef<HTMLInputElement>(null);
+  const importPreviewInputRef = useRef<HTMLInputElement>(null);
   const googleSyncBusyRef = useRef(false);
   const quietSyncTimerRef = useRef<number | null>(null);
   const draftAutosaveTimerRef = useRef<number | null>(null);
@@ -646,6 +701,60 @@ export default function App() {
     importInputRef.current?.click();
   }
 
+  function openImportPreviewPicker() {
+    importPreviewInputRef.current?.click();
+  }
+
+  function closeImportPreview() {
+    setImportPreviewState({ status: "idle" });
+    if (importPreviewInputRef.current) {
+      importPreviewInputRef.current.value = "";
+    }
+  }
+
+  async function handleImportPreviewFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    setImportPreviewState({ status: "reading-file", fileName: file.name });
+
+    try {
+      const result = prepareWriterDbImportPreview({
+        jsonText: await file.text(),
+        localSparks: loadWriterDbExportSparks(),
+        localPackages: loadWriterPackages()
+      });
+
+      if (!result.ok) {
+        setImportPreviewState({
+          status: "preview-blocked",
+          fileName: file.name,
+          error: result.error,
+          blockingIssues: result.blockingIssues
+        });
+        return;
+      }
+
+      setImportPreviewState({
+        status: "preview-ready",
+        fileName: file.name,
+        db: result.db,
+        preview: result.preview
+      });
+    } catch {
+      setImportPreviewState({
+        status: "preview-blocked",
+        fileName: file.name,
+        error: "Súbor sa nepodarilo načítať.",
+        blockingIssues: []
+      });
+    }
+  }
+
   async function handleImportDb(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
     event.currentTarget.value = "";
@@ -898,6 +1007,9 @@ export default function App() {
           <button className="data-action" type="button" onClick={openImportPicker}>
             Importovať DB
           </button>
+          <button className="data-action" type="button" onClick={openImportPreviewPicker}>
+            Náhľad importu DB v1/v2
+          </button>
         </div>
         <input
           ref={importInputRef}
@@ -906,7 +1018,96 @@ export default function App() {
           accept="application/json,.json"
           onChange={handleImportDb}
         />
+        <input
+          ref={importPreviewInputRef}
+          className="file-input"
+          type="file"
+          accept="application/json,.json"
+          onChange={handleImportPreviewFile}
+        />
         {dataMessage ? <p className="data-note">{dataMessage}</p> : null}
+
+        {importPreviewState.status === "reading-file" ? (
+          <section className="import-preview" aria-live="polite">
+            <h3>Import databázy — náhľad</h3>
+            <p>Načítavam súbor {importPreviewState.fileName}…</p>
+          </section>
+        ) : null}
+
+        {importPreviewState.status === "preview-ready" ? (
+          <section className="import-preview" aria-labelledby="import-preview-title">
+            <div className="import-preview-heading">
+              <div>
+                <p className="eyebrow">Read-only kontrola</p>
+                <h3 id="import-preview-title">Import databázy — náhľad</h3>
+              </div>
+              <span className="stage-badge">Writer DB v{importPreviewState.db.schemaVersion}</span>
+            </div>
+            <p className="import-preview-file">
+              <strong>Súbor:</strong> {importPreviewState.fileName}
+            </p>
+            <p className="import-preview-safety">Výber súboru zatiaľ nič nezmenil.</p>
+            <div className="import-preview-collections">
+              <section className="import-preview-collection">
+                <h3>Iskry</h3>
+                <dl>
+                  {previewRows(importPreviewState.preview.sparks).map(([label, value]) => (
+                    <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
+                  ))}
+                </dl>
+              </section>
+              <section className="import-preview-collection">
+                <h3>Tvorivé balíky</h3>
+                {importPreviewState.preview.packages.mode === "untouched" ? (
+                  <p>Tvorivé balíky zostanú nedotknuté.</p>
+                ) : (
+                  <dl>
+                    {previewRows(importPreviewState.preview.packages).map(([label, value]) => (
+                      <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
+                    ))}
+                  </dl>
+                )}
+              </section>
+            </div>
+            {importPreviewState.preview.warnings.length ? (
+              <div className="import-preview-warnings">
+                <h3>Upozornenia</h3>
+                <ul>
+                  {importPreviewState.preview.warnings.map((warning, index) => (
+                    <li key={`${warning.code}-${index}`}>{writerDbWarningText(warning)}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <p className="data-copy">Import ešte nie je zapojený.</p>
+            <button className="ghost-action" type="button" onClick={closeImportPreview}>
+              Zrušiť
+            </button>
+          </section>
+        ) : null}
+
+        {importPreviewState.status === "preview-blocked" ? (
+          <section className="import-preview import-preview-blocked" aria-live="polite">
+            <h3>Tento súbor sa nedá importovať</h3>
+            <p>Nič nebolo zmenené.</p>
+            <p>{importPreviewState.error}</p>
+            {importPreviewState.blockingIssues.length ? (
+              <ul>
+                {importPreviewState.blockingIssues.map((issue) => (
+                  <li key={issue.code}>{issue.message}</li>
+                ))}
+              </ul>
+            ) : null}
+            <div className="import-preview-actions">
+              <button className="data-action" type="button" onClick={openImportPreviewPicker}>
+                Vybrať iný súbor
+              </button>
+              <button className="ghost-action" type="button" onClick={closeImportPreview}>
+                Zavrieť
+              </button>
+            </div>
+          </section>
+        ) : null}
 
         <div className="sync-panel" aria-labelledby="google-sync-title">
           <div>

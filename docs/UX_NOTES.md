@@ -171,6 +171,13 @@ The recovery UX should feel like a quiet note on the table:
 
 ## Manual Writer DB Import Preview
 
+Current implementation boundary: the separate **Náhľad importu DB v1/v2**
+action now covers file selection, file reading, `parseWriterDbJson`, pure
+preview, ready/blocked presentation, and cancellation. It reads complete local
+Sparks plus real WriterPackages. It does not show an active import command and
+does not merge, back up, persist, inspect recovery, migrate, or sync anything.
+The confirmation and result states below remain the future execution contract.
+
 The future v1/v2 importer is a deliberate administrative flow, not an instant
 file action. Selecting a JSON file only reads, parses, and previews it. Until
 the author presses **Importovať**, no backup, merge, storage write, migration,

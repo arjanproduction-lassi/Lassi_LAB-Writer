@@ -144,11 +144,14 @@ Small commits:
    and failure copy distinguishes no write, successful rollback, and failed
    rollback. Runtime UI remains unimplemented.
 12. Implement the smallest import UI state shell and read-only file-to-preview
-   path, without connecting merge, persistence, recovery actions, or production
-   storage writes.
-13. Only then design Google Drive v2 sync.
-14. Only after v2 sync is safe, start creating WriterPackages from production UI.
-15. Only after packages exist safely across devices, build the workspace UI.
+   path. Prepared locally with separate idle/reading/ready/blocked states,
+   complete local Sparks, real WriterPackages, no active import command, and no
+   merge, persistence, recovery action, or production storage write.
+13. Add the explicit **Importovať** execution only after a recovery gate and a
+   fresh preview recomputation can be enforced before merge and persistence.
+14. Only then design Google Drive v2 sync.
+15. Only after v2 sync is safe, start creating WriterPackages from production UI.
+16. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 

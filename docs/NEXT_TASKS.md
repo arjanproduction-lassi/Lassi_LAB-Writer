@@ -48,9 +48,9 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- implement only the explicit import UI state shell and read-only
-  file-to-preview path described in `UX_NOTES.md`; do not connect merge,
-  persistence, recovery actions, or production storage yet
+- connect an explicit **Importovať** action only after the UI first enforces the
+  recovery gate and recomputes preview from fresh local Sparks and real
+  WriterPackages; do not bypass renewed confirmation when preview changes
 
 ## Next Technical Slice
 
@@ -76,15 +76,16 @@ injected persistence coordinator now covers backup and marker writes,
 read-back validation, rollback, and failed-rollback marker retention. A
 read-only recovery inspection now diagnoses remaining prepared markers as
 `clean`, `recoverable`, or `blocked` without writing, rollback, UI, or runtime
-localStorage access. The manual preview and confirmation UX contract is now
-documented, including fresh-preview confirmation, blocked states, result copy,
-and responsive layout. Preview UI remains unimplemented. Current production
-v1 import/export and Google Drive sync remain unchanged.
+localStorage access. The manual preview and confirmation UX contract is
+documented, and the separate read-only file-to-preview shell is prepared
+locally with no active import command. Current production v1 import/export and
+Google Drive sync remain unchanged.
 
 After that:
 
-1. Add the smallest discriminated UI state shell and read-only file-to-preview
-   path. Stop before merge, backup, persistence, recovery UI, or runtime keys.
+1. Add the recovery gate and fresh-preview confirmation boundary before
+   exposing an active import action. Keep the action disconnected until both
+   can be proven without changing the current production v1 importer.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

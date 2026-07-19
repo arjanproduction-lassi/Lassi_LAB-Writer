@@ -51,9 +51,10 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summaries report 107 checks total: 66 parser/export, import-preview,
+- The summaries report 122 checks total: 66 parser/export, import-preview,
   in-memory merge, and backup-factory checks; 21 injected persistence
-  coordinator checks; and 20 read-only recovery inspection checks.
+  coordinator checks; 20 read-only recovery inspection checks; and 15 pure
+  file-to-preview preparation checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -70,6 +71,8 @@ Expected result:
   localStorage access.
 - Recovery checks cover `clean`, `recoverable`, and `blocked` results, warning
   cases, blocking backup/marker damage, and read-only behavior.
+- Preparation checks cover ready and blocked v1/v2 results, warnings, input
+  immutability, and no localStorage access.
 - No production storage write, production import, export, UI, or Google Drive
   sync change is performed.
 
@@ -527,8 +530,9 @@ The recovery inspection checks use injected storage only. They cover:
 
 ## Future Manual Import UX Acceptance
 
-This is a documentation contract, not an implemented production test yet. When
-the manual v1/v2 import UI is added, verify on both PC and mobile that:
+The read-only file-to-preview shell is implemented as a separate action in the
+Data section. Import execution is still not connected. Verify on both PC and
+mobile that:
 
 1. Selecting a file only reads, parses, and previews it; storage, backup,
    import, sync, and recovery remain untouched.
@@ -549,8 +553,14 @@ the manual v1/v2 import UI is added, verify on both PC and mobile that:
 10. PC can use two count columns. Mobile uses one vertical panel with reachable
     actions and no horizontal table or zoom requirement.
 
-Until this UI exists, keep `App.tsx`, production import/export, storage keys,
-Google Drive sync, and recovery runtime wiring unchanged.
+While import execution remains disconnected, keep the existing production
+import/export, storage keys, Google Drive sync, and recovery runtime wiring
+unchanged.
+
+The pure preparation helper adds 15 checks to `npm run check:writer-db` for a
+total of 122. They cover valid v1/v2 previews, parser failures, damaged records,
+duplicate same-collection ids, every warning family, input immutability, and no
+localStorage access.
 
 ## Add To Home Screen On Android
 

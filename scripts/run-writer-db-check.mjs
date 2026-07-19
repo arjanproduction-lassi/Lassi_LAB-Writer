@@ -28,7 +28,8 @@ try {
       outputDir,
       "src/writerDbChecks.ts",
       "src/writerDbPersistenceChecks.ts",
-      "src/writerDbRecoveryChecks.ts"
+      "src/writerDbRecoveryChecks.ts",
+      "src/writerDbImportPreviewChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -62,6 +63,16 @@ try {
 
   if (recoveryRun.status !== 0) {
     process.exit(recoveryRun.status ?? 1);
+  }
+
+  const previewPreparationRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerDbImportPreviewChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (previewPreparationRun.status !== 0) {
+    process.exit(previewPreparationRun.status ?? 1);
   }
 } finally {
   rmSync(outputDir, { recursive: true, force: true });
