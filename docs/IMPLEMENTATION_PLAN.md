@@ -154,10 +154,14 @@ Small commits:
    Prepared locally with a read-only readiness action, refreshed preview display,
    get-only recovery storage injection, and no import execution or persistence.
 15. Design and test an explicit pure import execution function outside App.tsx
-   before any runtime button or storage wiring.
-16. Only then design Google Drive v2 sync.
-17. Only after v2 sync is safe, start creating WriterPackages from production UI.
-18. Only after packages exist safely across devices, build the workspace UI.
+   before any runtime button or storage wiring. Prepared locally as a
+   deterministic preflight -> merge -> original-state backup plan. It returns
+   ready/stale/blocked data but performs no persistence and creates no marker.
+16. Add a separate import execution coordinator with injected storage, first
+   only in harness checks and still without App.tsx wiring.
+17. Only then design Google Drive v2 sync.
+18. Only after v2 sync is safe, start creating WriterPackages from production UI.
+19. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 

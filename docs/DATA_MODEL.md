@@ -762,6 +762,27 @@ blocking issues. The preflight does not merge, create a backup, persist, roll
 back, write a marker, touch localStorage, or mutate any input. It is not wired
 to the current preview UI or production import yet.
 
+### Pure Import Execution Plan
+
+`prepareWriterDbImportExecution` is a pure, read-only orchestration step. It
+first calls the confirmation preflight and proceeds only when that result is
+`ready`. A `stale` or `blocked` preflight result returns immediately, before
+merge or backup creation.
+
+For a ready preflight, the helper reuses `mergeWriterDbInMemory` and then
+`createWriterDbImportBackup`. The backup factory receives the original local
+Sparks and WriterPackages, never the merged arrays, plus an explicit
+`backupCreatedAt`. The ready result contains the confirmed preview, deeply
+detached merged collections, the original-state backup, and the imported
+source schema version.
+
+The execution result is discriminated as `ready`, `stale`, or `blocked`.
+Blocked reasons are recovery-required, recovery-blocked, preview-blocked,
+merge-failed, or backup-failed. Ready means only that a deterministic plan was
+calculated. It does not mean an import was performed: the persistence
+coordinator is not called, no transaction marker is created, and no success
+summary exists before a future write and read-back verification.
+
 ### Version Meanings
 
 These versions are different and must not be mixed:

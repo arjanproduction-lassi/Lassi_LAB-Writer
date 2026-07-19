@@ -51,11 +51,11 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summaries report 148 checks total: 66 parser/export, import-preview,
+- The summaries report 174 checks total: 66 parser/export, import-preview,
   in-memory merge, and backup-factory checks; 21 injected persistence
   coordinator checks; 20 read-only recovery inspection checks; 15 pure
   file-to-preview preparation checks; 16 pure confirmation preflight checks;
-  and 10 pure preview UI transition checks.
+  10 pure preview UI transition checks; and 26 pure import execution checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -80,8 +80,23 @@ Expected result:
 - Preview UI checks cover confirmed-ready, stale refreshed preview, renewed
   readiness checks, recovery and preview blocking, no import action, and reset
   to idle.
+- Execution checks cover strict preflight ordering, v1/v2 merge rules,
+  original-state backup creation, deterministic time, real merge and backup
+  failures, deep-copy isolation, repeatability, and absence of storage or
+  persistence side effects.
 - No production storage write, production import, export, UI, or Google Drive
   sync change is performed.
+
+## Writer DB Pure Import Execution Checks
+
+`prepareWriterDbImportExecution` calculates a future import plan without
+executing it. Preflight must be ready before merge and backup creation. Stale
+or blocked results stop immediately. On ready, the backup is created from the
+original local arrays while the merged arrays are returned separately.
+
+The helper does not call the persistence coordinator, write a transaction
+marker, touch browser storage, or produce a success summary. A ready result
+therefore confirms only a prepared in-memory plan, not a completed import.
 
 ## Writer DB Import Preview Checks
 

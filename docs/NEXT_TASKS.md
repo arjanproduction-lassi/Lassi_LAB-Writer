@@ -48,9 +48,9 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- design an explicit pure import execution function outside `App.tsx` and test
-  its ordering and failure results in the harness before exposing any runtime
-  **Importovať** action or storage wiring
+- add a separate import execution coordinator with injected storage, initially
+  only in harness checks and without `App.tsx`, an active import action, or
+  production runtime wiring
 
 ## Next Technical Slice
 
@@ -78,13 +78,17 @@ read-only recovery inspection now diagnoses remaining prepared markers as
 `clean`, `recoverable`, or `blocked` without writing, rollback, UI, or runtime
 localStorage access. The manual preview and confirmation UX contract is
 documented, and the separate read-only file-to-preview shell is prepared
-locally with no active import command. Current production v1 import/export and
-Google Drive sync remain unchanged.
+locally with no active import command. A pure execution plan now enforces
+preflight first, merges only when ready, and creates a deterministic backup
+from the original local collections. Its ready result is still read-only and
+does not call persistence or mean that an import completed. Current production
+v1 import/export and Google Drive sync remain unchanged.
 
 After that:
 
-1. Specify and test the pure execution contract outside the UI. Keep runtime
-   execution disconnected and preserve the current production v1 importer.
+1. Specify and test an import execution coordinator with injected storage,
+   first only in the harness. Keep App.tsx disconnected and preserve the
+   current production v1 importer.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

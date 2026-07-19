@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-19 - Pure Writer DB import execution plan
+
+- Added `prepareWriterDbImportExecution`, a pure orchestration of confirmation
+  preflight, in-memory merge, and original-state backup creation.
+- Stale and blocked preflight results return before merge or backup. Only a
+  ready preflight can calculate merged Sparks and WriterPackages.
+- Backup creation receives the original local arrays and an explicit timestamp,
+  so it is deterministic and cannot capture already merged data.
+- Ready means only that the plan is prepared; persistence, marker writes,
+  rollback, read-back verification, and success summary remain disconnected.
+- Added 26 execution checks while preserving all existing 148 checks.
+- No App.tsx, CSS, production storage, import/export, Google Drive sync, runtime
+  storage key, or active import action was changed.
+- The next smallest step is an injected-storage execution coordinator tested
+  only in the harness and still not wired into App.tsx.
+
 ## 2026-07-19 - Read-only import readiness UI
 
 - Added **Skontrolovať pripravenosť** to the existing preview without adding an
