@@ -30,6 +30,13 @@ import {
   type WriterDbImportWarning
 } from "./writerDb";
 import { prepareWriterDbImportPreview } from "./writerDbImportPreview";
+import { prepareWriterDbImportPreflight } from "./writerDbImportPreflight";
+import {
+  applyWriterDbImportPreflightResult,
+  resetWriterDbImportPreviewUiState,
+  type WriterDbImportPreviewUiState
+} from "./writerDbImportPreviewUi";
+import { inspectWriterDbRecovery } from "./writerDbRecovery";
 import {
   createManualWriterDbV2Export,
   getManualWriterDbV2ExportFileName
@@ -50,25 +57,15 @@ type EditorState = {
 
 type StageFilter = "all" | SparkStage;
 
-type WriterDbImportPreviewUiState =
-  | { status: "idle" }
-  | { status: "reading-file"; fileName: string }
-  | {
-      status: "preview-ready";
-      fileName: string;
-      db: WriterDb;
-      preview: WriterDbImportPreview;
-    }
-  | {
-      status: "preview-blocked";
-      fileName: string;
-      error: string;
-      blockingIssues: WriterDbImportBlockingIssue[];
-    };
-
 const QUIET_SYNC_DEBOUNCE_MS = 4000;
 const STALE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
 const DRAFT_AUTOSAVE_DEBOUNCE_MS = 500;
+const WRITER_DB_RECOVERY_KEYS = {
+  sparks: "lassilab-writer:v0.1:sparks",
+  packages: "lassilab-writer:v0.1:packages",
+  backup: "lassilab-writer:v0.1:writer-db:backup-before-import",
+  transaction: "lassilab-writer:v0.1:writer-db:import-transaction"
+};
 const STAGE_LABELS: Record<SparkStage, string> = {
   spark: "Iskra",
   notes: "Poznámky",
@@ -226,6 +223,25 @@ export default function App() {
         : sparks.filter((spark) => normalizeSparkStage(spark.stage) === stageFilter),
     [sparks, stageFilter]
   );
+  const displayedImportPreview =
+    importPreviewState.status === "preview-ready" ||
+    importPreviewState.status === "preview-confirmed-ready"
+      ? importPreviewState.preview
+      : importPreviewState.status === "preview-stale"
+        ? importPreviewState.refreshedPreview
+        : undefined;
+  const displayedImportDb =
+    importPreviewState.status === "preview-ready" ||
+    importPreviewState.status === "preview-confirmed-ready" ||
+    importPreviewState.status === "preview-stale"
+      ? importPreviewState.db
+      : undefined;
+  const displayedImportFileName =
+    importPreviewState.status === "preview-ready" ||
+    importPreviewState.status === "preview-confirmed-ready" ||
+    importPreviewState.status === "preview-stale"
+      ? importPreviewState.fileName
+      : undefined;
 
   const isEditing = Boolean(editor?.id);
   const activeSparkStage = activeSpark ? normalizeSparkStage(activeSpark.stage) : "spark";
@@ -706,10 +722,43 @@ export default function App() {
   }
 
   function closeImportPreview() {
-    setImportPreviewState({ status: "idle" });
+    setImportPreviewState(resetWriterDbImportPreviewUiState());
     if (importPreviewInputRef.current) {
       importPreviewInputRef.current.value = "";
     }
+  }
+
+  function chooseAnotherImportPreviewFile() {
+    closeImportPreview();
+    importPreviewInputRef.current?.click();
+  }
+
+  function handleCheckImportReadiness() {
+    if (
+      importPreviewState.status !== "preview-ready" &&
+      importPreviewState.status !== "preview-stale"
+    ) {
+      return;
+    }
+
+    const previousPreview = importPreviewState.status === "preview-ready"
+      ? importPreviewState.preview
+      : importPreviewState.refreshedPreview;
+    const recoveryInspection = inspectWriterDbRecovery({
+      storage: {
+        getItem: (key) => window.localStorage.getItem(key)
+      },
+      keys: WRITER_DB_RECOVERY_KEYS
+    });
+    const result = prepareWriterDbImportPreflight({
+      db: importPreviewState.db,
+      previousPreview,
+      currentLocalSparks: loadWriterDbExportSparks(),
+      currentLocalPackages: loadWriterPackages(),
+      recoveryInspection
+    });
+
+    setImportPreviewState(applyWriterDbImportPreflightResult(importPreviewState, result));
   }
 
   async function handleImportPreviewFile(event: ChangeEvent<HTMLInputElement>) {
@@ -1034,55 +1083,75 @@ export default function App() {
           </section>
         ) : null}
 
-        {importPreviewState.status === "preview-ready" ? (
+        {displayedImportPreview && displayedImportDb && displayedImportFileName ? (
           <section className="import-preview" aria-labelledby="import-preview-title">
             <div className="import-preview-heading">
               <div>
                 <p className="eyebrow">Read-only kontrola</p>
                 <h3 id="import-preview-title">Import databázy — náhľad</h3>
               </div>
-              <span className="stage-badge">Writer DB v{importPreviewState.db.schemaVersion}</span>
+              <span className="stage-badge">Writer DB v{displayedImportDb.schemaVersion}</span>
             </div>
             <p className="import-preview-file">
-              <strong>Súbor:</strong> {importPreviewState.fileName}
+              <strong>Súbor:</strong> {displayedImportFileName}
             </p>
             <p className="import-preview-safety">Výber súboru zatiaľ nič nezmenil.</p>
             <div className="import-preview-collections">
               <section className="import-preview-collection">
                 <h3>Iskry</h3>
                 <dl>
-                  {previewRows(importPreviewState.preview.sparks).map(([label, value]) => (
+                  {previewRows(displayedImportPreview.sparks).map(([label, value]) => (
                     <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
                   ))}
                 </dl>
               </section>
               <section className="import-preview-collection">
                 <h3>Tvorivé balíky</h3>
-                {importPreviewState.preview.packages.mode === "untouched" ? (
+                {displayedImportPreview.packages.mode === "untouched" ? (
                   <p>Tvorivé balíky zostanú nedotknuté.</p>
                 ) : (
                   <dl>
-                    {previewRows(importPreviewState.preview.packages).map(([label, value]) => (
+                    {previewRows(displayedImportPreview.packages).map(([label, value]) => (
                       <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
                     ))}
                   </dl>
                 )}
               </section>
             </div>
-            {importPreviewState.preview.warnings.length ? (
+            {displayedImportPreview.warnings.length ? (
               <div className="import-preview-warnings">
                 <h3>Upozornenia</h3>
                 <ul>
-                  {importPreviewState.preview.warnings.map((warning, index) => (
+                  {displayedImportPreview.warnings.map((warning, index) => (
                     <li key={`${warning.code}-${index}`}>{writerDbWarningText(warning)}</li>
                   ))}
                 </ul>
               </div>
             ) : null}
-            <p className="data-copy">Import ešte nie je zapojený.</p>
-            <button className="ghost-action" type="button" onClick={closeImportPreview}>
-              Zrušiť
-            </button>
+            {importPreviewState.status === "preview-stale" ||
+            importPreviewState.status === "preview-confirmed-ready" ? (
+              <p className="import-preview-status" data-status={importPreviewState.status}>
+                {importPreviewState.message}
+              </p>
+            ) : null}
+            <p className="data-copy">
+              Import ešte nie je zapojený. Zatiaľ neboli zmenené žiadne dáta.
+            </p>
+            <div className="import-preview-actions">
+              {importPreviewState.status === "preview-ready" ||
+              importPreviewState.status === "preview-stale" ? (
+                <button className="data-action" type="button" onClick={handleCheckImportReadiness}>
+                  Skontrolovať pripravenosť
+                </button>
+              ) : (
+                <button className="data-action" type="button" onClick={chooseAnotherImportPreviewFile}>
+                  Vybrať iný súbor
+                </button>
+              )}
+              <button className="ghost-action" type="button" onClick={closeImportPreview}>
+                {importPreviewState.status === "preview-ready" ? "Zrušiť" : "Zavrieť"}
+              </button>
+            </div>
           </section>
         ) : null}
 
@@ -1099,7 +1168,23 @@ export default function App() {
               </ul>
             ) : null}
             <div className="import-preview-actions">
-              <button className="data-action" type="button" onClick={openImportPreviewPicker}>
+              <button className="data-action" type="button" onClick={chooseAnotherImportPreviewFile}>
+                Vybrať iný súbor
+              </button>
+              <button className="ghost-action" type="button" onClick={closeImportPreview}>
+                Zavrieť
+              </button>
+            </div>
+          </section>
+        ) : null}
+
+        {importPreviewState.status === "preflight-blocked" ? (
+          <section className="import-preview import-preview-blocked" aria-live="polite">
+            <h3>Pripravenosť importu je zablokovaná</h3>
+            <p>{importPreviewState.message}</p>
+            <p>Nič nebolo zmenené.</p>
+            <div className="import-preview-actions">
+              <button className="data-action" type="button" onClick={chooseAnotherImportPreviewFile}>
                 Vybrať iný súbor
               </button>
               <button className="ghost-action" type="button" onClick={closeImportPreview}>

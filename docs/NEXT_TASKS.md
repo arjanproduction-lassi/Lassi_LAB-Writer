@@ -48,9 +48,9 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- wire the pure recovery-gated `ready` / `stale` / `blocked` preflight result
-  into the existing preview shell, still without exposing an active
-  **Importovať** action or connecting merge, backup, or persistence
+- design an explicit pure import execution function outside `App.tsx` and test
+  its ordering and failure results in the harness before exposing any runtime
+  **Importovať** action or storage wiring
 
 ## Next Technical Slice
 
@@ -83,9 +83,8 @@ Google Drive sync remain unchanged.
 
 After that:
 
-1. Add only the recovery and stale-result UI states around the existing
-   read-only shell. Keep execution disconnected and preserve the current
-   production v1 importer.
+1. Specify and test the pure execution contract outside the UI. Keep runtime
+   execution disconnected and preserve the current production v1 importer.
 2. Only then plan Google Drive v2 sync rollout.
 3. Only after that begin production creation of WriterPackages.
 4. Only after packages can travel safely build the new workspace UI.

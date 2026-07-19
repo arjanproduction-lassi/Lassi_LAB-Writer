@@ -50,7 +50,7 @@ export type WriterDbRecoveryInspection =
     };
 
 export type InspectWriterDbRecoveryInput = {
-  storage: WriterDbKeyValueStorage;
+  storage: Pick<WriterDbKeyValueStorage, "getItem">;
   keys: WriterDbPersistenceKeys;
 };
 

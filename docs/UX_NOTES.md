@@ -178,6 +178,14 @@ Sparks plus real WriterPackages. It does not show an active import command and
 does not merge, back up, persist, inspect recovery, migrate, or sync anything.
 The confirmation and result states below remain the future execution contract.
 
+The preview now also offers **Skontrolovať pripravenosť**. This read-only action
+reloads current Sparks and real WriterPackages, inspects recovery through an
+injected get-only storage adapter, and runs the pure preflight. A ready result
+confirms only that the preview is current. A stale result displays the refreshed
+preview and requires another readiness check. Recovery-required,
+recovery-blocked, or newly blocked preview states prevent readiness. None of
+these states exposes **Importovať** or writes data.
+
 The future v1/v2 importer is a deliberate administrative flow, not an instant
 file action. Selecting a JSON file only reads, parses, and previews it. Until
 the author presses **Importovať**, no backup, merge, storage write, migration,

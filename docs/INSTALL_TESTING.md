@@ -51,11 +51,11 @@ npm run check:writer-db
 Expected result:
 
 - The command exits with code 0.
-- The summaries report 138 checks total: 66 parser/export, import-preview,
+- The summaries report 148 checks total: 66 parser/export, import-preview,
   in-memory merge, and backup-factory checks; 21 injected persistence
-  coordinator checks; 20 read-only recovery inspection checks; and 15 pure
-  file-to-preview preparation checks; plus 16 pure confirmation preflight
-  checks.
+  coordinator checks; 20 read-only recovery inspection checks; 15 pure
+  file-to-preview preparation checks; 16 pure confirmation preflight checks;
+  and 10 pure preview UI transition checks.
 - Empty, Sparks-only, WriterPackages-only, mixed, tombstone, count mismatch,
   invalid JSON, unsupported schema, and corrupted record scenarios are checked.
 - Preview checks cover v1 Packages untouched, newer/equal/older timestamps,
@@ -77,6 +77,9 @@ Expected result:
 - Preflight checks cover recovery blocking, fresh ready/stale/blocked preview
   results, deterministic comparison, v1 Packages untouched, tombstones, input
   immutability, and no localStorage access.
+- Preview UI checks cover confirmed-ready, stale refreshed preview, renewed
+  readiness checks, recovery and preview blocking, no import action, and reset
+  to idle.
 - No production storage write, production import, export, UI, or Google Drive
   sync change is performed.
 

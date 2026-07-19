@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-07-19 - Read-only import readiness UI
+
+- Added **Skontrolovať pripravenosť** to the existing preview without adding an
+  import action.
+- The action reloads complete Sparks and real WriterPackages, injects a
+  get-only localStorage adapter into recovery inspection, and runs pure preflight.
+- Ready confirms only that the preview is current; stale displays the refreshed
+  preview and requires another readiness check.
+- Recovery-required, recovery-blocked, and newly blocked preview results show
+  human-readable blocked states with no writes or recovery action.
+- Added 10 pure UI transition checks while preserving the existing 138 checks.
+- No merge, backup, persistence, rollback, migration, new storage key, active
+  import action, production import change, or Google Drive change was added.
+
 ## 2026-07-19 - Pure Writer DB import confirmation preflight
 
 - Added a pure preflight that receives recovery inspection and fresh local

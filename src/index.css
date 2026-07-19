@@ -484,6 +484,22 @@ h3 {
   font-weight: 800;
 }
 
+.import-preview-status {
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(132, 204, 22, 0.32);
+  border-radius: 0.5rem;
+  color: #e5f7c5;
+  background: rgba(54, 83, 20, 0.28);
+  line-height: 1.45;
+  font-weight: 800;
+}
+
+.import-preview-status[data-status="preview-stale"] {
+  border-color: rgba(242, 196, 91, 0.32);
+  color: #ffe3a3;
+  background: rgba(99, 75, 22, 0.26);
+}
+
 .import-preview-collections {
   display: grid;
   gap: 0.75rem;

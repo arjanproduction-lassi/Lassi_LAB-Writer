@@ -150,11 +150,14 @@ Small commits:
 13. Add a pure confirmation preflight with recovery gate, fresh preview
    recomputation, and meaningful stale detection. Prepared locally without UI,
    storage access, merge, backup, persistence, or rollback.
-14. Wire recovery-gated ready/stale/blocked results into the preview shell,
-   still without exposing import execution or persistence.
-15. Only then design Google Drive v2 sync.
-16. Only after v2 sync is safe, start creating WriterPackages from production UI.
-17. Only after packages exist safely across devices, build the workspace UI.
+14. Wire recovery-gated ready/stale/blocked results into the preview shell.
+   Prepared locally with a read-only readiness action, refreshed preview display,
+   get-only recovery storage injection, and no import execution or persistence.
+15. Design and test an explicit pure import execution function outside App.tsx
+   before any runtime button or storage wiring.
+16. Only then design Google Drive v2 sync.
+17. Only after v2 sync is safe, start creating WriterPackages from production UI.
+18. Only after packages exist safely across devices, build the workspace UI.
 
 Rules:
 
