@@ -562,3 +562,13 @@ Later screens:
 - AI controls visible too early.
 - Desktop-first layouts that feel heavy on mobile.
 - Treating image, voice, or melody as attachments instead of creative origins.
+
+## Writer DB Import Cutover UX
+
+The local, not-yet-deployed flow now presents one path: select file, inspect
+preview, check readiness, then use one **Importovať databázu** action. The
+action exists only in `import-confirm-ready` with clean recovery. During
+`importing`, selection and cancellation are unavailable and page exit only
+warns. Success, stale, typed blocked, and failed states report coordinator facts
+without inventing recovery or success. The legacy import UI is no longer an
+available bypass.

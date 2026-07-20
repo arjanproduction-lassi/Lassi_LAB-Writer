@@ -150,6 +150,14 @@ After that:
 
 ## Technical Tasks For Later
 
+- Manually execute the disposable-data cutover plan on PC and mobile before
+  allowing any push. Treat any duplicate import action, recovery bypass, or
+  premature success as a no-go.
+- Review the local 284/284 cutover diff against runtime baseline
+  `24c6b71311ba89d5ce2b12d762a8332691fb351e`; do not deploy it yet.
+- Defer dead-code removal of the internal `importWriterDb` helper to a separate
+  small change after the cutover is proven.
+
 - Test manual JSON export/import on phone and desktop with real saved sparks.
 - Test Google Drive sync PC -> mobile -> tablet and back with real sparks.
 - Test editing the same spark across PC and mobile; confirm newer `updatedAt`

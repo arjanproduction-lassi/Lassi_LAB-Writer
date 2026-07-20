@@ -237,3 +237,12 @@ Rules:
 - No collaboration.
 - No Songbook or Storyboard export bridges.
 - No shared import/export contract beyond the manual Writer DB JSON file.
+
+## Local Atomic Import Cutover
+
+The production-facing UI cutover is implemented locally as one coordinated
+v1/v2 path. The state machine is authoritative; only an accepted
+`import-started` transition can reach the runtime adapter and coordinator.
+Startup and pre-execution recovery inspection block unresolved markers. The
+legacy App route was removed in the same diff. This work remains isolated on a
+local cutover branch, unpushed and undeployed; Google Drive remains v1.

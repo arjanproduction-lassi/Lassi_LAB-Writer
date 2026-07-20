@@ -1064,3 +1064,12 @@ Blocking conditions:
 
 Inspection never writes, removes the marker, creates a backup, performs
 rollback, or repairs data automatically.
+
+## Runtime Import Boundary
+
+The local cutover introduces no new data model or storage key. A thin runtime
+adapter injects the existing four persistence keys, browser storage, two ISO
+timestamps, and an opaque transaction ID into the existing coordinator. The ID
+contains no filename, creative content, email, or token. Merge, backup,
+persistence, rollback, marker handling, and read-back validation remain owned
+by their existing Writer DB layers. Google Drive remains v1/Sparks-only.

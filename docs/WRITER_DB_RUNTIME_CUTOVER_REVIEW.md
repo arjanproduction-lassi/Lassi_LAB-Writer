@@ -397,3 +397,21 @@ The cutover is explicitly **NO-GO** if any of these are true:
 
 If the active legacy route must remain available, the coordinated action must
 remain disabled.
+
+## Local Cutover Implementation Status (2026-07-20)
+
+The reviewed cutover is now implemented on a local cutover branch, but it has
+not been pushed or deployed. The active legacy UI button, file input, and App handler
+that called `importWriterDb(parsed)` are removed. The internal helper remains
+unchanged in `storage.ts` as deferred dead code.
+
+There is one user flow: file selection -> preview -> readiness check ->
+`import-confirm-ready` -> **Importovať databázu**. Runtime execution enters
+`importing` through the state machine, performs a fresh read-only recovery
+inspection, and then uses the existing coordinator and read-back validation.
+Google Drive remains v1/Sparks-only. No recovery restore action, automatic
+rollback, migration, export-format change, per-note merge, or new storage key
+was added.
+
+The runtime return baseline remains
+`24c6b71311ba89d5ce2b12d762a8332691fb351e`.

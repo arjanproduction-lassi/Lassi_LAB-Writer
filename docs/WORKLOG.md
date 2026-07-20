@@ -435,6 +435,19 @@
 - Kept the main capture flow unchanged and did not add restore, permanent purge,
   backend, AI, media capture, Songbook integration, or Storyboard integration.
 
+## 2026-07-20 — local Writer DB runtime cutover
+
+- Replaced the two active import UI truths with one coordinated v1/v2 flow.
+- Removed the legacy App button, file input, and handler; left the unreachable
+  `storage.ts` helper unchanged for a later low-risk cleanup.
+- Added an injected runtime adapter for time, opaque transaction ID, storage,
+  existing keys, startup recovery inspection, and fresh pre-execution gating.
+- Added importing, success, stale, typed blocked, and truthful failed UI.
+- Added 15 runtime controls; the local harness is 284/284.
+- Google Drive stays v1/Sparks-only. No new key, migration, recovery action,
+  push, or deployment was made; the cutover stays on a local branch.
+- Runtime return baseline: `24c6b71311ba89d5ce2b12d762a8332691fb351e`.
+
 ## 2026-07-05
 
 - Added experimental manual Google Drive sync as the next device bridge for one

@@ -8,7 +8,7 @@ import {
 } from "./writerDbImportUiState";
 
 export const WRITER_DB_IMPORT_STALE_MESSAGE =
-  "Miestne data sa medzitym zmenili. Import nebol spusteny. Skontrolujte aktualizovany nahlad a potvrdte ho znova.";
+  "Miestne dáta sa medzitým zmenili. Import nebol spustený. Skontrolujte aktualizovaný náhľad a potvrďte ho znova.";
 
 type NonStaleCoordinatorResult = Exclude<ExecuteWriterDbImportResult, { status: "stale" }>;
 

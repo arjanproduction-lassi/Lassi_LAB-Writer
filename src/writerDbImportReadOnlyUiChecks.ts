@@ -182,37 +182,37 @@ const tests: TestCase[] = [
     }
   },
   {
-    name: "L read-only App path never calls import execution",
+    name: "L App exposes one coordinated import path and no legacy call",
     run: () => {
-      assert(!appSource.includes("executeWriterDbImport"), "App calls import coordinator");
-      assert(!appSource.includes("requestWriterDbImportStart"), "App requests active import");
-      assert(!appSource.includes("applyWriterDbCoordinatorResult"), "App maps coordinator results");
+      assert(!appSource.includes("importWriterDb(parsed)"), "App still calls legacy import");
+      assert(!appSource.includes("handleImportDb") && !appSource.includes("importInputRef"), "legacy UI path remains active");
+      assert((appSource.match(/Importovať databázu/g) ?? []).length === 1, "active import button is not unique");
     }
   },
   {
-    name: "M preview and readiness handlers contain no write path",
+    name: "M import button is scoped to confirmed ready and clean recovery",
     run: () => {
-      const readOnlyHandlers = sourceBetween("function handleCheckImportReadiness()", "async function handleImportDb");
-      for (const forbidden of ["importWriterDb(", "mergeWriterDbInMemory", "createWriterDbImportBackup", "persistWriterDbImport", "setItem(", "removeItem("]) {
-        assert(!readOnlyHandlers.includes(forbidden), `read-only handlers contain ${forbidden}`);
+      assert(appSource.includes('importPreviewState.status === "import-confirm-ready" &&'), "button lacks confirmed-ready guard");
+      assert(appSource.includes('importRecoveryGate.status === "clean" ? ('), "button lacks recovery guard");
+      assert(appSource.includes("onClick={handleExecuteWriterDbImport}"), "button bypasses coordinated handler");
+    }
+  },
+  {
+    name: "N App does not own merge backup persistence rollback or read-back",
+    run: () => {
+      const handler = sourceBetween("function handleExecuteWriterDbImport()", "async function handleConnectGoogle");
+      assert(handler.includes("runWriterDbImportRuntime"), "runtime adapter is not used");
+      for (const forbidden of ["mergeWriterDbInMemory", "createWriterDbImportBackup", "persistWriterDbImport", ".setItem(", ".removeItem("]) {
+        assert(!handler.includes(forbidden), `App handler owns forbidden ${forbidden}`);
       }
     }
   },
   {
-    name: "N legacy import handler remains separate and unchanged in purpose",
+    name: "O importing owns the only beforeunload warning and disables selection",
     run: () => {
-      const legacyHandler = sourceBetween("async function handleImportDb", "async function handleConnectGoogle");
-      assert(legacyHandler.includes("const result = importWriterDb(parsed);"), "legacy import call changed");
-      assert(legacyHandler.includes("setSparks(listSparks())"), "legacy import refresh changed");
-      assert(!legacyHandler.includes("applyWriterDb"), "legacy handler was mixed with preview adapter");
-    }
-  },
-  {
-    name: "O runtime recovery adapter exposes getItem only",
-    run: () => {
-      const readinessHandler = sourceBetween("function handleCheckImportReadiness()", "async function handleImportPreviewFile");
-      assert(readinessHandler.includes("getItem: (key) => window.localStorage.getItem(key)"), "recovery getItem injection missing");
-      assert(!readinessHandler.includes("setItem") && !readinessHandler.includes("removeItem"), "recovery adapter can write");
+      assert(appSource.includes('importPreviewState.status !== "importing"'), "beforeunload lacks importing guard");
+      assert(appSource.includes('disabled={importPreviewState.status === "importing"}'), "file selection remains enabled while importing");
+      assert(appSource.includes("Importujem databázu a vytváram bezpečnostný backup…"), "importing status is missing");
     }
   }
 ];

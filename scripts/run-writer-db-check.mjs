@@ -36,7 +36,8 @@ try {
       "src/writerDbImportCoordinatorChecks.ts",
       "src/writerDbImportUiStateChecks.ts",
       "src/writerDbImportUiAdapterChecks.ts",
-      "src/writerDbImportReadOnlyUiChecks.ts"
+      "src/writerDbImportReadOnlyUiChecks.ts",
+      "src/writerDbImportRuntimeChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -150,6 +151,16 @@ try {
 
   if (readOnlyUiRun.status !== 0) {
     process.exit(readOnlyUiRun.status ?? 1);
+  }
+
+  const runtimeRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerDbImportRuntimeChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (runtimeRun.status !== 0) {
+    process.exit(runtimeRun.status ?? 1);
   }
 } finally {
   rmSync(outputDir, { recursive: true, force: true });

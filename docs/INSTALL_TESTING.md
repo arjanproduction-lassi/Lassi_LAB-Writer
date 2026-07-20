@@ -665,6 +665,38 @@ recovery runtime wiring unchanged.
 The read-only state-machine runtime integration adds 15 checks to
 `npm run check:writer-db`, bringing the current harness total to 269.
 
+## Local Writer DB Cutover Manual Plan (not deployed)
+
+Use only disposable test Sparks and WriterPackages, never real author text.
+Before each destructive scenario, export the disposable baseline and inspect
+the browser storage in a test profile.
+
+1. Import a valid v1 JSON; verify success only after read-back, changed Sparks,
+   untouched Packages, counts, schema version, and backup confirmation.
+2. Import a valid v2 JSON; verify both collections and their summary counts.
+3. Select damaged JSON; verify a blocked preview and zero writes.
+4. Change local data after preview; verify stale, refreshed preview, and a new
+   required readiness confirmation.
+5. Seed a compatible transaction marker and backup; verify
+   `recovery-required` and zero coordinator calls.
+6. Seed a damaged marker; verify `recovery-blocked`, no automatic repair, and
+   no legacy bypass.
+7. Double-click the import action; verify one execution only.
+8. While `importing`, attempt reset, close, file selection, and page close;
+   verify rejected UI actions and a `beforeunload` warning.
+9. With an in-memory fault adapter, verify persistence failure before writes,
+   successful rollback, failed rollback, and verification failure separately.
+10. Verify the four truthful failed messages and actual marker state
+    (`true`, `false`, or unknown).
+11. Repeat the visible flow on PC and mobile widths; verify one primary import
+    button, readable counts, and no horizontal overflow.
+12. Verify the legacy **Importovať DB** action no longer exists and selecting
+    the same file works again after a safe reset.
+13. Verify existing Google Drive v1 sync still exchanges Sparks only.
+
+The automated harness now has 284 checks: the previous 269 plus 15 runtime
+cutover checks. This plan is preparation only; no deployment was performed.
+
 ## Add To Home Screen On Android
 
 In Chrome on Android:

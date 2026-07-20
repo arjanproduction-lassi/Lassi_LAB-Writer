@@ -10,7 +10,6 @@ import {
   createWriterDbExport,
   deleteSpark,
   getWriterDbExportFileName,
-  importWriterDb,
   loadWriterDbExportSparks,
   listSparks,
   normalizeSparkStage,
@@ -37,13 +36,19 @@ import {
   applyWriterDbPreparedPreview,
   resetWriterDbImportUi
 } from "./writerDbImportUiAdapter";
+import {
+  createWriterDbImportStorage,
+  inspectWriterDbImportRecoveryGate,
+  runWriterDbImportRuntime,
+  WRITER_DB_IMPORT_KEYS,
+  type WriterDbImportRecoveryGate
+} from "./writerDbImportRuntime";
 import { createWriterDbImportPreviewRevision } from "./writerDbImportPreviewRevision";
 import type {
   WriterDbImportUiBlockedReason,
   WriterDbImportUiState,
   WriterDbImportUiTransitionResult
 } from "./writerDbImportUiState";
-import { inspectWriterDbRecovery } from "./writerDbRecovery";
 import {
   createManualWriterDbV2Export,
   getManualWriterDbV2ExportFileName
@@ -67,12 +72,6 @@ type StageFilter = "all" | SparkStage;
 const QUIET_SYNC_DEBOUNCE_MS = 4000;
 const STALE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
 const DRAFT_AUTOSAVE_DEBOUNCE_MS = 500;
-const WRITER_DB_RECOVERY_KEYS = {
-  sparks: "lassilab-writer:v0.1:sparks",
-  packages: "lassilab-writer:v0.1:packages",
-  backup: "lassilab-writer:v0.1:writer-db:backup-before-import",
-  transaction: "lassilab-writer:v0.1:writer-db:import-transaction"
-};
 const STAGE_LABELS: Record<SparkStage, string> = {
   spark: "Iskra",
   notes: "Poznámky",
@@ -148,24 +147,53 @@ function reportRejectedWriterDbImportUiTransition(
 }
 
 function writerDbImportBlockedMessage(
-  reason: "recovery-required" | "recovery-blocked" | "preview-blocked"
+  reason: WriterDbImportUiBlockedReason
 ) {
   switch (reason) {
     case "recovery-required":
-      return "Predchádzajúca databázová operácia zostala nedokončená. Pred novým importom bude potrebné vykonať kontrolu obnovy.";
+      return "Predchádzajúca databázová operácia zostala nedokončená. Nový import nebol spustený.";
     case "recovery-blocked":
-      return "Predchádzajúcu databázovú operáciu nemožno bezpečne vyhodnotiť. Nový import je zablokovaný.";
+      return "Stav predchádzajúcej databázovej operácie sa nedá bezpečne vyhodnotiť. Nový import je zablokovaný.";
     case "preview-blocked":
-      return "Aktualizovaný náhľad importu už nie je bezpečne použiteľný. Nič nebolo zmenené.";
+      return "Aktualizovaný náhľad už nie je bezpečne použiteľný. Import nebol spustený.";
+    case "merge-failed":
+      return "Dáta sa nepodarilo bezpečne pripraviť na import. Nič nebolo zapísané.";
+    case "backup-failed":
+      return "Bezpečnostný backup sa nepodarilo pripraviť. Nič nebolo zapísané.";
   }
 }
 
-function isWriterDbPreflightBlockedReason(
+function isWriterDbBlockedReason(
   reason: WriterDbImportUiBlockedReason | undefined
-): reason is "recovery-required" | "recovery-blocked" | "preview-blocked" {
-  return reason === "recovery-required" ||
-    reason === "recovery-blocked" ||
-    reason === "preview-blocked";
+): reason is WriterDbImportUiBlockedReason {
+  return reason === "recovery-required" || reason === "recovery-blocked" ||
+    reason === "preview-blocked" || reason === "merge-failed" || reason === "backup-failed";
+}
+
+function writerDbImportFailureMessage(
+  result: Extract<WriterDbImportUiState, { status: "failed" }>["result"]
+) {
+  if (result.stage === "verification") {
+    return "Dáta boli zapísané, ale výsledok sa nepodarilo bezpečne overiť. Writer nebude tento stav označovať ako úspešný import.";
+  }
+  if (result.persistenceStage === "rollback" && !result.rollbackAttempted) {
+    return "Dáta boli zapísané, ale transaction marker sa nepodarilo bezpečne odstrániť. Nič ďalšie automaticky neurobíme. Pred ďalším importom je potrebná kontrola obnovy.";
+  }
+  if (!result.rollbackAttempted) {
+    return "Import sa nepodarilo zapísať. Pôvodné dáta zostali nezmenené.";
+  }
+  if (result.rollbackSucceeded) {
+    return "Import sa nepodarilo dokončiť. Pôvodné dáta boli bezpečne obnovené a backup zostal k dispozícii.";
+  }
+  return "Import sa nepodarilo dokončiť a pôvodné dáta sa nepodarilo úplne obnoviť. Nič ďalšie automaticky neurobíme. Pred ďalším importom je potrebná kontrola obnovy.";
+}
+
+function writerDbImportMarkerMessage(markerRemaining: boolean | null) {
+  return markerRemaining === null
+    ? "Stav transaction markera sa nepodarilo overiť."
+    : markerRemaining
+      ? "Transaction marker zostal uložený."
+      : "Transaction marker nezostal uložený.";
 }
 
 function googleSyncUnavailableMessage() {
@@ -223,6 +251,8 @@ export default function App() {
   const [dataMessage, setDataMessage] = useState("");
   const [importPreviewState, setImportPreviewState] =
     useState<WriterDbImportUiState>({ status: "idle" });
+  const [importRecoveryGate, setImportRecoveryGate] =
+    useState<WriterDbImportRecoveryGate>({ status: "checking" });
   const [newSparkDraft, setNewSparkDraft] = useState<NewSparkDraft | undefined>(() =>
     readNewSparkDraft()
   );
@@ -239,8 +269,8 @@ export default function App() {
   const [googleSyncMessage, setGoogleSyncMessage] = useState(
     googleSyncAvailable ? "" : googleSyncUnavailableMessage()
   );
-  const importInputRef = useRef<HTMLInputElement>(null);
   const importPreviewInputRef = useRef<HTMLInputElement>(null);
+  const importPreviewStateRef = useRef<WriterDbImportUiState>(importPreviewState);
   const googleSyncBusyRef = useRef(false);
   const quietSyncTimerRef = useRef<number | null>(null);
   const draftAutosaveTimerRef = useRef<number | null>(null);
@@ -281,7 +311,7 @@ export default function App() {
       : undefined;
   const importPreviewPreflightBlockedReason =
     importPreviewState.status === "preview-blocked" &&
-    isWriterDbPreflightBlockedReason(importPreviewState.reason)
+    isWriterDbBlockedReason(importPreviewState.reason)
       ? importPreviewState.reason
       : undefined;
 
@@ -310,6 +340,29 @@ export default function App() {
   useEffect(() => {
     editorRef.current = editor;
   }, [editor]);
+
+  useEffect(() => {
+    importPreviewStateRef.current = importPreviewState;
+  }, [importPreviewState]);
+
+  useEffect(() => {
+    const storage = createWriterDbImportStorage(window.localStorage);
+    setImportRecoveryGate(inspectWriterDbImportRecoveryGate(storage));
+  }, []);
+
+  useEffect(() => {
+    if (importPreviewState.status !== "importing") {
+      return;
+    }
+
+    function warnBeforeUnload(event: BeforeUnloadEvent) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [importPreviewState.status]);
 
   useEffect(() => {
     syncPreferencesRef.current = syncPreferences;
@@ -755,10 +808,6 @@ export default function App() {
     );
   }
 
-  function openImportPicker() {
-    importInputRef.current?.click();
-  }
-
   function openImportPreviewPicker() {
     if (importPreviewInputRef.current) {
       importPreviewInputRef.current.value = "";
@@ -773,7 +822,14 @@ export default function App() {
       return;
     }
 
+    importPreviewStateRef.current = transition.state;
     setImportPreviewState(transition.state);
+    if (importPreviewState.status === "success") {
+      setSparks(listSparks());
+      setImportRecoveryGate(
+        inspectWriterDbImportRecoveryGate(createWriterDbImportStorage(window.localStorage))
+      );
+    }
     if (importPreviewInputRef.current) {
       importPreviewInputRef.current.value = "";
     }
@@ -792,12 +848,9 @@ export default function App() {
     }
 
     const previousPreview = importPreviewState.preview;
-    const recoveryInspection = inspectWriterDbRecovery({
-      storage: {
-        getItem: (key) => window.localStorage.getItem(key)
-      },
-      keys: WRITER_DB_RECOVERY_KEYS
-    });
+    const recoveryInspection = inspectWriterDbImportRecoveryGate(
+      createWriterDbImportStorage(window.localStorage)
+    ).inspection;
     const result = prepareWriterDbImportPreflight({
       db: importPreviewState.db,
       previousPreview,
@@ -820,6 +873,7 @@ export default function App() {
       return;
     }
 
+    importPreviewStateRef.current = transition.state;
     setImportPreviewState(transition.state);
   }
 
@@ -837,6 +891,7 @@ export default function App() {
       return;
     }
 
+    importPreviewStateRef.current = selectedTransition.state;
     setImportPreviewState(selectedTransition.state);
 
     try {
@@ -853,6 +908,7 @@ export default function App() {
           revision: result.ok ? createWriterDbImportPreviewRevision(result.preview) : ""
         });
         reportRejectedWriterDbImportUiTransition(transition);
+        if (transition.accepted) importPreviewStateRef.current = transition.state;
         return transition.accepted ? transition.state : currentState;
       });
     } catch {
@@ -867,38 +923,64 @@ export default function App() {
           revision: ""
         });
         reportRejectedWriterDbImportUiTransition(transition);
+        if (transition.accepted) importPreviewStateRef.current = transition.state;
         return transition.accepted ? transition.state : currentState;
       });
     }
   }
 
-  async function handleImportDb(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.currentTarget.files?.[0];
-    event.currentTarget.value = "";
-
-    if (!file) {
+  function handleExecuteWriterDbImport() {
+    const currentState = importPreviewStateRef.current;
+    if (currentState.status !== "import-confirm-ready" || importRecoveryGate.status !== "clean") {
       return;
     }
 
-    try {
-      const parsed = JSON.parse(await file.text());
-      const result = importWriterDb(parsed);
-      const skippedInvalid = result.skipped + result.invalid;
+    const storage = createWriterDbImportStorage(window.localStorage);
+    const runtimeResult = runWriterDbImportRuntime({
+      state: currentState,
+      confirmedRevision: currentState.confirmedRevision,
+      storage,
+      keys: WRITER_DB_IMPORT_KEYS,
+      loadCurrentLocalSparks: loadWriterDbExportSparks,
+      loadCurrentLocalPackages: loadWriterPackages,
+      now: () => new Date().toISOString(),
+      createTransactionId: () => window.crypto.randomUUID(),
+      onImporting: (state) => {
+        importPreviewStateRef.current = state;
+        setImportPreviewState(state);
+      }
+    });
 
+    if (!runtimeResult.startTransition.accepted) {
+      reportRejectedWriterDbImportUiTransition(runtimeResult.startTransition);
+      return;
+    }
+
+    if (runtimeResult.recoveryGate) {
+      setImportRecoveryGate(runtimeResult.recoveryGate);
+    }
+
+    if (!runtimeResult.finalTransition?.accepted) {
+      if (runtimeResult.finalTransition) {
+        reportRejectedWriterDbImportUiTransition(runtimeResult.finalTransition);
+      }
+      return;
+    }
+
+    const nextState = runtimeResult.finalTransition.state;
+    importPreviewStateRef.current = nextState;
+    setImportPreviewState(nextState);
+
+    if (nextState.status === "success") {
       flushNewSparkDraft();
       editorRef.current = null;
       setSparks(listSparks());
       setEditor(null);
       setSavedMessage("");
-      setDataMessage(
-        `Import hotový: pridané ${result.added}, aktualizované ${result.updated}, preskočené/neplatné ${skippedInvalid}.`
-      );
-
-      if (result.added || result.updated) {
+      setDataMessage("");
+      if (nextState.result.summary.sparks.created || nextState.result.summary.sparks.updated) {
         markLocalChangesForSync();
       }
-    } catch {
-      setDataMessage("Import zlyhal. Aktuálne iskry ostali nezmenené.");
     }
   }
 
@@ -1121,20 +1203,15 @@ export default function App() {
           <button className="data-action" type="button" onClick={handleExportDbV2}>
             Exportovať DB v2 test
           </button>
-          <button className="data-action" type="button" onClick={openImportPicker}>
-            Importovať DB
-          </button>
-          <button className="data-action" type="button" onClick={openImportPreviewPicker}>
-            Náhľad importu DB v1/v2
+          <button
+            className="data-action"
+            type="button"
+            disabled={importPreviewState.status === "importing"}
+            onClick={openImportPreviewPicker}
+          >
+            Vybrať databázu na import
           </button>
         </div>
-        <input
-          ref={importInputRef}
-          className="file-input"
-          type="file"
-          accept="application/json,.json"
-          onChange={handleImportDb}
-        />
         <input
           ref={importPreviewInputRef}
           className="file-input"
@@ -1143,6 +1220,19 @@ export default function App() {
           onChange={handleImportPreviewFile}
         />
         {dataMessage ? <p className="data-note">{dataMessage}</p> : null}
+        {importRecoveryGate.status === "checking" ? (
+          <p className="data-note">Kontrolujem stav predchádzajúcej databázovej operácie…</p>
+        ) : importRecoveryGate.status === "recoverable" ? (
+          <p className="data-note">
+            Predchádzajúca databázová operácia zostala nedokončená. Nový import je
+            zablokovaný, kým sa nevykoná kontrola obnovy.
+          </p>
+        ) : importRecoveryGate.status === "blocked" ? (
+          <p className="data-note">
+            Stav predchádzajúcej databázovej operácie sa nedá bezpečne vyhodnotiť.
+            Nový import je zablokovaný.
+          </p>
+        ) : null}
 
         {importPreviewState.status === "reading-file" ? (
           <section className="import-preview" aria-live="polite">
@@ -1200,18 +1290,23 @@ export default function App() {
             importPreviewState.status === "import-confirm-ready" ? (
               <p className="import-preview-status" data-status={importPreviewState.status}>
                 {importPreviewState.status === "preview-stale"
-                  ? "Miestne dáta sa medzitým zmenili. Skontrolujte aktualizovaný náhľad."
+                  ? importPreviewState.message
                   : "Náhľad je aktuálny. Miestne dáta sa od jeho vytvorenia nezmenili."}
               </p>
             ) : null}
-            <p className="data-copy">
-              Import ešte nie je zapojený. Zatiaľ neboli zmenené žiadne dáta.
-            </p>
+            {importPreviewState.status === "import-confirm-ready" ? (
+              <p className="data-copy">Výber súboru zatiaľ nič nezmenil.</p>
+            ) : null}
             <div className="import-preview-actions">
               {importPreviewState.status === "preview-ready" ||
               importPreviewState.status === "preview-stale" ? (
                 <button className="data-action" type="button" onClick={handleCheckImportReadiness}>
                   Skontrolovať pripravenosť
+                </button>
+              ) : importPreviewState.status === "import-confirm-ready" &&
+                importRecoveryGate.status === "clean" ? (
+                <button className="data-action" type="button" onClick={handleExecuteWriterDbImport}>
+                  Importovať databázu
                 </button>
               ) : (
                 <button className="data-action" type="button" onClick={chooseAnotherImportPreviewFile}>
@@ -1222,6 +1317,62 @@ export default function App() {
                 {importPreviewState.status === "preview-ready" ? "Zrušiť" : "Zavrieť"}
               </button>
             </div>
+          </section>
+        ) : null}
+
+        {importPreviewState.status === "importing" ? (
+          <section className="import-preview" aria-live="assertive">
+            <h3>Import databázy</h3>
+            <p>Importujem databázu a vytváram bezpečnostný backup…</p>
+          </section>
+        ) : null}
+
+        {importPreviewState.status === "success" ? (
+          <section className="import-preview" aria-live="polite">
+            <h3>Import databázy bol dokončený.</h3>
+            <p>Writer DB verzia {importPreviewState.result.summary.sourceSchemaVersion}</p>
+            <div className="import-preview-collections">
+              {(["sparks", "packages"] as const).map((collection) => {
+                const summary = importPreviewState.result.summary[collection];
+                return (
+                  <section className="import-preview-collection" key={collection}>
+                    <h3>{collection === "sparks" ? "Iskry" : "Tvorivé balíky"}</h3>
+                    <dl>
+                      <div><dt>Vytvorené</dt><dd>{summary.created}</dd></div>
+                      <div><dt>Aktualizované</dt><dd>{summary.updated}</dd></div>
+                      <div><dt>Nezmenené</dt><dd>{summary.unchanged}</dd></div>
+                      <div><dt>Staršie ignorované</dt><dd>{summary.ignoredOlder}</dd></div>
+                      <div><dt>Záznamy obsahujúce tombstone</dt><dd>{summary.tombstones}</dd></div>
+                    </dl>
+                  </section>
+                );
+              })}
+            </div>
+            <p>Bezpečnostný backup bol vytvorený.</p>
+            {importPreviewState.result.summary.packagesUntouched ? (
+              <p>Tvorivé balíky zostali nedotknuté.</p>
+            ) : null}
+            <div className="import-preview-actions">
+              <button className="data-action" type="button" onClick={closeImportPreview}>
+                Hotovo
+              </button>
+            </div>
+          </section>
+        ) : null}
+
+        {importPreviewState.status === "failed" ? (
+          <section className="import-preview import-preview-blocked" aria-live="assertive">
+            <h3>Import databázy sa nedokončil</h3>
+            <p>{writerDbImportFailureMessage(importPreviewState.result)}</p>
+            <p>{writerDbImportMarkerMessage(importPreviewState.result.transactionMarkerRemaining)}</p>
+            <p>Fáza: {importPreviewState.result.stage}</p>
+            {importPreviewState.canSafelyClose ? (
+              <div className="import-preview-actions">
+                <button className="ghost-action" type="button" onClick={closeImportPreview}>
+                  Zavrieť
+                </button>
+              </div>
+            ) : null}
           </section>
         ) : null}
 
