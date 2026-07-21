@@ -11,9 +11,10 @@ future information architecture in `WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`.
 No runtime, storage, import, recovery, export, sync, or CSS change belongs to
 this slice.
 
-The next implementation, only after a separate approval, should start with
-Phase A: a static `Knižnica / Dielňa / Dáta` shell using fixture data and no
-production storage wiring.
+Phase A is implemented as a separate static `Knižnica / Dielňa / Dáta` entry
+using fixture data and no production storage wiring. Manual PC and mobile review
+approved the architecture as a baseline, not as a final visual design. Do not
+connect the shell to real data without a separate Phase B decision.
 
 ## Completed v0.1 Slice
 

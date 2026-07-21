@@ -2,9 +2,10 @@
 
 ## Status And Scope
 
-This is a docs-only product and information-architecture proposal for the next
-phase of LassiLAB Writer. It describes a future product direction; it does not
-claim that the new shell, Library, Workshop, or package editing UI exists.
+This document defines the product and information architecture for the next
+phase of LassiLAB Writer. Phase A now has an isolated fixture-only shell for
+evaluating that direction; it is not the production Writer runtime or a final
+visual design.
 
 Current published baseline:
 
@@ -15,6 +16,22 @@ Current published baseline:
 
 This review changes no runtime code, data format, storage key, import behavior,
 recovery behavior, export behavior, or sync behavior.
+
+## Local Phase A Prototype
+
+A separate static product shell exists at `/product-shell.html`. Its source is
+kept outside the production `index.html`, `src/main.tsx`, and `src/App.tsx`
+entry path, so the production build and navigation do not expose it.
+
+The shell uses only presentation fixtures and local React state. It does not
+read or write production storage, load real Sparks or WriterPackages, connect
+Google Drive, or call import/export/recovery code. Reloading may discard every
+prototype edit.
+
+Its purpose is to evaluate the information architecture and working feeling of
+Knižnica, Dielňa, and Dáta. Manual PC and mobile review approved that structure
+as the baseline for further development. It is not a final visual design, and
+this approval does not authorize connection to real data.
 
 ## Evidence And Review Limits
 
@@ -584,6 +601,9 @@ by this document.
 
 Acceptance: navigation and hierarchy can be evaluated without touching user
 data or pretending the fixtures are real packages.
+
+Status: implemented as a separate fixture-only entry and manually reviewed on
+PC and mobile. Phase B real-data wiring still requires a separate decision.
 
 ### Phase B — Library reads the existing package catalog
 

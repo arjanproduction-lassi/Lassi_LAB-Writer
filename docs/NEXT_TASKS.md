@@ -13,9 +13,10 @@ The docs-only architecture is defined in
 - **Dielňa** for one WriterPackage with `Iskra / Poznámky / Dielňa / Text OK`
 - **Dáta** for Google connection, sync, import/export, backup, and recovery
 
-The smallest later implementation step is Phase A only: a static shell and
-navigation with fixture data. It must not read or write production storage and
-must not replace the current runtime until separately reviewed.
+Phase A is an isolated static shell and navigation with fixture data. It does
+not read or write production storage and does not replace the current runtime.
+Manual PC and mobile review approved its architecture as a baseline; Phase B
+data wiring has not started and still needs a separate decision.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
@@ -69,8 +70,8 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- after separate approval, build only the fixture-data Phase A product shell
-  from `WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`
+- use the approved fixture shell to identify the smallest separately reviewed
+  Phase B read-only data boundary; do not begin data wiring implicitly
 
 ## Closed Writer DB Technical Slice
 

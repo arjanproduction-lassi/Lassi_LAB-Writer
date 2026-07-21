@@ -12,6 +12,11 @@ The product-level information architecture is now defined in
 contextual **Dielňa**, and **Dáta**. The four notebook names remain layers of
 one WriterPackage, not primary global filters or a card-moving workflow.
 
+An isolated Phase A shell presents those places with fixture data only. It is
+separate from the production App entry and all production storage, sync,
+import, export, and recovery behavior. Manual PC and mobile review approved the
+architecture as a baseline, while the visual details remain intentionally open.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

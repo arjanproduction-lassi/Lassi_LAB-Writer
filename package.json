@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "check:product-shell": "node scripts/run-product-shell-check.mjs",
     "check:writer-db": "node scripts/run-writer-db-check.mjs",
     "preview": "vite preview"
   },

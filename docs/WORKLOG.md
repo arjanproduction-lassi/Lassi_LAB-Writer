@@ -1,5 +1,24 @@
 # Worklog
 
+## 2026-07-21 - Isolated Writer product shell prototype
+
+- Added a separate development HTML entry for the product shell; production
+  `index.html`, `main.tsx`, and `App.tsx` remain unchanged.
+- Added fixture-only Knižnica, Dielňa, and Dáta views with simple local UI
+  navigation and no URL router.
+- Added a desktop active-plus-context workspace and a mobile one-panel layout
+  for Iskra, Poznámky, Dielňa, and Text OK.
+- Added only artificial package and note content. Prototype edits live in local
+  React state and may disappear on reload.
+- Added separate product-shell model and isolation checks outside the Writer DB
+  harness.
+- No production storage, Spark, WriterPackage, Google Drive, import, export,
+  recovery, persistence, data key, migration, or deployment behavior changed.
+- Manual PC and mobile review approved Knižnica / Dielňa / Dáta and the desktop
+  and mobile workshop layouts as the baseline for further development.
+- The prototype is not a final visual design, and real-data wiring has not
+  started.
+
 ## 2026-07-21 - Writer product architecture review (docs only)
 
 - Audited the current production structure, App shell, Spark workflow,
