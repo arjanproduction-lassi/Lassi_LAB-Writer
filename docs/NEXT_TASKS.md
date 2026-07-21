@@ -1,6 +1,27 @@
 # Next Tasks
 
-## Smallest Safe Next Step
+## Current Product Priority
+
+Stop extending the database and import safety surface. The next product goal is
+to turn Writer from a long technical Spark form into an author's workshop for
+one creative package.
+
+The docs-only architecture is defined in
+`WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`:
+
+- **Knižnica** for finding, creating, and reopening packages
+- **Dielňa** for one WriterPackage with `Iskra / Poznámky / Dielňa / Text OK`
+- **Dáta** for Google connection, sync, import/export, backup, and recovery
+
+The smallest later implementation step is Phase A only: a static shell and
+navigation with fixture data. It must not read or write production storage and
+must not replace the current runtime until separately reviewed.
+
+One remaining manual regression check is outside development scope: connect
+Google on production and confirm that the existing v1/Sparks-only sync still
+works.
+
+## Completed MVP Foundation
 
 The first MVP slice is now implemented:
 
@@ -48,11 +69,29 @@ The first code bridge is intentionally small:
 
 Next implementation decision:
 
-- add a separate adapter between `App.tsx` and the pure import state machine,
-  initially without calling `executeWriterDbImport` or enabling an active
-  import action
+- after separate approval, build only the fixture-data Phase A product shell
+  from `WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`
 
-## Next Technical Slice
+## Closed Writer DB Technical Slice
+
+The coordinated Writer DB runtime cutover is published at `aa2c631`, the
+harness passes 284/284, and the production UI has one v1/v2 import path. This
+slice is closed. Google Drive remains v1/Sparks-only and no database, recovery,
+import, or sync expansion is the current priority.
+
+The product implementation sequence is now:
+
+1. static shell with fixture data
+2. read-only Library from the existing package catalog
+3. read-only opening of one real package
+4. isolated layer editing with autosave
+5. direct WriterPackage creation from `Nová iskra`
+6. safe hiding or relocation of the legacy Spark UX
+
+The detailed gates and non-goals live in
+`WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`.
+
+## Historical Writer DB Foundation
 
 Do not start with Google sync or production writes.
 
@@ -150,11 +189,6 @@ After that:
 
 ## Technical Tasks For Later
 
-- Manually execute the disposable-data cutover plan on PC and mobile before
-  allowing any push. Treat any duplicate import action, recovery bypass, or
-  premature success as a no-go.
-- Review the local 284/284 cutover diff against runtime baseline
-  `24c6b71311ba89d5ce2b12d762a8332691fb351e`; do not deploy it yet.
 - Defer dead-code removal of the internal `importWriterDb` helper to a separate
   small change after the cutover is proven.
 

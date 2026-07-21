@@ -1,6 +1,21 @@
 # Implementation Plan
 
-## Current Slice
+## Current Product Direction
+
+The Writer DB runtime cutover is published at
+`aa2c631022269e63cf3615d8cc4dae9d07b264c3`. The import path is no longer the
+active product-development priority. Google Drive remains v1/Sparks-only.
+
+The current planning slice is docs-only: define the product inventory and the
+future information architecture in `WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`.
+No runtime, storage, import, recovery, export, sync, or CSS change belongs to
+this slice.
+
+The next implementation, only after a separate approval, should start with
+Phase A: a static `Knižnica / Dielňa / Dáta` shell using fixture data and no
+production storage wiring.
+
+## Completed v0.1 Slice
 
 Build only the true v0.1 loop:
 
@@ -178,7 +193,8 @@ Small commits:
    canonical semantic preview revisions, and no import execution.
 20. Replace the legacy production importer with the coordinated path in one
    explicitly reviewed final runtime cutover; activate one import action and do
-   not keep two active import truths.
+   not keep two active import truths. Completed and published at `aa2c631` with
+   284/284 Writer DB checks.
 21. Only then design Google Drive v2 sync.
 22. Only after v2 sync is safe, start creating WriterPackages from production UI.
 23. Only after packages exist safely across devices, build the workspace UI.
@@ -238,11 +254,11 @@ Rules:
 - No Songbook or Storyboard export bridges.
 - No shared import/export contract beyond the manual Writer DB JSON file.
 
-## Local Atomic Import Cutover
+## Published Atomic Import Cutover
 
-The production-facing UI cutover is implemented locally as one coordinated
-v1/v2 path. The state machine is authoritative; only an accepted
+The production-facing UI cutover is published as one coordinated v1/v2 path at
+`aa2c631`. The state machine is authoritative; only an accepted
 `import-started` transition can reach the runtime adapter and coordinator.
 Startup and pre-execution recovery inspection block unresolved markers. The
-legacy App route was removed in the same diff. This work remains isolated on a
-local cutover branch, unpushed and undeployed; Google Drive remains v1.
+legacy App route was removed in the same cutover. Production is READY; Google
+Drive remains v1/Sparks-only.

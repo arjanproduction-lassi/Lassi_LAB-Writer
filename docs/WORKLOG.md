@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-07-21 - Writer product architecture review (docs only)
+
+- Audited the current production structure, App shell, Spark workflow,
+  WriterPackage foundation, storage boundaries, and existing UX documentation.
+- Defined the next product model as one creative package with one stable ID and
+  four connected layers: Iskra, Poznámky, Dielňa, and Text OK.
+- Proposed three primary destinations: Knižnica, contextual Dielňa, and Dáta.
+- Moved import/export, Google connection, sync, recovery, and diagnostics out
+  of the future creative workspace in the information architecture only.
+- Added PC two-panel and mobile one-panel workflow rules, six text wireframes,
+  a legacy-stage recommendation, and phased migration gates A-F.
+- No runtime, CSS, storage, data format, import, recovery, export, Google Drive,
+  commit, push, or deployment change was made.
+
 ## 2026-07-19 - Read-only Writer DB state-machine runtime wiring
 
 - Replaced the preview/readiness path's parallel ad-hoc React state with the

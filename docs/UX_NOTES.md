@@ -7,6 +7,11 @@ Writer must be faster than forgetting.
 The first screen should help the author capture, continue, or revisit work
 without making them choose a complex structure first.
 
+The product-level information architecture is now defined in
+`WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`. Its primary places are **Knižnica**,
+contextual **Dielňa**, and **Dáta**. The four notebook names remain layers of
+one WriterPackage, not primary global filters or a card-moving workflow.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook
@@ -565,7 +570,7 @@ Later screens:
 
 ## Writer DB Import Cutover UX
 
-The local, not-yet-deployed flow now presents one path: select file, inspect
+The published flow at `aa2c631` presents one path: select file, inspect
 preview, check readiness, then use one **Importovať databázu** action. The
 action exists only in `import-confirm-ready` with clean recovery. During
 `importing`, selection and cancellation are unavailable and page exit only
