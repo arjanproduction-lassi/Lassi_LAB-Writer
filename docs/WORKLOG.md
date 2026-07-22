@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-21 - Phase B read-only Library review (docs only)
+
+- Inspected the current Spark, WriterPackage, package catalog, same-ID,
+  tombstone, and legacy-adapter contracts from their source implementations.
+- Recommended `loadWriterPackageCatalog()` as the read-only Library source so
+  existing legacy Sparks do not disappear.
+- Defined a pure Library view model, read-only Knižnica and Dielňa behavior,
+  human empty/error copy, privacy rules, and B1-B5 implementation gates.
+- Kept fixture mode as the default and specified an explicit development-only,
+  non-persistent real-data mode behind an injected loader.
+- Documented that current loaders cannot distinguish malformed JSON from an
+  empty collection and that `getWriterPackageById` is not a universal path for
+  adapted legacy items.
+- No runtime, product-shell, CSS, storage, migration, import/export, recovery,
+  Google Drive, commit, push, or deployment change was made.
+
 ## 2026-07-21 - Isolated Writer product shell prototype
 
 - Added a separate development HTML entry for the product shell; production

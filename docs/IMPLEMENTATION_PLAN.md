@@ -16,6 +16,12 @@ using fixture data and no production storage wiring. Manual PC and mobile review
 approved the architecture as a baseline, not as a final visual design. Do not
 connect the shell to real data without a separate Phase B decision.
 
+The Phase B read-only boundary is now specified in
+`WRITER_LIBRARY_READ_ONLY_REVIEW.md`. It recommends the existing combined
+catalog behind an injected loader and a pure presentation adapter. This is
+documentation only; no real catalog is connected. The first future code slice
+is B1 adapter plus artificial checks, without React or storage access.
+
 ## Completed v0.1 Slice
 
 Build only the true v0.1 loop:

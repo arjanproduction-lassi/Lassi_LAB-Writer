@@ -614,6 +614,10 @@ PC and mobile. Phase B real-data wiring still requires a separate decision.
 Acceptance: the same-id preference and legacy adapter behavior remain intact;
 opening is not yet allowed to mutate data.
 
+Design status: the docs-only boundary, view model, privacy rules, fixture/real
+mode isolation, and B1-B5 rollout are specified in
+`WRITER_LIBRARY_READ_ONLY_REVIEW.md`. No Phase B runtime wiring exists yet.
+
 ### Phase C — open one real package read-only
 
 - Open a selected catalog item in the Workshop.

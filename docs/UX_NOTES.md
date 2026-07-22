@@ -17,6 +17,12 @@ separate from the production App entry and all production storage, sync,
 import, export, and recovery behavior. Manual PC and mobile review approved the
 architecture as a baseline, while the visual details remain intentionally open.
 
+The Phase B read-only Library should keep that hierarchy while replacing
+fixtures through an injected catalog provider. It may label historical content
+`Pôvodná Iskra`, but must not show storage terminology or imply migration. Real
+mode has no active `Nová iskra`, editing, or autosave and says `Iba na čítanie`.
+Detailed rules live in `WRITER_LIBRARY_READ_ONLY_REVIEW.md`.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook
