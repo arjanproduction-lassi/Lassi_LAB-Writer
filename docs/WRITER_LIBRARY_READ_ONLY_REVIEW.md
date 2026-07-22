@@ -3,9 +3,10 @@
 ## Status And Scope
 
 This document defines Phase B: a read-only Knižnica backed by the existing
-WriterPackage catalog. It is a design and implementation-boundary review only.
-No runtime, product-shell, CSS, storage, import, export, recovery, persistence,
-or Google Drive code is changed by this review.
+WriterPackage catalog. B1 is now prepared locally as a pure presentation
+adapter with artificial checks. It accepts an already supplied catalog and is
+not connected to a loader, React, the product shell, CSS, storage, import,
+export, recovery, persistence, or Google Drive.
 
 Phase B may read existing local content and display it in the isolated
 `product-shell.html` experience. It may not create, edit, migrate, delete,
@@ -200,21 +201,23 @@ type WriterLibraryItem = Readonly<{
 `origin` is presentation history, derived from `legacy.source`, not physical
 storage provenance. Do not name it `storageSource`.
 
-Recommended pure functions:
+Implemented B1 functions:
 
 ```ts
 function toWriterLibraryItem(
   writerPackage: Readonly<WriterPackage>
 ): WriterLibraryItem;
 
-function createVisibleWriterLibrary(
-  packages: readonly Readonly<WriterPackage>[]
-): WriterLibraryItem[];
+function buildWriterLibraryItems(
+  catalog: readonly Readonly<WriterPackage>[]
+): readonly WriterLibraryItem[];
 ```
 
 They must not read storage, time, randomness, browser globals, or mutate their
-inputs. `createVisibleWriterLibrary` filters `deleted === true`, sorts newest
-first, and uses a deterministic ID tie-break when timestamps are equal.
+inputs. `buildWriterLibraryItems` filters `deleted === true`, sorts newest
+first, and uses a deterministic ID tie-break when timestamps are equal. B1
+returns newly allocated frozen items and a frozen result array containing only
+presentation scalars.
 
 ### Mapping rules
 
@@ -241,7 +244,7 @@ Progress:
 
 - non-empty `finalText` -> `final`;
 - otherwise non-empty `workshopText` -> `workshop`;
-- otherwise at least one non-deleted note -> `notes`;
+- otherwise at least one non-deleted, non-empty note -> `notes`;
 - otherwise non-empty `sparkText` -> `spark`;
 - otherwise -> `empty`.
 
@@ -256,6 +259,9 @@ Dates:
 - keep the validated `createdAt` and `updatedAt` strings in the view model;
 - format human-readable dates only in the UI boundary;
 - do not call the current clock or rewrite timestamps.
+- assume normal inputs come from the validated catalog;
+- if an unexpected invalid `updatedAt` reaches B1, sort valid dates first and
+  place invalid dates deterministically by ID without repairing the input.
 
 Legacy item:
 
@@ -425,9 +431,14 @@ must never log package titles, excerpts, layer text, or notes.
   the repository.
 - Console logging of catalog values is forbidden even in development mode.
 
-## Future Test Plan
+## Test Plan
 
 ### Pure adapter checks
+
+B1 now covers the applicable mapping and visible-list rules with artificial
+data in `writerLibraryViewModelChecks.ts`; the production catalog is never
+loaded by the checks. Provider and read-only detail integration remain future
+checks.
 
 1. real WriterPackage maps to the expected Library item;
 2. legacy-origin package maps to a read-only `Pôvodná Iskra` item;
@@ -468,8 +479,10 @@ collision before the view model receives its input.
 
 ### B1 — Pure catalog-to-view-model adapter
 
-Add only the pure types, mapping, visible filtering, sorting, progress, title,
-and excerpt rules plus artificial checks. No loader, React, storage, or CSS.
+Prepared locally in `writerLibraryViewModel.ts` with artificial checks. It
+contains only the pure types, mapping, visible filtering, sorting, progress,
+title, and excerpt rules. It does not call `loadWriterPackageCatalog()` and has
+no loader, React, storage, browser, current-time, network, or CSS dependency.
 
 ### B2 — Read-only provider with injected loader
 
@@ -513,13 +526,13 @@ surface.
 - recovery, persistence, rollback, or per-note merge;
 - new data formats, dependencies, routes, or storage keys;
 - screenshots, snapshots, logs, or fixtures containing real author text;
-- commit, push, deploy, or publication of this docs slice.
+- commit, push, deploy, or publication of this local B1 implementation slice.
 
 ## Decision Summary
 
 Phase B should read `loadWriterPackageCatalog()` through one injected provider,
-map its visible package-shaped results through a pure adapter, and keep the
-isolated shell read-only. Fixture mode remains the default. Local real-data
-mode is an explicit development-only, non-persistent choice. The smallest next
-implementation is B1 only: pure catalog-to-view-model mapping and artificial
-checks.
+map its visible package-shaped results through the prepared pure B1 adapter,
+and keep the isolated shell read-only. Fixture mode remains the default. Local
+real-data mode is an explicit development-only, non-persistent choice. B1 is
+local and not connected to the shell; the smallest next implementation is B2,
+a read-only provider with an injected loader.

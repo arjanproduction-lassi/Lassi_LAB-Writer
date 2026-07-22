@@ -6,21 +6,23 @@ The Writer DB runtime cutover is published at
 `aa2c631022269e63cf3615d8cc4dae9d07b264c3`. The import path is no longer the
 active product-development priority. Google Drive remains v1/Sparks-only.
 
-The current planning slice is docs-only: define the product inventory and the
-future information architecture in `WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`.
-No runtime, storage, import, recovery, export, sync, or CSS change belongs to
-this slice.
+The product inventory and future information architecture are defined in
+`WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`. The current local Phase B1 slice adds
+only a pure WriterPackage-catalog-to-Library view-model adapter and artificial
+checks. No React, UI, loader, storage, import, recovery, export, sync, or CSS
+change belongs to B1.
 
 Phase A is implemented as a separate static `Knižnica / Dielňa / Dáta` entry
 using fixture data and no production storage wiring. Manual PC and mobile review
 approved the architecture as a baseline, not as a final visual design. Do not
 connect the shell to real data without a separate Phase B decision.
 
-The Phase B read-only boundary is now specified in
-`WRITER_LIBRARY_READ_ONLY_REVIEW.md`. It recommends the existing combined
-catalog behind an injected loader and a pure presentation adapter. This is
-documentation only; no real catalog is connected. The first future code slice
-is B1 adapter plus artificial checks, without React or storage access.
+The Phase B read-only boundary is specified in
+`WRITER_LIBRARY_READ_ONLY_REVIEW.md`. B1 is prepared locally: its pure adapter
+accepts an already supplied catalog and does not call
+`loadWriterPackageCatalog()`. No real catalog is connected to the product
+shell. The next future code slice is B2, a read-only provider with an injected
+loader and no write surface.
 
 ## Completed v0.1 Slice
 

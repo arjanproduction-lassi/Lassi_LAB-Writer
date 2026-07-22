@@ -42,7 +42,8 @@ try {
       "--esModuleInterop",
       "--outDir",
       outputDir,
-      "src/productShellPrototypeModelChecks.ts"
+      "src/productShellPrototypeModelChecks.ts",
+      "src/writerLibraryViewModelChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -59,6 +60,16 @@ try {
 
   if (run.status !== 0) {
     process.exit(run.status ?? 1);
+  }
+
+  const libraryRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerLibraryViewModelChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (libraryRun.status !== 0) {
+    process.exit(libraryRun.status ?? 1);
   }
 
   let isolationChecks = 0;
@@ -81,6 +92,49 @@ try {
   isolationChecks += 1;
 
   console.log(`Product shell isolation checks: ${isolationChecks}/${isolationChecks} passed.`);
+
+  const writerLibrarySource = readFileSync(
+    resolve(repoRoot, "src/writerLibraryViewModel.ts"),
+    "utf8"
+  ).toLowerCase();
+  const writerLibraryForbiddenPatterns = [
+    "from \"react\"",
+    "from 'react'",
+    "from \"./storage\"",
+    "from './storage'",
+    "writerpackagestorage",
+    "loadwriterpackagecatalog",
+    "localstorage",
+    "sessionstorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "indexeddb",
+    "caches.",
+    "date.now",
+    "new date",
+    "performance.",
+    "settimeout",
+    "setinterval",
+    "math.random",
+    "crypto.",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "http://",
+    "https://",
+    "googledrive"
+  ];
+
+  for (const pattern of writerLibraryForbiddenPatterns) {
+    if (writerLibrarySource.includes(pattern)) {
+      throw new Error(`Writer Library view model contains forbidden dependency: ${pattern}`);
+    }
+  }
+
+  console.log("Writer library isolation checks: 1/1 passed.");
 } finally {
   rmSync(outputDir, { recursive: true, force: true });
 }

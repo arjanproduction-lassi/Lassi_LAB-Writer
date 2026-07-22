@@ -17,7 +17,8 @@ Phase A is an isolated static shell and navigation with fixture data. It does
 not read or write production storage and does not replace the current runtime.
 Manual PC and mobile review approved its architecture as a baseline. The
 docs-only Phase B boundary is defined in `WRITER_LIBRARY_READ_ONLY_REVIEW.md`;
-real-data wiring has not started.
+the pure B1 view-model adapter is prepared locally, but real-data wiring has
+not started.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
@@ -69,11 +70,12 @@ The first code bridge is intentionally small:
 - do not change the Writer DB export/import format yet
 - do not change Google Drive sync payloads yet
 
-Next implementation decision:
+Next implementation decision after B1 review:
 
-- after a separate approval, implement B1 only: a pure
-  WriterPackage-catalog-to-Library view-model adapter with artificial checks;
-  do not add React or storage wiring in that slice
+- after a separate approval, implement B2 only: a read-only provider that
+  receives `loadWriterPackageCatalog` as an injected loader and exposes no
+  write operation; do not connect it to React or the product shell in that
+  slice
 
 ## Closed Writer DB Technical Slice
 

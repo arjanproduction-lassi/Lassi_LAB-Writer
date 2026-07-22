@@ -23,6 +23,11 @@ fixtures through an injected catalog provider. It may label historical content
 mode has no active `Nová iskra`, editing, or autosave and says `Iba na čítanie`.
 Detailed rules live in `WRITER_LIBRARY_READ_ONLY_REVIEW.md`.
 
+The local B1 adapter now prepares only immutable Library card data from an
+already supplied catalog. It does not load storage or render UI. The product
+shell remains fixture-only; B2 will separately define the injected read-only
+provider before any real-data mode can be connected.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

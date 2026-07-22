@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-22 - Phase B1 pure Library view model (local only)
+
+- Added a pure catalog-to-`WriterLibraryItem` adapter using the existing
+  `WriterPackage` type and only artificial checks.
+- Added deterministic title, excerpt, progress, live-note, tombstone, and
+  updated-time sorting rules with an ascending ID tie-break.
+- Kept physical storage provenance out of the view model; `legacy.source`
+  becomes only the human-facing historical origin `legacy-spark`.
+- The adapter accepts an already supplied catalog and does not call
+  `loadWriterPackageCatalog()`, React, browser globals, storage, current time,
+  network, Google Drive, import, export, persistence, or recovery.
+- B1 is not connected to `ProductShellPrototype`, production UI, or real data.
+  B2 remains the next separately reviewed read-only provider step.
+- This B1 slice is local only and is not staged, committed, pushed, or
+  deployed.
+
 ## 2026-07-21 - Phase B read-only Library review (docs only)
 
 - Inspected the current Spark, WriterPackage, package catalog, same-ID,
