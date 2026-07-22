@@ -1,6 +1,24 @@
 # Worklog
 
-## 2026-07-22 - Phase B1 pure Library view model (local only)
+## 2026-07-22 - Phase B2 read-only Library provider (local only)
+
+- Added a typed read-only provider that receives a synchronous WriterPackage
+  catalog loader by dependency injection and calls it exactly once.
+- Passed the returned catalog directly to the published B1 view-model adapter;
+  B2 adds no collision, Spark adaptation, sorting, filtering, or migration
+  rule of its own.
+- Added stable `ready` and `failed/catalog-load-failed` results without stack
+  traces, data logging, global state, storage, or write methods.
+- Kept the documented limitation that an empty current catalog result cannot
+  distinguish damaged loader data from a genuinely empty Library.
+- Used only artificial catalogs and loaders in provider checks. B2 is not
+  connected to React, `ProductShellPrototype`, production storage, Google
+  Drive, import/export, persistence, or recovery.
+- This B2 slice is local only and is not staged, committed, pushed, or
+  deployed. B3 remains the next separately reviewed development-only mode
+  selector.
+
+## 2026-07-22 - Phase B1 pure Library view model
 
 - Added a pure catalog-to-`WriterLibraryItem` adapter using the existing
   `WriterPackage` type and only artificial checks.
@@ -13,8 +31,8 @@
   network, Google Drive, import, export, persistence, or recovery.
 - B1 is not connected to `ProductShellPrototype`, production UI, or real data.
   B2 remains the next separately reviewed read-only provider step.
-- This B1 slice is local only and is not staged, committed, pushed, or
-  deployed.
+- Published as `4158a9ebc491886b44ae171e5d1130b504f9fe06` after the product-shell,
+  Writer DB, build, immutability, and side-effect checks passed.
 
 ## 2026-07-21 - Phase B read-only Library review (docs only)
 

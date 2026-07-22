@@ -3,9 +3,9 @@
 ## Status And Scope
 
 This document defines Phase B: a read-only Knižnica backed by the existing
-WriterPackage catalog. B1 is now prepared locally as a pure presentation
-adapter with artificial checks. It accepts an already supplied catalog and is
-not connected to a loader, React, the product shell, CSS, storage, import,
+WriterPackage catalog. B1 is published as a pure presentation adapter. B2 is
+now prepared locally as a read-only provider with an injected loader. Neither
+step is connected to React, the product shell, CSS, direct storage, import,
 export, recovery, persistence, or Google Drive.
 
 Phase B may read existing local content and display it in the isolated
@@ -390,22 +390,29 @@ Keep `product-shell.html` as the only entry. The product shell receives a
 provider instead of importing production storage directly:
 
 ```ts
-type ProductShellCatalogResult =
-  | { status: "ready"; packages: readonly WriterPackage[] }
-  | { status: "failed"; message: string };
+type WriterPackageCatalogLoader = () => readonly WriterPackage[];
 
-type ProductShellCatalogProvider = Readonly<{
-  mode: "fixture" | "local-read-only";
-  load: () => ProductShellCatalogResult;
-}>;
+type WriterLibraryReadOnlyResult =
+  | { status: "ready"; items: readonly WriterLibraryItem[] }
+  | { status: "failed"; reason: "catalog-load-failed" };
+
+function loadWriterLibraryReadOnly(
+  loader: WriterPackageCatalogLoader
+): WriterLibraryReadOnlyResult;
 ```
 
 Recommended providers:
 
 - fixture provider returns the existing artificial package objects;
 - local read-only provider receives `loadWriterPackageCatalog` by dependency
-  injection and calls it once;
+  injection, calls it once, and passes its result to the B1 adapter;
 - neither provider exposes save, upsert, delete, sync, import, or recovery.
+
+B2 catches a thrown loader error and returns only `catalog-load-failed`; it
+does not expose a stack or record content. An empty loader result is a
+successful empty Library. Because the current catalog loader may also collapse
+damaged collections to an empty array, B2 cannot reinterpret that empty result
+as a reliable corruption diagnosis.
 
 Safe mode selection:
 
@@ -455,6 +462,10 @@ checks.
 
 ### Integration checks
 
+B2 now covers the injected-loader, ready/failed, one-call, immutability,
+no-logging, and provider-isolation rules with artificial loaders. Mode
+selection and product-shell integration remain future checks.
+
 1. fixture mode remains the default and unchanged;
 2. unknown or production-mode query cannot activate local real data;
 3. real mode calls only the injected catalog loader;
@@ -479,16 +490,20 @@ collision before the view model receives its input.
 
 ### B1 — Pure catalog-to-view-model adapter
 
-Prepared locally in `writerLibraryViewModel.ts` with artificial checks. It
+Published at `4158a9ebc491886b44ae171e5d1130b504f9fe06`. It
 contains only the pure types, mapping, visible filtering, sorting, progress,
 title, and excerpt rules. It does not call `loadWriterPackageCatalog()` and has
 no loader, React, storage, browser, current-time, network, or CSS dependency.
 
 ### B2 — Read-only provider with injected loader
 
-Add a provider that receives `loadWriterPackageCatalog` as a dependency and
-returns a discriminated ready/failed result. Its public surface contains no
-write operation. Test with injected artificial loaders only.
+Prepared locally in `writerLibraryReadOnlyProvider.ts`. It receives a
+synchronous catalog loader as a dependency, calls it exactly once, and passes
+the returned catalog directly to `buildWriterLibraryItems()`. It returns only
+typed `ready` or `failed/catalog-load-failed` results, logs nothing, exposes no
+write operation, and has no React, direct storage, browser, network, sync, or
+Google Drive dependency. Checks use injected artificial loaders only. B2 is
+not connected to `ProductShellPrototype`.
 
 ### B3 — Development-only mode selection
 
@@ -526,13 +541,13 @@ surface.
 - recovery, persistence, rollback, or per-note merge;
 - new data formats, dependencies, routes, or storage keys;
 - screenshots, snapshots, logs, or fixtures containing real author text;
-- commit, push, deploy, or publication of this local B1 implementation slice.
+- commit, push, deploy, or publication of this local B2 implementation slice.
 
 ## Decision Summary
 
 Phase B should read `loadWriterPackageCatalog()` through one injected provider,
-map its visible package-shaped results through the prepared pure B1 adapter,
-and keep the isolated shell read-only. Fixture mode remains the default. Local
-real-data mode is an explicit development-only, non-persistent choice. B1 is
-local and not connected to the shell; the smallest next implementation is B2,
-a read-only provider with an injected loader.
+map its visible package-shaped results through the published pure B1 adapter,
+and keep the isolated shell read-only. B2 now provides that local injected
+boundary but is not connected to the shell. Fixture mode remains the default.
+The smallest next implementation is B3: an explicit, non-persistent,
+development-only fixture/real mode selector that fails closed to fixtures.

@@ -43,7 +43,8 @@ try {
       "--outDir",
       outputDir,
       "src/productShellPrototypeModelChecks.ts",
-      "src/writerLibraryViewModelChecks.ts"
+      "src/writerLibraryViewModelChecks.ts",
+      "src/writerLibraryReadOnlyProviderChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -70,6 +71,16 @@ try {
 
   if (libraryRun.status !== 0) {
     process.exit(libraryRun.status ?? 1);
+  }
+
+  const providerRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerLibraryReadOnlyProviderChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (providerRun.status !== 0) {
+    process.exit(providerRun.status ?? 1);
   }
 
   let isolationChecks = 0;
@@ -135,6 +146,66 @@ try {
   }
 
   console.log("Writer library isolation checks: 1/1 passed.");
+
+  const writerLibraryProviderSource = readFileSync(
+    resolve(repoRoot, "src/writerLibraryReadOnlyProvider.ts"),
+    "utf8"
+  ).toLowerCase();
+  const providerRuntimeForbiddenPatterns = [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "loadwriterpackagecatalog",
+    "localstorage",
+    "sessionstorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "indexeddb",
+    "caches.",
+    "date.now",
+    "new date",
+    "performance.",
+    "settimeout",
+    "setinterval",
+    "math.random",
+    "crypto.",
+    "console.",
+    "setitem",
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "deletewriter"
+  ];
+  const providerNetworkForbiddenPatterns = [
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "http://",
+    "https://",
+    "googledrive"
+  ];
+  let providerIsolationChecks = 0;
+
+  for (const pattern of providerRuntimeForbiddenPatterns) {
+    if (writerLibraryProviderSource.includes(pattern)) {
+      throw new Error(`Writer Library provider contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  providerIsolationChecks += 1;
+
+  for (const pattern of providerNetworkForbiddenPatterns) {
+    if (writerLibraryProviderSource.includes(pattern)) {
+      throw new Error(`Writer Library provider contains forbidden network dependency: ${pattern}`);
+    }
+  }
+  providerIsolationChecks += 1;
+
+  console.log(
+    `Writer library provider isolation checks: ${providerIsolationChecks}/${providerIsolationChecks} passed.`
+  );
 } finally {
   rmSync(outputDir, { recursive: true, force: true });
 }

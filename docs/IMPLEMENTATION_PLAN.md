@@ -7,10 +7,9 @@ The Writer DB runtime cutover is published at
 active product-development priority. Google Drive remains v1/Sparks-only.
 
 The product inventory and future information architecture are defined in
-`WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`. The current local Phase B1 slice adds
-only a pure WriterPackage-catalog-to-Library view-model adapter and artificial
-checks. No React, UI, loader, storage, import, recovery, export, sync, or CSS
-change belongs to B1.
+`WRITER_PRODUCT_ARCHITECTURE_REVIEW.md`. The published Phase B1 slice adds only
+a pure WriterPackage-catalog-to-Library view-model adapter and artificial
+checks. B1 is published at `4158a9ebc491886b44ae171e5d1130b504f9fe06`.
 
 Phase A is implemented as a separate static `Knižnica / Dielňa / Dáta` entry
 using fixture data and no production storage wiring. Manual PC and mobile review
@@ -18,11 +17,12 @@ approved the architecture as a baseline, not as a final visual design. Do not
 connect the shell to real data without a separate Phase B decision.
 
 The Phase B read-only boundary is specified in
-`WRITER_LIBRARY_READ_ONLY_REVIEW.md`. B1 is prepared locally: its pure adapter
-accepts an already supplied catalog and does not call
-`loadWriterPackageCatalog()`. No real catalog is connected to the product
-shell. The next future code slice is B2, a read-only provider with an injected
-loader and no write surface.
+`WRITER_LIBRARY_READ_ONLY_REVIEW.md`. The B1 pure adapter accepts an already
+supplied catalog and does not call
+`loadWriterPackageCatalog()`. B2 is now prepared locally as a read-only
+provider that calls one injected loader and passes its result to B1. It has no
+write surface and is not connected to the product shell. The next future code
+slice is B3, a development-only, non-persistent fixture/real mode selector.
 
 ## Completed v0.1 Slice
 

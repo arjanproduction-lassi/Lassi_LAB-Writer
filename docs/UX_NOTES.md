@@ -23,10 +23,11 @@ fixtures through an injected catalog provider. It may label historical content
 mode has no active `Nová iskra`, editing, or autosave and says `Iba na čítanie`.
 Detailed rules live in `WRITER_LIBRARY_READ_ONLY_REVIEW.md`.
 
-The local B1 adapter now prepares only immutable Library card data from an
-already supplied catalog. It does not load storage or render UI. The product
-shell remains fixture-only; B2 will separately define the injected read-only
-provider before any real-data mode can be connected.
+The published B1 adapter prepares only immutable Library card data from an
+already supplied catalog. The local B2 provider adds a typed, one-call injected
+loader boundary and passes its result to B1 without exposing storage or write
+methods. Neither B1 nor B2 renders UI. The product shell remains fixture-only;
+B3 will separately define the development-only fixture/real mode selector.
 
 ## Four Notebook Comfort
 
