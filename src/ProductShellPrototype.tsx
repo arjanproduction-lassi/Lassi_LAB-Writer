@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ProductShellDataMode } from "./productShellDataMode";
 import {
   PRODUCT_SHELL_LAYERS,
   PRODUCT_SHELL_NAV_ITEMS,
@@ -31,7 +32,42 @@ function excerpt(value: string, length = 118) {
   return compact.length > length ? `${compact.slice(0, length).trimEnd()}…` : compact;
 }
 
-export function ProductShellPrototype() {
+type ProductShellPrototypeProps = Readonly<{
+  dataMode: ProductShellDataMode;
+}>;
+
+function ProductShellRealReadOnlyPlaceholder() {
+  return (
+    <div className="product-shell-root">
+      <a className="prototype-skip-link" href="#prototype-main">
+        Preskočiť na obsah
+      </a>
+      <div className="prototype-banner" role="note">
+        Vývojový režim – bez načítania dát
+      </div>
+      <main className="prototype-page prototype-mode-placeholder" id="prototype-main">
+        <section
+          className="prototype-mode-placeholder-card"
+          aria-labelledby="prototype-mode-placeholder-title"
+        >
+          <p className="prototype-eyebrow">Vývojový režim – bez načítania dát</p>
+          <h1 id="prototype-mode-placeholder-title">Read-only režim je pripravený.</h1>
+          <p>Pripojenie katalógu príde v ďalšom kroku.</p>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+export function ProductShellPrototype({ dataMode }: ProductShellPrototypeProps) {
+  return dataMode === "real-read-only" ? (
+    <ProductShellRealReadOnlyPlaceholder />
+  ) : (
+    <FixtureProductShellPrototype />
+  );
+}
+
+function FixtureProductShellPrototype() {
   const [packages, setPackages] = useState<ProductShellPackage[]>(() =>
     createProductShellFixtures()
   );

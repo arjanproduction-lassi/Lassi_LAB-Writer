@@ -18,11 +18,13 @@ connect the shell to real data without a separate Phase B decision.
 
 The Phase B read-only boundary is specified in
 `WRITER_LIBRARY_READ_ONLY_REVIEW.md`. The B1 pure adapter accepts an already
-supplied catalog and does not call
-`loadWriterPackageCatalog()`. B2 is now prepared locally as a read-only
-provider that calls one injected loader and passes its result to B1. It has no
-write surface and is not connected to the product shell. The next future code
-slice is B3, a development-only, non-persistent fixture/real mode selector.
+supplied catalog and does not call `loadWriterPackageCatalog()`. B2 is
+published at `207801b17665a7669ffe52adb4887b5ed262b6b9` as a read-only provider
+that calls one injected loader and passes its result to B1. It has no write
+surface and is not connected to the product shell. B3 is prepared locally as
+a development-only, non-persistent fixture/real-read-only selector. It shows
+only a truthful no-data placeholder and does not yet call B2 or load a catalog.
+The next future code slice is B4, the isolated real read-only Knižnica.
 
 ## Completed v0.1 Slice
 

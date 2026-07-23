@@ -1,6 +1,21 @@
 # Worklog
 
-## 2026-07-22 - Phase B2 read-only Library provider (local only)
+## 2026-07-22 - Phase B3 development-only data mode (local only)
+
+- Added a pure, deterministic resolver for fixture and `real-read-only` modes
+  from injected development state and query text.
+- Kept fixture mode as the default and failed closed for production, absent,
+  blank, unknown, malformed, and case-mismatched query values.
+- Limited `import.meta.env.DEV` and `window.location.search` reads to the
+  isolated product-shell entry; the resolver has no browser or storage access.
+- Added a truthful development placeholder that loads neither fixtures nor the
+  B2 provider in real-read-only mode. It performs no catalog or storage read.
+- Kept production App, navigation, storage, Writer DB, and Google Drive outside
+  B3. This slice is local only and is not staged, committed, pushed, or
+  deployed. B4 remains the next separately reviewed real read-only Library
+  step.
+
+## 2026-07-22 - Phase B2 read-only Library provider
 
 - Added a typed read-only provider that receives a synchronous WriterPackage
   catalog loader by dependency injection and calls it exactly once.
@@ -14,9 +29,8 @@
 - Used only artificial catalogs and loaders in provider checks. B2 is not
   connected to React, `ProductShellPrototype`, production storage, Google
   Drive, import/export, persistence, or recovery.
-- This B2 slice is local only and is not staged, committed, pushed, or
-  deployed. B3 remains the next separately reviewed development-only mode
-  selector.
+- Published as `207801b17665a7669ffe52adb4887b5ed262b6b9` after product-shell,
+  Writer DB, build, immutability, injected-loader, and isolation checks passed.
 
 ## 2026-07-22 - Phase B1 pure Library view model
 

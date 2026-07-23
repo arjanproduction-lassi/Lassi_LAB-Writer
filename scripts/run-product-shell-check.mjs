@@ -43,6 +43,7 @@ try {
       "--outDir",
       outputDir,
       "src/productShellPrototypeModelChecks.ts",
+      "src/productShellDataModeChecks.ts",
       "src/writerLibraryViewModelChecks.ts",
       "src/writerLibraryReadOnlyProviderChecks.ts"
     ],
@@ -81,6 +82,16 @@ try {
 
   if (providerRun.status !== 0) {
     process.exit(providerRun.status ?? 1);
+  }
+
+  const dataModeRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "productShellDataModeChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (dataModeRun.status !== 0) {
+    process.exit(dataModeRun.status ?? 1);
   }
 
   let isolationChecks = 0;
@@ -205,6 +216,65 @@ try {
 
   console.log(
     `Writer library provider isolation checks: ${providerIsolationChecks}/${providerIsolationChecks} passed.`
+  );
+
+  const dataModeSource = readFileSync(
+    resolve(repoRoot, "src/productShellDataMode.ts"),
+    "utf8"
+  ).toLowerCase();
+  const productShellUiSource = ["src/productShellMain.tsx", "src/ProductShellPrototype.tsx"]
+    .map((relativePath) => readFileSync(resolve(repoRoot, relativePath), "utf8"))
+    .join("\n")
+    .toLowerCase();
+  let dataModeIsolationChecks = 0;
+
+  for (const pattern of ["window", "document", "location", "import.meta", "urlsearchparams"]) {
+    if (dataModeSource.includes(pattern)) {
+      throw new Error(`Product shell data mode resolver contains browser dependency: ${pattern}`);
+    }
+  }
+  dataModeIsolationChecks += 1;
+
+  for (const pattern of ["localstorage", "sessionstorage", "indexeddb", "cookie", "storage."]) {
+    if (dataModeSource.includes(pattern)) {
+      throw new Error(`Product shell data mode resolver contains storage dependency: ${pattern}`);
+    }
+  }
+  dataModeIsolationChecks += 1;
+
+  for (const pattern of ["fetch(", "xmlhttprequest", "websocket", "http://", "https://", "googledrive"]) {
+    if (dataModeSource.includes(pattern)) {
+      throw new Error(`Product shell data mode resolver contains network dependency: ${pattern}`);
+    }
+  }
+  dataModeIsolationChecks += 1;
+
+  for (const pattern of [
+    "loadwriterlibraryreadonly",
+    "loadwriterpackagecatalog",
+    "writerlibraryreadonlyprovider",
+    "writerpackagestorage",
+    "localstorage"
+  ]) {
+    if (productShellUiSource.includes(pattern)) {
+      throw new Error(`B3 product shell UI contains forbidden data source: ${pattern}`);
+    }
+  }
+  dataModeIsolationChecks += 1;
+
+  const productionDataModeEntries = ["index.html", "src/main.tsx", "src/App.tsx"]
+    .map((relativePath) => readFileSync(resolve(repoRoot, relativePath), "utf8"))
+    .join("\n")
+    .toLowerCase();
+  for (const pattern of ["productshelldatamode", "real-read-only"]) {
+    if (productionDataModeEntries.includes(pattern)) {
+      throw new Error(`Production entry points reference the B3 data mode boundary: ${pattern}`);
+    }
+  }
+  dataModeIsolationChecks += 1;
+
+  console.log(
+    `Product shell data mode isolation checks: ${dataModeIsolationChecks}/${dataModeIsolationChecks} passed.`
   );
 } finally {
   rmSync(outputDir, { recursive: true, force: true });

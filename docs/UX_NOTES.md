@@ -24,10 +24,12 @@ mode has no active `Nová iskra`, editing, or autosave and says `Iba na čítani
 Detailed rules live in `WRITER_LIBRARY_READ_ONLY_REVIEW.md`.
 
 The published B1 adapter prepares only immutable Library card data from an
-already supplied catalog. The local B2 provider adds a typed, one-call injected
-loader boundary and passes its result to B1 without exposing storage or write
-methods. Neither B1 nor B2 renders UI. The product shell remains fixture-only;
-B3 will separately define the development-only fixture/real mode selector.
+already supplied catalog. Published B2 adds a typed, one-call injected loader
+boundary and passes its result to B1 without exposing storage or write methods.
+Neither B1 nor B2 renders UI. Local B3 keeps fixtures as the default and adds
+only a development-only `?mode=real-read-only` no-data state; it does not call
+B2, load the catalog, or display real author content. B4 will separately wire
+the read-only Knižnica.
 
 ## Four Notebook Comfort
 

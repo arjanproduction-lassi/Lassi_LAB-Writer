@@ -792,3 +792,15 @@ blockquote {
     transition: none;
   }
 }
+
+.prototype-mode-placeholder {
+  display: grid;
+  min-height: calc(100vh - 2.5rem);
+  place-items: center;
+}
+
+.prototype-mode-placeholder-card {
+  max-width: 42rem;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  text-align: center;
+}
