@@ -1,6 +1,20 @@
 # Worklog
 
-## 2026-07-22 - Phase B3 development-only data mode (local only)
+## 2026-07-23 - Phase B4 real read-only Library (local only)
+
+- Added a small assembly boundary that calls the published B2 provider exactly
+  once before React render only in exact DEV `real-read-only` mode.
+- Injected the existing `loadWriterPackageCatalog()`; fixture mode calls
+  neither the provider nor loader and retains its three fixture packages.
+- Rendered B1-ordered items, one `Pokračovať` item, human progress and
+  `Pôvodná Iskra` labels, plus truthful empty and failed states.
+- Kept `Nová iskra` and real cards inactive. No real package opens, no selected
+  ID is stored, and B5 detail does not exist.
+- Added only artificial assembly/presentation checks. Production App, storage
+  implementation, Writer DB, and Google Drive remain unchanged. B4 is not
+  staged, committed, pushed, or deployed.
+
+## 2026-07-22 - Phase B3 development-only data mode
 
 - Added a pure, deterministic resolver for fixture and `real-read-only` modes
   from injected development state and query text.
@@ -11,9 +25,8 @@
 - Added a truthful development placeholder that loads neither fixtures nor the
   B2 provider in real-read-only mode. It performs no catalog or storage read.
 - Kept production App, navigation, storage, Writer DB, and Google Drive outside
-  B3. This slice is local only and is not staged, committed, pushed, or
-  deployed. B4 remains the next separately reviewed real read-only Library
-  step.
+  B3. Published as `1fd2ac05065022a3a0a3d95307324b3bcbb34bd7` after resolver,
+  isolation, build, and five-URL browser checks passed.
 
 ## 2026-07-22 - Phase B2 read-only Library provider
 

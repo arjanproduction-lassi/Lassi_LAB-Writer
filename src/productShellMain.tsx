@@ -2,6 +2,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ProductShellPrototype } from "./ProductShellPrototype";
 import { resolveProductShellDataMode } from "./productShellDataMode";
+import { assembleProductShellData } from "./productShellReadOnlyLibrary";
+import { loadWriterPackageCatalog } from "./writerPackageStorage";
 import "./productShellPrototype.css";
 
 const root = document.getElementById("product-shell-root");
@@ -14,9 +16,16 @@ const dataMode = resolveProductShellDataMode({
   isDevelopment: import.meta.env.DEV,
   search: window.location.search
 });
+const data =
+  dataMode === "real-read-only"
+    ? assembleProductShellData({
+        dataMode,
+        catalogLoader: loadWriterPackageCatalog
+      })
+    : assembleProductShellData({ dataMode });
 
 createRoot(root).render(
   <StrictMode>
-    <ProductShellPrototype dataMode={dataMode} />
+    <ProductShellPrototype data={data} />
   </StrictMode>
 );

@@ -793,14 +793,47 @@ blockquote {
   }
 }
 
-.prototype-mode-placeholder {
-  display: grid;
-  min-height: calc(100vh - 2.5rem);
-  place-items: center;
+.prototype-read-only-card:disabled {
+  color: inherit;
+  cursor: default;
+  opacity: 1;
 }
 
-.prototype-mode-placeholder-card {
-  max-width: 42rem;
-  padding: clamp(1.5rem, 5vw, 3rem);
-  text-align: center;
+.prototype-read-only-card:hover {
+  border-color: var(--prototype-border);
+  transform: none;
+}
+
+.prototype-read-only-card-labels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.prototype-origin-chip {
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--prototype-border);
+  border-radius: 999px;
+  color: var(--prototype-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.prototype-read-only-status {
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid var(--prototype-border);
+  border-radius: 0.8rem;
+  background: var(--prototype-surface);
+}
+
+.prototype-read-only-status p {
+  color: var(--prototype-muted);
+}
+
+.prototype-primary-button:disabled,
+.prototype-main-nav button:disabled {
+  opacity: 0.72;
 }

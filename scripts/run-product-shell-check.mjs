@@ -10,7 +10,7 @@ const outputDir = mkdtempSync(join(tmpdir(), "lassilab-product-shell-check-"));
 const prototypeFiles = [
   "src/ProductShellPrototype.tsx",
   "src/productShellPrototypeModel.ts",
-  "src/productShellMain.tsx"
+  "src/productShellDataMode.ts"
 ];
 
 const forbiddenPatterns = [
@@ -44,6 +44,7 @@ try {
       outputDir,
       "src/productShellPrototypeModelChecks.ts",
       "src/productShellDataModeChecks.ts",
+      "src/productShellReadOnlyLibraryChecks.ts",
       "src/writerLibraryViewModelChecks.ts",
       "src/writerLibraryReadOnlyProviderChecks.ts"
     ],
@@ -92,6 +93,16 @@ try {
 
   if (dataModeRun.status !== 0) {
     process.exit(dataModeRun.status ?? 1);
+  }
+
+  const readOnlyLibraryRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "productShellReadOnlyLibraryChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (readOnlyLibraryRun.status !== 0) {
+    process.exit(readOnlyLibraryRun.status ?? 1);
   }
 
   let isolationChecks = 0;
@@ -222,7 +233,7 @@ try {
     resolve(repoRoot, "src/productShellDataMode.ts"),
     "utf8"
   ).toLowerCase();
-  const productShellUiSource = ["src/productShellMain.tsx", "src/ProductShellPrototype.tsx"]
+  const productShellUiSource = ["src/ProductShellPrototype.tsx"]
     .map((relativePath) => readFileSync(resolve(repoRoot, relativePath), "utf8"))
     .join("\n")
     .toLowerCase();
@@ -275,6 +286,121 @@ try {
 
   console.log(
     `Product shell data mode isolation checks: ${dataModeIsolationChecks}/${dataModeIsolationChecks} passed.`
+  );
+
+  const productShellMainSource = readFileSync(
+    resolve(repoRoot, "src/productShellMain.tsx"),
+    "utf8"
+  );
+  const readOnlyAssemblySource = readFileSync(
+    resolve(repoRoot, "src/productShellReadOnlyLibrary.ts"),
+    "utf8"
+  );
+  const readOnlyUiSource = readFileSync(
+    resolve(repoRoot, "src/ProductShellReadOnlyLibraryView.tsx"),
+    "utf8"
+  );
+  const readOnlyChecksSource = readFileSync(
+    resolve(repoRoot, "src/productShellReadOnlyLibraryChecks.ts"),
+    "utf8"
+  );
+  const compactReadOnlyUiSource = readOnlyUiSource.replace(/\s+/g, " ");
+  const b4RuntimeSource = [
+    productShellMainSource,
+    readOnlyAssemblySource,
+    readOnlyUiSource
+  ].join("\n").toLowerCase();
+  let readOnlyLibraryIsolationChecks = 0;
+
+  if (
+    !productShellMainSource.includes(
+      'import { loadWriterPackageCatalog } from "./writerPackageStorage";'
+    ) ||
+    !productShellMainSource.includes("catalogLoader: loadWriterPackageCatalog") ||
+    productShellMainSource.indexOf("const data =") >
+      productShellMainSource.indexOf("createRoot(root).render")
+  ) {
+    throw new Error("B4 assembly must inject the existing catalog loader before React render.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  if (
+    !compactReadOnlyUiSource.includes(
+      '<button className="prototype-primary-button" type="button" disabled>'
+    ) ||
+    !readOnlyUiSource.includes("Nová iskra · Pripravujeme")
+  ) {
+    throw new Error("Real read-only mode must keep Nová iskra disabled.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  if (
+    !readOnlyUiSource.includes("prototype-read-only-card") ||
+    !readOnlyUiSource.includes("disabled") ||
+    !readOnlyUiSource.includes("item.noteCount") ||
+    readOnlyUiSource.includes("openPackage") ||
+    readOnlyUiSource.includes("FixtureProductShellPrototype") ||
+    readOnlyUiSource.includes("onClick")
+  ) {
+    throw new Error("Real Library cards must not open fixture or editable detail.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  for (const pattern of [
+    "savewriterpackages",
+    "upsertwriterpackage",
+    "deletewriter",
+    "migrate",
+    "importwriterdb",
+    "executewriterdbimport",
+    "syncgoogledrive",
+    "connectgoogledrive",
+    "console."
+  ]) {
+    if (b4RuntimeSource.includes(pattern)) {
+      throw new Error(`B4 runtime contains forbidden write or private-data API: ${pattern}`);
+    }
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  for (const pattern of ["setitem", "removeitem", "localstorage.set", "sessionstorage", "indexeddb"]) {
+    if (b4RuntimeSource.includes(pattern)) {
+      throw new Error(`B4 runtime contains forbidden storage write: ${pattern}`);
+    }
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  const lowerReadOnlyChecksSource = readOnlyChecksSource.toLowerCase();
+  if (
+    !readOnlyChecksSource.includes("Umelý") ||
+    lowerReadOnlyChecksSource.includes("loadwriterpackagecatalog") ||
+    lowerReadOnlyChecksSource.includes("writerpackagestorage") ||
+    lowerReadOnlyChecksSource.includes("localstorage")
+  ) {
+    throw new Error("B4 checks must use only artificial injected data.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  const productionReadOnlyEntries = ["index.html", "src/main.tsx", "src/App.tsx"]
+    .map((relativePath) => readFileSync(resolve(repoRoot, relativePath), "utf8"))
+    .join("\n")
+    .toLowerCase();
+  for (const pattern of ["productshellreadonlylibrary", "loadwriterpackagecatalog", "real-read-only"]) {
+    if (productionReadOnlyEntries.includes(pattern)) {
+      throw new Error(`Production entries reference the B4 Library: ${pattern}`);
+    }
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  for (const pattern of ["getWriterPackageById", "<textarea", "<input", "onChange="]) {
+    if (readOnlyUiSource.includes(pattern)) {
+      throw new Error(`B5 detail or editing leaked into B4: ${pattern}`);
+    }
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  console.log(
+    `Product shell read-only Library isolation checks: ${readOnlyLibraryIsolationChecks}/${readOnlyLibraryIsolationChecks} passed.`
   );
 } finally {
   rmSync(outputDir, { recursive: true, force: true });

@@ -26,10 +26,11 @@ Detailed rules live in `WRITER_LIBRARY_READ_ONLY_REVIEW.md`.
 The published B1 adapter prepares only immutable Library card data from an
 already supplied catalog. Published B2 adds a typed, one-call injected loader
 boundary and passes its result to B1 without exposing storage or write methods.
-Neither B1 nor B2 renders UI. Local B3 keeps fixtures as the default and adds
-only a development-only `?mode=real-read-only` no-data state; it does not call
-B2, load the catalog, or display real author content. B4 will separately wire
-the read-only Knižnica.
+Published B3 keeps fixtures as the default and permits exact
+`?mode=real-read-only` only in development. Local B4 uses that mode for a real
+read-only Knižnica with inactive creation and cards, truthful empty/failure
+copy, and no detail or writes. B5 will separately open one already loaded item
+read-only.
 
 ## Four Notebook Comfort
 

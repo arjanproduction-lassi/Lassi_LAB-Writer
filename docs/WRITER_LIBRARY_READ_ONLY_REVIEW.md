@@ -3,11 +3,12 @@
 ## Status And Scope
 
 This document defines Phase B: a read-only Knižnica backed by the existing
-WriterPackage catalog. B1 is published as a pure presentation adapter and B2
-is published as a read-only provider with an injected loader. B3 is prepared
-locally as a development-only fixture/real-read-only mode boundary, but it
-does not connect B2 or load real data. None of these steps writes storage or
-changes production App, import, export, recovery, persistence, or Google Drive.
+WriterPackage catalog. B1 is published as a pure presentation adapter, B2 as a
+read-only provider with an injected loader, and B3 as the development-only
+fixture/real-read-only mode boundary. B4 is prepared locally: only the exact
+DEV real-read-only mode loads the existing catalog and renders a read-only
+Knižnica. None of these steps writes storage or changes production App,
+import, export, recovery, persistence, or Google Drive.
 
 Phase B may read existing local content and display it in the isolated
 `product-shell.html` experience. It may not create, edit, migrate, delete,
@@ -419,7 +420,7 @@ Safe mode selection:
 
 - fixture remains the default;
 - the exact URL query `?mode=real-read-only` selects the development-only
-  read-only placeholder;
+  read-only Knižnica;
 - honor real-data mode only when `import.meta.env.DEV` is true;
 - do not store the choice in localStorage or create another key;
 - fail closed to fixture mode for an absent, unknown, or production-mode value;
@@ -465,9 +466,10 @@ checks.
 ### Integration checks
 
 B2 covers the injected-loader, ready/failed, one-call, immutability,
-no-logging, and provider-isolation rules with artificial loaders. Local B3
-covers the fail-closed mode resolver and an isolated product-shell placeholder;
-provider loading and real-data rendering remain future checks.
+no-logging, and provider-isolation rules with artificial loaders. Published B3
+covers the fail-closed mode resolver. Local B4 covers one-call assembly before
+React render, fixture isolation, ordered read-only presentation, empty/failed
+states, inactive creation and detail, privacy, and production isolation.
 
 1. fixture mode remains the default and unchanged;
 2. unknown or production-mode query cannot activate local real data;
@@ -510,19 +512,21 @@ not connected to `ProductShellPrototype`.
 
 ### B3 — Development-only mode selection
 
-Prepared locally. Fixture mode remains the default. The pure resolver accepts
+Published at `1fd2ac05065022a3a0a3d95307324b3bcbb34bd7`. Fixture mode remains the default. The pure resolver accepts
 injected development state and query text; the isolated shell entry alone
 reads `import.meta.env.DEV` and `window.location.search`. The exact,
-non-persistent `?mode=real-read-only` query selects a truthful no-data
-placeholder only in development. Production, absent, blank, unknown, and
-case-mismatched values fail closed to fixtures. B3 does not call the B2
-provider, the catalog loader, storage, or any real-data API.
+non-persistent `?mode=real-read-only` value is available only in development.
+Production, absent, blank, unknown, and case-mismatched values fail closed to
+fixtures. B3 itself does not load a catalog or define storage behavior.
 
 ### B4 — Real read-only Knižnica
 
-Render the provider result through the pure view model. Disable or remove
-`Nová iskra`, display human empty/error states, show at most one `Pokračovať`
-item initially, and expose no edit or save behavior.
+Prepared locally. The isolated entry injects the existing
+`loadWriterPackageCatalog()` into B2 only for exact DEV real-read-only mode and
+does so before React render. Fixture mode calls neither provider nor loader.
+The Knižnica preserves B1 order, shows at most one `Pokračovať` item, has
+truthful empty and failed states, disables `Nová iskra`, and exposes no detail,
+edit, save, migration, sync, import, or recovery behavior.
 
 ### B5 — Read-only package detail
 
@@ -547,15 +551,14 @@ author content adds a larger privacy and interaction surface.
 - recovery, persistence, rollback, or per-note merge;
 - new data formats, dependencies, routes, or storage keys;
 - screenshots, snapshots, logs, or fixtures containing real author text;
-- commit, push, deploy, or publication of this local B3 implementation slice.
+- commit, push, deploy, or publication of this local B4 implementation slice.
 
 ## Decision Summary
 
 Phase B should read `loadWriterPackageCatalog()` through one injected provider,
 map its visible package-shaped results through the published pure B1 adapter,
-and keep the isolated shell read-only. Published B2 provides that injected
-boundary but is not connected to the shell. Local B3 adds only the explicit,
-non-persistent, development-only mode selector and a truthful no-data state;
-fixture mode remains the default. The smallest next implementation is B4:
-connect the B2 provider only inside the isolated real-read-only shell mode and
-render a read-only Knižnica.
+and keep the isolated shell read-only. Published B3 keeps fixture mode as the
+default and fails closed outside exact DEV selection. Local B4 connects B2
+only inside that isolated real-read-only mode, renders no fixture content as
+real, and performs no writes. The smallest next implementation is B5: open one
+already loaded catalog snapshot as a separately reviewed read-only detail.

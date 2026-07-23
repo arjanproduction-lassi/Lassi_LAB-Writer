@@ -21,10 +21,12 @@ The Phase B read-only boundary is specified in
 supplied catalog and does not call `loadWriterPackageCatalog()`. B2 is
 published at `207801b17665a7669ffe52adb4887b5ed262b6b9` as a read-only provider
 that calls one injected loader and passes its result to B1. It has no write
-surface and is not connected to the product shell. B3 is prepared locally as
-a development-only, non-persistent fixture/real-read-only selector. It shows
-only a truthful no-data placeholder and does not yet call B2 or load a catalog.
-The next future code slice is B4, the isolated real read-only Knižnica.
+surface. B3 is published at `1fd2ac05065022a3a0a3d95307324b3bcbb34bd7` as
+the development-only, non-persistent fixture/real-read-only selector. B4 is
+prepared locally: exact DEV real-read-only mode injects the existing catalog
+loader into B2 once before React render and displays a read-only Knižnica;
+fixture and production behavior remain unchanged. The next future code slice
+is B5, read-only detail from the already loaded catalog snapshot.
 
 ## Completed v0.1 Slice
 
