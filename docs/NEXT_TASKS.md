@@ -74,12 +74,15 @@ The first code bridge is intentionally small:
 - do not change the Writer DB export/import format yet
 - do not change Google Drive sync payloads yet
 
-Next implementation decision after the docs-only B5 review:
+Next implementation decision after local B5.1 review:
 
-- after a separate approval, implement B5.1 only: a pure immutable
-  `WriterLibraryDetail` adapter with artificial checks
-- keep B5.2 provider snapshot, B5.3 local selection, B5.4 read-only UI, and
-  B5.5 synthetic integration as separately reviewed later steps
+- B5.1 is prepared locally as a pure immutable `WriterLibraryDetail` adapter,
+  order-preserving detail-array builder, and artificial checks; it is not wired
+  to B2 or React and remains uncommitted
+- after a separate approval, implement B5.2 only: one provider snapshot with
+  B1-ordered `items` and immutable `detailsById` from one catalog load
+- keep B5.3 local selection, B5.4 read-only UI, and B5.5 synthetic integration
+  as separately reviewed later steps
 - never re-read by ID, create editable copies, add autosave, or change the
   production App in B5
 

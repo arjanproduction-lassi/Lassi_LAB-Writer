@@ -3,9 +3,11 @@
 ## Status And Scope
 
 This document defines the proposed Phase B5 contract for opening one work from
-the already loaded read-only Writer Library snapshot. It is a documentation-only
-design. B5 is not implemented, staged, committed, pushed, deployed, or connected
-to the production App.
+the already loaded read-only Writer Library snapshot. The contract was
+published at `e40eb9b5d7b8724818e9c975956013f50efc91b8`. B5.1 is now prepared
+locally as a pure, deeply immutable detail adapter and artificial checks. It is
+not staged, committed, pushed, deployed, connected to the B2 provider, or
+connected to React. B5.2-B5.5 remain unimplemented.
 
 The only future runtime in scope is the isolated development entry:
 
@@ -516,14 +518,20 @@ only the synthetic data and close the profile afterward.
 
 ### B5.1 - pure detail adapter and checks
 
-- add `WriterLibraryDetail` and `WriterLibraryDetailNote`;
-- map a supplied package without storage or React;
-- share the B1 title fallback rule;
-- filter deleted notes and top-level tombstones in the pure collection builder;
-- deeply freeze outputs;
-- add artificial pure checks only.
+- Prepared locally in `src/writerLibraryDetailViewModel.ts` with artificial
+  checks in `src/writerLibraryDetailViewModelChecks.ts`.
+- Adds `WriterLibraryDetail` and `WriterLibraryDetailNote`.
+- Maps a supplied package without storage or React.
+- Reuses the published B1 item adapter for the shared title fallback and origin
+  rules without changing the B1 contract.
+- Filters deleted notes and top-level tombstones in the pure array builder.
+- Preserves live input order without sorting or deduplication.
+- Deeply freezes the detail, copied notes, notes array, and detail result array.
+- Adds 24 pure checks and 3 static isolation checks, bringing the product-shell
+  harness from 85/85 to 112/112.
 
-This is the recommended smallest next implementation commit.
+This local slice does not create `detailsById`, change B2, or expose detail data
+to React. It remains uncommitted. The next separately reviewed step is B5.2.
 
 ### B5.2 - one immutable Library snapshot
 
@@ -583,9 +591,10 @@ B5 does not add:
 ## Decision Summary
 
 Evolve the existing B2 ready result rather than create a second provider. One
-injected `loadWriterPackageCatalog()` call before React render produces one
+injected `loadWriterPackageCatalog()` call before React render will produce one
 deeply immutable snapshot: existing ordered B1 items plus a frozen detail index
-for those same live IDs. React receives only presentation models. Opening,
-returning, and switching layers are local in-memory actions and never read or
-write storage. The smallest implementation after separate approval is B5.1,
-the pure detail adapter and artificial checks only.
+for those same live IDs. React will receive only presentation models. Opening,
+returning, and switching layers remain future local in-memory actions that must
+never read or write storage. Local B5.1 now supplies only the pure immutable
+detail and array builder. The smallest next implementation after separate
+approval is B5.2, the one-call `items + detailsById` provider snapshot.

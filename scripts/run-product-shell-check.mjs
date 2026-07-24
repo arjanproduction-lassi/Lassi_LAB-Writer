@@ -46,6 +46,7 @@ try {
       "src/productShellDataModeChecks.ts",
       "src/productShellReadOnlyLibraryChecks.ts",
       "src/writerLibraryViewModelChecks.ts",
+      "src/writerLibraryDetailViewModelChecks.ts",
       "src/writerLibraryReadOnlyProviderChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
@@ -73,6 +74,16 @@ try {
 
   if (libraryRun.status !== 0) {
     process.exit(libraryRun.status ?? 1);
+  }
+
+  const detailRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerLibraryDetailViewModelChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (detailRun.status !== 0) {
+    process.exit(detailRun.status ?? 1);
   }
 
   const providerRun = spawnSync(
@@ -168,6 +179,75 @@ try {
   }
 
   console.log("Writer library isolation checks: 1/1 passed.");
+
+  const writerLibraryDetailSource = readFileSync(
+    resolve(repoRoot, "src/writerLibraryDetailViewModel.ts"),
+    "utf8"
+  ).toLowerCase();
+  const detailRuntimeForbiddenPatterns = [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "writerlibraryreadonlyprovider",
+    "loadwriterpackagecatalog",
+    "getwriterpackagebyid",
+    "localstorage",
+    "sessionstorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "indexeddb",
+    "caches.",
+    "date.now",
+    "new date",
+    "performance.",
+    "settimeout",
+    "setinterval",
+    "math.random",
+    "crypto.",
+    "console.",
+    "setitem",
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "deletewriter"
+  ];
+  const detailNetworkForbiddenPatterns = [
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "http://",
+    "https://",
+    "googledrive"
+  ];
+  let detailIsolationChecks = 0;
+
+  for (const pattern of detailRuntimeForbiddenPatterns) {
+    if (writerLibraryDetailSource.includes(pattern)) {
+      throw new Error(`Writer Library detail view model contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  detailIsolationChecks += 1;
+
+  for (const pattern of detailNetworkForbiddenPatterns) {
+    if (writerLibraryDetailSource.includes(pattern)) {
+      throw new Error(`Writer Library detail view model contains forbidden network dependency: ${pattern}`);
+    }
+  }
+  detailIsolationChecks += 1;
+
+  for (const pattern of ["detailsbyid", "record<", "new map", "map<"]) {
+    if (writerLibraryDetailSource.includes(pattern)) {
+      throw new Error(`B5.1 detail view model contains future B5.2 snapshot behavior: ${pattern}`);
+    }
+  }
+  detailIsolationChecks += 1;
+
+  console.log(
+    `Writer library detail isolation checks: ${detailIsolationChecks}/${detailIsolationChecks} passed.`
+  );
 
   const writerLibraryProviderSource = readFileSync(
     resolve(repoRoot, "src/writerLibraryReadOnlyProvider.ts"),

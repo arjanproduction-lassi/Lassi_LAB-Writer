@@ -1,5 +1,24 @@
 # Worklog
 
+## 2026-07-24 - Phase B5.1 pure read-only detail adapter (local only)
+
+- Added a pure `WriterPackage -> WriterLibraryDetail` adapter that copies only
+  presentation fields and reuses B1 title/origin rules.
+- Copied live notes into new frozen objects, excluded deleted notes, preserved
+  empty live notes and note order, and kept each layer text exact without
+  fallback copying.
+- Added a pure frozen detail-array builder that filters top-level tombstones and
+  preserves catalog order without sorting, deduplication, or collision logic.
+- Added 24 artificial detail checks and 3 static isolation checks. The complete
+  product-shell harness now passes 112/112 while the existing B1-B4 totals stay
+  unchanged.
+- B5.1 reads no storage, browser global, current time, randomness, network, or
+  Google Drive. It does not create `detailsById` and is not connected to B2,
+  React, ProductShell, or production App.
+- Local only: not staged, committed, pushed, or deployed. The next separately
+  reviewed step is B5.2, one immutable `items + detailsById` snapshot from one
+  injected catalog load.
+
 ## 2026-07-23 - Phase B5 read-only detail contract (docs only)
 
 - Inventoried the published B4 path from the single injected

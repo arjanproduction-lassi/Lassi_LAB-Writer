@@ -39,6 +39,11 @@ active and context panel, while mobile shows one layer panel at a time. Legacy
 items say `Pôvodná Iskra`, empty layers use calm truthful copy, and no UI claims
 autosave or successful storage work.
 
+Local B5.1 now prepares only the pure immutable detail data needed by that
+future experience. It is not connected to the provider or React, so real cards
+remain inactive and no read-only Dielňa opens yet. B5.2 must first create one
+typed `items + detailsById` snapshot from the existing single catalog load.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

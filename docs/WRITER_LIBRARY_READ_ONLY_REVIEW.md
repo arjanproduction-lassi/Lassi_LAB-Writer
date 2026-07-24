@@ -9,9 +9,10 @@ fixture/real-read-only mode boundary. B4 is published at
 `08b06848e712bac3499d397e50cee5ca4c62a439`: only the exact DEV
 real-read-only mode loads the existing catalog and renders a read-only
 Knižnica. None of these steps writes storage or changes production App,
-import, export, recovery, persistence, or Google Drive. The docs-only B5 detail
-contract is defined separately in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`;
-B5 runtime is not implemented.
+import, export, recovery, persistence, or Google Drive. The published B5 detail
+contract is defined separately in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
+Its pure B5.1 detail adapter is prepared locally but is not connected to the
+provider, React, or UI; B5.2-B5.5 are not implemented.
 
 Phase B may read existing local content and display it in the isolated
 `product-shell.html` experience. It may not create, edit, migrate, delete,
@@ -570,5 +571,7 @@ default and fails closed outside exact DEV selection. Published B4 connects B2
 only inside that isolated real-read-only mode, renders no fixture content as
 real, and performs no writes. The separately reviewed B5 contract keeps the
 single loader call and adds immutable detail presentation from the same
-in-memory catalog. Its smallest future implementation step is the pure B5.1
-detail adapter and artificial checks; no B5 runtime exists yet.
+in-memory catalog. Local B5.1 now contains only the pure, deeply immutable
+detail and detail-array adapters with artificial checks. It creates no
+`detailsById` index and changes no provider or React code. The smallest next
+implementation is the separately reviewed B5.2 one-call snapshot.
