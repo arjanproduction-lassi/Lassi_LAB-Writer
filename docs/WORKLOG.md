@@ -1,6 +1,23 @@
 # Worklog
 
-## 2026-07-24 - Phase B5.2 immutable read-only Library snapshot (local only)
+## 2026-07-24 - Phase B5.3 pure read-only selection model (local only)
+
+- Added a pure immutable state for one optional `selectedPackageId` and one of
+  the four detail layers, initially `null / spark`.
+- Added frozen select, layer, and return transitions. Selecting a work resets
+  the layer to `spark`; returning clears the ID and also resets to `spark`.
+- Added a pure resolver over the existing B5.2 `detailsById`. It returns
+  `library`, `detail`, or `missing-detail`, uses an own-property lookup, safely
+  supports `__proto__`, and reuses the original frozen detail reference.
+- Added 26 artificial behavior checks and 5 static isolation checks, bringing
+  the complete product-shell harness from 143/143 to 174/174.
+- No loader, provider, storage, persistence, React, UI, CSS, time, randomness,
+  logging, network, or Google Drive behavior was added. Selection is not
+  persisted and missing-detail triggers no new load.
+- Local only: not staged, committed, pushed, or deployed. The next separately
+  reviewed step is B5.4, the read-only detail UI for PC and mobile.
+
+## 2026-07-24 - Phase B5.2 immutable read-only Library snapshot
 
 - Added a pure `WriterLibraryReadOnlySnapshot` builder that creates the
   published B1 items and B5.1 details from the exact same supplied catalog.
@@ -17,8 +34,8 @@
 - Added 28 artificial snapshot checks and 3 static isolation checks. The full
   product-shell harness now passes 143/143; existing B1, B2, B4, and B5.1 test
   counts remain unchanged.
-- Local only: not staged, committed, pushed, or deployed. The next separately
-  reviewed step is B5.3, the local selection model.
+- Published at `8ec9fe3431ee71aab78085cca07661dc25c31633`. Its snapshot
+  and provider contracts remain unchanged by B5.3.
 
 ## 2026-07-24 - Phase B5.1 pure read-only detail adapter
 

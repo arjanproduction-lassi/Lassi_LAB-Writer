@@ -6,9 +6,11 @@ This document defines the proposed Phase B5 contract for opening one work from
 the already loaded read-only Writer Library snapshot. The contract was
 published at `e40eb9b5d7b8724818e9c975956013f50efc91b8`. B5.1 is published at
 `bbdebc1779faeb355d785245780f9f11e0aa0b64` as a pure, deeply immutable
-detail adapter. B5.2 is now prepared locally as the one-load immutable snapshot
-and provider result. It is not staged, committed, pushed, deployed, or used by
-detail selection or React detail UI. B5.3-B5.5 remain unimplemented.
+detail adapter. B5.2 is published at
+`8ec9fe3431ee71aab78085cca07661dc25c31633` as the one-load immutable snapshot
+and provider result. B5.3 is now prepared locally as a pure immutable selection,
+layer, and resolution model. It is not staged, committed, pushed, deployed, or
+connected to React detail UI. B5.4-B5.5 remain unimplemented.
 
 The only future runtime in scope is the isolated development entry:
 
@@ -539,8 +541,9 @@ data to React. Those boundaries remain unchanged inside B5.1.
 
 ### B5.2 - one immutable Library snapshot
 
-- Prepared locally in `src/writerLibraryReadOnlySnapshot.ts` with artificial
-  checks in `src/writerLibraryReadOnlySnapshotChecks.ts`.
+- Published at `8ec9fe3431ee71aab78085cca07661dc25c31633` in
+  `src/writerLibraryReadOnlySnapshot.ts` with artificial checks in
+  `src/writerLibraryReadOnlySnapshotChecks.ts`.
 - Evolves the B2 ready result to one `WriterLibraryReadOnlySnapshot` after the
   injected loader is called exactly once.
 - Builds the existing B1 `items` and B5.1 details from that same catalog.
@@ -562,11 +565,20 @@ published provider result and deserves an independent review.
 
 ### B5.3 - local selection model
 
-- add pure/local `selectedPackageId` and layer transitions;
-- define missing-detail behavior;
-- prove click, return, and layer change invoke no loader or storage;
-- do not render the detail UI yet beyond a testable presentation state if that
-  keeps the commit small.
+- Prepared locally in `src/writerLibraryReadOnlySelection.ts` with artificial
+  checks in `src/writerLibraryReadOnlySelectionChecks.ts`.
+- Adds one frozen state with `selectedPackageId` and `activeLayer`, initially
+  `null / spark`.
+- Selecting an ID and returning to Knižnica both reset the active layer to
+  `spark`; layer transitions preserve the selected ID.
+- Resolves only against the supplied `snapshot.detailsById` through a safe
+  own-property lookup and returns `library`, `detail`, or `missing-detail`.
+- Reuses the existing frozen B5.1 detail without cloning or changing it.
+- Adds 26 behavior checks and 5 isolation checks, bringing the complete
+  product-shell harness from 143/143 to 174/174.
+- Performs no loader/provider call, storage read/write, persistence, logging,
+  network, React, UI, or CSS work. `selectedPackageId` is not persisted and
+  remains reserved for future local React state.
 
 ### B5.4 - read-only detail UI
 
@@ -612,6 +624,8 @@ deeply immutable snapshot: existing ordered B1 items plus a frozen detail index
 for those same live IDs. React will receive only presentation models. Opening,
 returning, and switching layers remain future local in-memory actions that must
 never read or write storage. Published B5.1 supplies the pure immutable detail
-and array builder. Local B5.2 supplies the one-call `items + detailsById`
-provider snapshot while B4 continues to use only its items. The smallest next
-implementation after separate approval is B5.3, the local selection model.
+and array builder, and published B5.2 supplies the one-call
+`items + detailsById` provider snapshot. Local B5.3 now supplies only the pure
+selection/layer/resolution model while B4 continues to use only snapshot items.
+The smallest next implementation after separate approval is B5.4, the
+read-only detail UI for PC and mobile.

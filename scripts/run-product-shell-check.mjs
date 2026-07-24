@@ -48,6 +48,7 @@ try {
       "src/writerLibraryViewModelChecks.ts",
       "src/writerLibraryDetailViewModelChecks.ts",
       "src/writerLibraryReadOnlySnapshotChecks.ts",
+      "src/writerLibraryReadOnlySelectionChecks.ts",
       "src/writerLibraryReadOnlyProviderChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
@@ -95,6 +96,16 @@ try {
 
   if (snapshotRun.status !== 0) {
     process.exit(snapshotRun.status ?? 1);
+  }
+
+  const selectionRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerLibraryReadOnlySelectionChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (selectionRun.status !== 0) {
+    process.exit(selectionRun.status ?? 1);
   }
 
   const providerRun = spawnSync(
@@ -331,6 +342,101 @@ try {
 
   console.log(
     `Writer library snapshot isolation checks: ${snapshotIsolationChecks}/${snapshotIsolationChecks} passed.`
+  );
+
+  const writerLibrarySelectionSource = readFileSync(
+    resolve(repoRoot, "src/writerLibraryReadOnlySelection.ts"),
+    "utf8"
+  ).toLowerCase();
+  let selectionIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "usestate",
+    "usereducer",
+    "useeffect"
+  ]) {
+    if (writerLibrarySelectionSource.includes(pattern)) {
+      throw new Error(`Writer Library selection contains forbidden React dependency: ${pattern}`);
+    }
+  }
+  selectionIsolationChecks += 1;
+
+  for (const pattern of [
+    "localstorage",
+    "sessionstorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "indexeddb",
+    "urlsearchparams",
+    "date.now",
+    "new date",
+    "performance.",
+    "math.random",
+    "crypto."
+  ]) {
+    if (writerLibrarySelectionSource.includes(pattern)) {
+      throw new Error(`Writer Library selection contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  selectionIsolationChecks += 1;
+
+  for (const pattern of [
+    "writerlibraryreadonlyprovider",
+    "loadwriterlibraryreadonly",
+    "loadwriterpackagecatalog",
+    "getwriterpackagebyid",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "http://",
+    "https://",
+    "googledrive",
+    "console."
+  ]) {
+    if (writerLibrarySelectionSource.includes(pattern)) {
+      throw new Error(`Writer Library selection contains forbidden data source: ${pattern}`);
+    }
+  }
+  selectionIsolationChecks += 1;
+
+  for (const pattern of [
+    "setitem",
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "deletewriter",
+    "persist",
+    "cookie"
+  ]) {
+    if (writerLibrarySelectionSource.includes(pattern)) {
+      throw new Error(`Writer Library selection contains forbidden persistence behavior: ${pattern}`);
+    }
+  }
+  selectionIsolationChecks += 1;
+
+  for (const pattern of [
+    "from \"./productshell",
+    "from './productshell",
+    "classname",
+    "onclick",
+    "<button",
+    "<textarea",
+    "<input",
+    ".css"
+  ]) {
+    if (writerLibrarySelectionSource.includes(pattern)) {
+      throw new Error(`Writer Library selection contains forbidden UI behavior: ${pattern}`);
+    }
+  }
+  selectionIsolationChecks += 1;
+
+  console.log(
+    `Writer library selection isolation checks: ${selectionIsolationChecks}/${selectionIsolationChecks} passed.`
   );
 
   const writerLibraryProviderSource = readFileSync(

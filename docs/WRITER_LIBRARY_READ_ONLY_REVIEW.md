@@ -12,10 +12,11 @@ Knižnica. None of these steps writes storage or changes production App,
 import, export, recovery, persistence, or Google Drive. The published B5 detail
 contract is defined separately in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
 Its pure B5.1 detail adapter is published at
-`bbdebc1779faeb355d785245780f9f11e0aa0b64`. Local B5.2 evolves the existing
-B2 ready result to one immutable `items + detailsById` snapshot from the same
-single injected load. B4 consumes only `snapshot.items`; B5.3-B5.5 are not
-implemented and no real detail opens.
+`bbdebc1779faeb355d785245780f9f11e0aa0b64`, and its one-load immutable B5.2
+snapshot is published at `8ec9fe3431ee71aab78085cca07661dc25c31633`.
+Local B5.3 adds only a pure selection/layer/resolution model over
+`snapshot.detailsById`. B4 still consumes only `snapshot.items`; B5.4-B5.5 are
+not implemented and no real detail opens.
 
 Phase B may read existing local content and display it in the isolated
 `product-shell.html` experience. It may not create, edit, migrate, delete,
@@ -574,9 +575,10 @@ default and fails closed outside exact DEV selection. Published B4 connects B2
 only inside that isolated real-read-only mode, renders no fixture content as
 real, and performs no writes. The separately reviewed B5 contract keeps the
 single loader call and adds immutable detail presentation from the same
-in-memory catalog. Published B5.1 contains only the pure, deeply immutable
-detail and detail-array adapters. Local B5.2 creates the frozen null-prototype
-`detailsById` index beside the unchanged B1 item result, rejects duplicate IDs
-as an invalid snapshot, and passes no raw package or loader to React. B4 still
-reads only the item array. The smallest next implementation is the separately
-reviewed B5.3 local selection model.
+in-memory catalog. Published B5.1 contains the pure, deeply immutable detail
+adapters, and published B5.2 creates the frozen null-prototype `detailsById`
+index beside the unchanged B1 item result. Local B5.3 resolves an optional ID
+only against that index, preserves the frozen detail reference, and never
+loads, persists, or renders anything. B4 still reads only the item array. The
+smallest next implementation is the separately reviewed B5.4 read-only detail
+UI for PC and mobile.

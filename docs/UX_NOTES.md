@@ -39,11 +39,14 @@ active and context panel, while mobile shows one layer panel at a time. Legacy
 items say `Pôvodná Iskra`, empty layers use calm truthful copy, and no UI claims
 autosave or successful storage work.
 
-Published B5.1 prepares the pure immutable detail data needed by that future
-experience. Local B5.2 now combines it with the existing B1 items in one typed,
-deeply immutable `items + detailsById` snapshot from the existing single
-catalog load. B4 deliberately consumes only `snapshot.items`: real cards remain
-inactive, no selection exists, and no read-only Dielňa opens yet.
+Published B5.1 prepares the pure immutable detail data and published B5.2
+combines it with the existing B1 items in one deeply immutable
+`items + detailsById` snapshot from the single catalog load. Local B5.3 prepares
+the pure state rules for selecting an ID, resetting each opened work to Iskra,
+switching the four layers, returning to Knižnica, and reporting a missing detail
+without reloading. The selected ID is not persisted and will live only in
+future local React state. B4 remains unchanged: real cards are inactive and no
+read-only Dielňa opens yet.
 
 ## Four Notebook Comfort
 
