@@ -1,6 +1,24 @@
 # Worklog
 
-## 2026-07-24 - Phase B5.3 pure read-only selection model (local only)
+## 2026-07-24 - Phase B5.4 read-only detail UI (local only)
+
+- Connected the published B5.3 selection model to the isolated exact DEV
+  `real-read-only` Library using local React state and the already-loaded B5.2
+  snapshot only.
+- Enabled `Pokračovať` and Library cards to open static detail, added the four
+  layer buttons, PC context/active panels, mobile active-only layout, return to
+  Knižnica, truthful empty states, legacy origin label, and safe missing-detail
+  copy.
+- Added no editor, input, save, autosave, second loader, storage read/write,
+  persistence, production entry, or Google Drive behavior. `Nová iskra` remains
+  disabled and fixture mode remains unchanged.
+- Added 17 artificial detail-presentation checks and 9 new static isolation
+  checks. The product-shell harness now passes 200/200 while all earlier 174
+  checks remain present.
+- Local only: not staged, committed, pushed, or deployed. B5.5 synthetic
+  integration and final isolation review is the next separate gate.
+
+## 2026-07-24 - Phase B5.3 pure read-only selection model
 
 - Added a pure immutable state for one optional `selectedPackageId` and one of
   the four detail layers, initially `null / spark`.
@@ -14,8 +32,8 @@
 - No loader, provider, storage, persistence, React, UI, CSS, time, randomness,
   logging, network, or Google Drive behavior was added. Selection is not
   persisted and missing-detail triggers no new load.
-- Local only: not staged, committed, pushed, or deployed. The next separately
-  reviewed step is B5.4, the read-only detail UI for PC and mobile.
+- Published at `22973efd5c0b6a49f51d0a954073ffb603b31345`. Its pure model
+  remains unchanged by the local B5.4 UI.
 
 ## 2026-07-24 - Phase B5.2 immutable read-only Library snapshot
 

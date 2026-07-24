@@ -799,7 +799,7 @@ blockquote {
   opacity: 1;
 }
 
-.prototype-read-only-card:hover {
+.prototype-read-only-card:disabled:hover {
   border-color: var(--prototype-border);
   transform: none;
 }
@@ -833,7 +833,65 @@ blockquote {
   color: var(--prototype-muted);
 }
 
+.prototype-read-only-titlebar {
+  align-items: center;
+}
+
+.prototype-read-only-title {
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+}
+
+.prototype-read-only-title h1 {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.5rem, 3vw, 2.35rem);
+  line-height: 1.1;
+}
+
+.prototype-read-only-title-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.prototype-read-only-updated {
+  color: var(--prototype-subtle);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.prototype-read-only-workspace {
+  min-height: calc(100vh - 14rem);
+}
+
+.prototype-read-only-text {
+  max-width: 100%;
+  color: var(--prototype-text);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.prototype-context-panel .prototype-read-only-text {
+  color: var(--prototype-muted);
+}
+
+.prototype-read-only-layer .prototype-note-preview:last-child {
+  border-bottom: 0;
+}
+
 .prototype-primary-button:disabled,
 .prototype-main-nav button:disabled {
   opacity: 0.72;
+}
+
+@media (max-width: 760px) {
+  .prototype-read-only-updated {
+    white-space: normal;
+  }
+
+  .prototype-read-only-workspace {
+    min-height: auto;
+  }
 }

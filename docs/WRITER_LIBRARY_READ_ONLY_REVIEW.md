@@ -14,9 +14,10 @@ contract is defined separately in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
 Its pure B5.1 detail adapter is published at
 `bbdebc1779faeb355d785245780f9f11e0aa0b64`, and its one-load immutable B5.2
 snapshot is published at `8ec9fe3431ee71aab78085cca07661dc25c31633`.
-Local B5.3 adds only a pure selection/layer/resolution model over
-`snapshot.detailsById`. B4 still consumes only `snapshot.items`; B5.4-B5.5 are
-not implemented and no real detail opens.
+B5.3 is published at `22973efd5c0b6a49f51d0a954073ffb603b31345` as the
+pure selection/layer/resolution model over `snapshot.detailsById`. Local B5.4
+connects only that model and snapshot to the isolated read-only detail UI;
+B5.5 final synthetic integration remains pending.
 
 Phase B may read existing local content and display it in the isolated
 `product-shell.html` experience. It may not create, edit, migrate, delete,
@@ -577,8 +578,8 @@ real, and performs no writes. The separately reviewed B5 contract keeps the
 single loader call and adds immutable detail presentation from the same
 in-memory catalog. Published B5.1 contains the pure, deeply immutable detail
 adapters, and published B5.2 creates the frozen null-prototype `detailsById`
-index beside the unchanged B1 item result. Local B5.3 resolves an optional ID
-only against that index, preserves the frozen detail reference, and never
-loads, persists, or renders anything. B4 still reads only the item array. The
-smallest next implementation is the separately reviewed B5.4 read-only detail
-UI for PC and mobile.
+index beside the unchanged B1 item result. Published B5.3 resolves an optional
+ID only against that index and preserves the frozen detail reference. Local
+B5.4 uses it to open static read-only detail, switch layers, and return without
+a second load or write. Fixture and production remain unchanged. The smallest
+next step is B5.5 synthetic integration and final isolation review.

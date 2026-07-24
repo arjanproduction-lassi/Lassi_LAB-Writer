@@ -24,9 +24,9 @@ Knižnica. It loads only under exact DEV selection and writes nothing. The B5
 detail contract is defined in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
 Published B5.1 supplies pure immutable detail presentation data and published
 B5.2 supplies one immutable item/detail snapshot from the existing one-call
-provider. Local B5.3 prepares only selection, layer transitions, and safe
-missing-detail resolution; real cards remain inactive and no detail experience
-is rendered.
+provider. B5.3 is published at `22973efd5c0b6a49f51d0a954073ffb603b31345`.
+Local B5.4 opens static read-only detail from that already-loaded snapshot,
+switches the four layers, and returns without another load or any write.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
@@ -78,7 +78,7 @@ The first code bridge is intentionally small:
 - do not change the Writer DB export/import format yet
 - do not change Google Drive sync payloads yet
 
-Next implementation decision after local B5.3 review:
+Next implementation decision after local B5.4 review:
 
 - B5.1 is published at `bbdebc1779faeb355d785245780f9f11e0aa0b64` as a
   pure immutable `WriterLibraryDetail` adapter and order-preserving detail-array
@@ -86,11 +86,12 @@ Next implementation decision after local B5.3 review:
 - B5.2 is published at `8ec9fe3431ee71aab78085cca07661dc25c31633` as one
   frozen snapshot containing B1-ordered `items` and immutable `detailsById`
   from one catalog load
-- B5.3 is prepared locally as a pure immutable selection/layer model with safe
-  own-property detail lookup and no loader, provider, storage, React, or UI
-- after a separate approval, implement B5.4 only: read-only detail UI for PC
-  and mobile using future local React state
-- keep B5.5 synthetic integration as a separately reviewed later step
+- B5.3 is published at `22973efd5c0b6a49f51d0a954073ffb603b31345` as a pure
+  immutable selection/layer model with safe own-property detail lookup
+- B5.4 is prepared locally as read-only PC/mobile detail using only local React
+  state and the existing snapshot; it remains uncommitted and unpublished
+- perform B5.5 synthetic integration and final isolation review as the next
+  separately approved step, adding no new behavior
 - never re-read by ID, create editable copies, add autosave, or change the
   production App in B5
 

@@ -8,9 +8,11 @@ published at `e40eb9b5d7b8724818e9c975956013f50efc91b8`. B5.1 is published at
 `bbdebc1779faeb355d785245780f9f11e0aa0b64` as a pure, deeply immutable
 detail adapter. B5.2 is published at
 `8ec9fe3431ee71aab78085cca07661dc25c31633` as the one-load immutable snapshot
-and provider result. B5.3 is now prepared locally as a pure immutable selection,
-layer, and resolution model. It is not staged, committed, pushed, deployed, or
-connected to React detail UI. B5.4-B5.5 remain unimplemented.
+and provider result. B5.3 is published at
+`22973efd5c0b6a49f51d0a954073ffb603b31345` as the pure immutable selection,
+layer, and resolution model. B5.4 is prepared locally as the isolated read-only
+React detail UI over that model and the already-loaded snapshot. It is not
+staged, committed, pushed, or deployed. B5.5 remains pending.
 
 The only future runtime in scope is the isolated development entry:
 
@@ -563,9 +565,10 @@ data to React. Those boundaries remain unchanged inside B5.1.
 Keep B5.1 and B5.2 separate. B5.1 is a pure mapping contract; B5.2 changes the
 published provider result and deserves an independent review.
 
-### B5.3 - local selection model
+### B5.3 - published selection model
 
-- Prepared locally in `src/writerLibraryReadOnlySelection.ts` with artificial
+- Published at `22973efd5c0b6a49f51d0a954073ffb603b31345` in
+  `src/writerLibraryReadOnlySelection.ts` with artificial
   checks in `src/writerLibraryReadOnlySelectionChecks.ts`.
 - Adds one frozen state with `selectedPackageId` and `activeLayer`, initially
   `null / spark`.
@@ -578,18 +581,23 @@ published provider result and deserves an independent review.
   product-shell harness from 143/143 to 174/174.
 - Performs no loader/provider call, storage read/write, persistence, logging,
   network, React, UI, or CSS work. `selectedPackageId` is not persisted and
-  remains reserved for future local React state.
+  is now consumed only as local React state by the uncommitted B5.4 UI.
 
 ### B5.4 - read-only detail UI
 
-- enable real cards only for local selection;
-- add PC active/context panels and mobile one-panel layout;
-- render static layer content, empty states, legacy label, and safe error state;
-- keep fixture UI and CSS behavior isolated and unchanged where possible.
-
-B5.3 and B5.4 should remain separate unless the selection model is so small
-that reviewing it without its only consumer would reduce clarity. Even then,
-the combined commit must retain pure transition checks.
+- Prepared locally in the isolated exact DEV `real-read-only` experience only.
+- Enables the real Library cards and `Pokračovať` only to select an ID in local
+  React state; every open starts on `Iskra` and resolves against the existing
+  `snapshot.detailsById` without another loader call.
+- Adds a separate presentational detail component with four pressed-state layer
+  buttons, PC context plus active panels, and a mobile active panel only.
+- Renders exact static text, live notes in existing order, truthful empty-layer
+  copy, `Pôvodná Iskra`, and the safe `missing-detail` return state.
+- Keeps `Nová iskra` disabled and adds no input, editor, save, autosave,
+  persistence, storage API, production wiring, or Google Drive behavior.
+- Adds 17 artificial detail-presentation checks and expands the static
+  read-only isolation group from 8 to 17, bringing the harness from 174/174 to
+  200/200.
 
 ### B5.5 - synthetic integration and final isolation review
 
@@ -621,11 +629,12 @@ B5 does not add:
 Evolve the existing B2 ready result rather than create a second provider. One
 injected `loadWriterPackageCatalog()` call before React render will produce one
 deeply immutable snapshot: existing ordered B1 items plus a frozen detail index
-for those same live IDs. React will receive only presentation models. Opening,
-returning, and switching layers remain future local in-memory actions that must
-never read or write storage. Published B5.1 supplies the pure immutable detail
+for those same live IDs. React receives only presentation models. Opening,
+returning, and switching layers are local in-memory actions that never read or
+write storage. Published B5.1 supplies the pure immutable detail
 and array builder, and published B5.2 supplies the one-call
-`items + detailsById` provider snapshot. Local B5.3 now supplies only the pure
-selection/layer/resolution model while B4 continues to use only snapshot items.
-The smallest next implementation after separate approval is B5.4, the
-read-only detail UI for PC and mobile.
+`items + detailsById` provider snapshot. Published B5.3 supplies the pure
+selection/layer/resolution model. Local B5.4 now connects that model to static
+detail presentation over the same snapshot only; it remains uncommitted and
+unpublished. The smallest next step is B5.5 synthetic integration and final
+isolation review, without adding product behavior.

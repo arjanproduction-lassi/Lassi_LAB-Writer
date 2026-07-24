@@ -49,7 +49,8 @@ try {
       "src/writerLibraryDetailViewModelChecks.ts",
       "src/writerLibraryReadOnlySnapshotChecks.ts",
       "src/writerLibraryReadOnlySelectionChecks.ts",
-      "src/writerLibraryReadOnlyProviderChecks.ts"
+      "src/writerLibraryReadOnlyProviderChecks.ts",
+      "src/productShellReadOnlyDetailChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -136,6 +137,16 @@ try {
 
   if (readOnlyLibraryRun.status !== 0) {
     process.exit(readOnlyLibraryRun.status ?? 1);
+  }
+
+  const readOnlyDetailRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "productShellReadOnlyDetailChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (readOnlyDetailRun.status !== 0) {
+    process.exit(readOnlyDetailRun.status ?? 1);
   }
 
   let isolationChecks = 0;
@@ -574,11 +585,37 @@ try {
     resolve(repoRoot, "src/productShellReadOnlyLibraryChecks.ts"),
     "utf8"
   );
+  const readOnlyDetailUiSource = readFileSync(
+    resolve(repoRoot, "src/ProductShellReadOnlyDetailView.tsx"),
+    "utf8"
+  );
+  const readOnlyDetailModelSource = readFileSync(
+    resolve(repoRoot, "src/productShellReadOnlyDetail.ts"),
+    "utf8"
+  );
+  const readOnlyDetailChecksSource = readFileSync(
+    resolve(repoRoot, "src/productShellReadOnlyDetailChecks.ts"),
+    "utf8"
+  );
+  const readOnlySelectionSource = readFileSync(
+    resolve(repoRoot, "src/writerLibraryReadOnlySelection.ts"),
+    "utf8"
+  );
+  const productShellCssSource = readFileSync(
+    resolve(repoRoot, "src/productShellPrototype.css"),
+    "utf8"
+  );
   const compactReadOnlyUiSource = readOnlyUiSource.replace(/\s+/g, " ");
+  const readOnlyRuntimeUiSource = [readOnlyUiSource, readOnlyDetailUiSource]
+    .join("\n")
+    .toLowerCase();
   const b4RuntimeSource = [
     productShellMainSource,
     readOnlyAssemblySource,
-    readOnlyUiSource
+    readOnlyUiSource,
+    readOnlyDetailUiSource,
+    readOnlyDetailModelSource,
+    readOnlySelectionSource
   ].join("\n").toLowerCase();
   let readOnlyLibraryIsolationChecks = 0;
 
@@ -606,13 +643,12 @@ try {
 
   if (
     !readOnlyUiSource.includes("prototype-read-only-card") ||
-    !readOnlyUiSource.includes("disabled") ||
+    !readOnlyUiSource.includes("onClick={() => onOpen(item.id)}") ||
     !readOnlyUiSource.includes("item.noteCount") ||
     readOnlyUiSource.includes("openPackage") ||
-    readOnlyUiSource.includes("FixtureProductShellPrototype") ||
-    readOnlyUiSource.includes("onClick")
+    readOnlyUiSource.includes("FixtureProductShellPrototype")
   ) {
-    throw new Error("Real Library cards must not open fixture or editable detail.");
+    throw new Error("Real Library cards must open only the read-only selected detail.");
   }
   readOnlyLibraryIsolationChecks += 1;
 
@@ -662,10 +698,119 @@ try {
   }
   readOnlyLibraryIsolationChecks += 1;
 
-  for (const pattern of ["getWriterPackageById", "<textarea", "<input", "onChange="]) {
-    if (readOnlyUiSource.includes(pattern)) {
-      throw new Error(`B5 detail or editing leaked into B4: ${pattern}`);
+  for (const pattern of [
+    "getwriterpackagebyid",
+    "<textarea",
+    "<input",
+    "contenteditable",
+    "onchange="
+  ]) {
+    if (readOnlyRuntimeUiSource.includes(pattern)) {
+      throw new Error(`Editable or second-loader behavior leaked into B5.4: ${pattern}`);
     }
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  for (const functionName of [
+    "createWriterLibraryReadOnlySelectionState",
+    "selectWriterLibraryDetail",
+    "setWriterLibraryDetailLayer",
+    "returnToWriterLibrary",
+    "resolveWriterLibraryReadOnlySelection"
+  ]) {
+    if (!readOnlyUiSource.includes(functionName)) {
+      throw new Error(`B5.4 UI must reuse the published selection model: ${functionName}`);
+    }
+  }
+  if (!readOnlyUiSource.includes("result.snapshot")) {
+    throw new Error("B5.4 detail resolution must use the already-loaded snapshot.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  if (
+    !readOnlyUiSource.includes("onOpen={openDetail}") ||
+    !readOnlyUiSource.includes("setWriterLibraryDetailLayer(current, layer)") ||
+    !readOnlyUiSource.includes("onReturnToLibrary={returnToLibrary}")
+  ) {
+    throw new Error("B5.4 click, layer, and return transitions are not fully wired.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  if (
+    !readOnlyDetailUiSource.includes("WRITER_LIBRARY_DETAIL_LAYER_OPTIONS.map") ||
+    !readOnlyDetailUiSource.includes("aria-pressed={activeLayer === layer.id}") ||
+    !readOnlyUiSource.includes('resolvedSelection?.status === "missing-detail"') ||
+    !readOnlyUiSource.includes("Dielo sa v tomto načítaní nepodarilo otvoriť.")
+  ) {
+    throw new Error("B5.4 must expose four pressed-state tabs and a safe missing-detail state.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  if (
+    !readOnlyDetailModelSource.includes('case "spark"') ||
+    !readOnlyDetailModelSource.includes('return "notes"') ||
+    !readOnlyDetailModelSource.includes('case "final"') ||
+    !readOnlyDetailModelSource.includes('return "workshop"')
+  ) {
+    throw new Error("B5.4 must keep the approved active-to-context layer mapping.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  if (
+    !productShellCssSource.includes("grid-template-columns: minmax(17rem, 34fr) minmax(0, 66fr)") ||
+    !productShellCssSource.includes("white-space: pre-wrap") ||
+    !productShellCssSource.includes("overflow-wrap: anywhere") ||
+    !productShellCssSource.includes("@media (max-width: 760px)") ||
+    !productShellCssSource.includes(".prototype-context-panel") ||
+    !productShellCssSource.includes("display: none")
+  ) {
+    throw new Error("B5.4 CSS must preserve the approved PC and one-panel mobile layout.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  for (const pattern of [
+    "loadwriterpackagecatalog",
+    "getwriterpackagebyid",
+    "writerpackagestorage",
+    "localstorage",
+    "setitem",
+    "removeitem",
+    "save",
+    "autosave"
+  ]) {
+    if (readOnlyRuntimeUiSource.includes(pattern)) {
+      throw new Error(`B5.4 UI contains a forbidden loader, storage, or write reference: ${pattern}`);
+    }
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  for (const pattern of [
+    "productshellreadonlydetailview",
+    "productshellreadonlydetail",
+    "writerlibraryreadonlyselection"
+  ]) {
+    if (productionReadOnlyEntries.includes(pattern)) {
+      throw new Error(`Production entries reference the B5.4 detail path: ${pattern}`);
+    }
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  if (
+    (productShellMainSource.match(/loadWriterPackageCatalog/g) ?? []).length !== 2 ||
+    (productShellMainSource.match(/catalogLoader: loadWriterPackageCatalog/g) ?? []).length !== 1
+  ) {
+    throw new Error("B5.4 must retain exactly one injected catalog-loader call site.");
+  }
+  readOnlyLibraryIsolationChecks += 1;
+
+  const lowerReadOnlyDetailChecksSource = readOnlyDetailChecksSource.toLowerCase();
+  if (
+    !lowerReadOnlyDetailChecksSource.includes("artificial") ||
+    lowerReadOnlyDetailChecksSource.includes("loadwriterpackagecatalog") ||
+    lowerReadOnlyDetailChecksSource.includes("writerpackagestorage") ||
+    lowerReadOnlyDetailChecksSource.includes("localstorage")
+  ) {
+    throw new Error("B5.4 checks must use only artificial in-memory detail data.");
   }
   readOnlyLibraryIsolationChecks += 1;
 

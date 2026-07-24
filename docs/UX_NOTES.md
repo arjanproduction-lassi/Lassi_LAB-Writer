@@ -41,12 +41,13 @@ autosave or successful storage work.
 
 Published B5.1 prepares the pure immutable detail data and published B5.2
 combines it with the existing B1 items in one deeply immutable
-`items + detailsById` snapshot from the single catalog load. Local B5.3 prepares
-the pure state rules for selecting an ID, resetting each opened work to Iskra,
-switching the four layers, returning to Knižnica, and reporting a missing detail
-without reloading. The selected ID is not persisted and will live only in
-future local React state. B4 remains unchanged: real cards are inactive and no
-read-only Dielňa opens yet.
+`items + detailsById` snapshot from the single catalog load. Published B5.3
+defines selecting an ID, resetting each opened work to Iskra, switching the
+four layers, returning to Knižnica, and reporting a missing detail. Local B5.4
+uses those rules in the isolated real mode: cards open a static read-only
+Dielňa, PC shows context plus active content, and mobile shows one active panel.
+The ID is local React state only; there is no second load, editor, save, or
+autosave, and `Nová iskra` stays disabled.
 
 ## Four Notebook Comfort
 

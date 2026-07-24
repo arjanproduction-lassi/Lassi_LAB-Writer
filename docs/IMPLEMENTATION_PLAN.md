@@ -34,11 +34,12 @@ single catalog load. B5.1 is published at
 WriterPackage-to-detail adapter plus a tombstone-filtering, order-preserving
 detail-array builder. B5.2 is published at
 `8ec9fe3431ee71aab78085cca07661dc25c31633` as the pure snapshot builder and
-one-load B2 provider result. Local B5.3 adds only a pure immutable selection and
-layer model with safe `missing-detail` resolution over `snapshot.detailsById`.
-It is not connected to React, so B4 still reads only `snapshot.items` and real
-cards remain inactive. The smallest future code slice is B5.4, the separately
-reviewed read-only detail UI.
+one-load B2 provider result. B5.3 is published at
+`22973efd5c0b6a49f51d0a954073ffb603b31345` as the pure immutable selection
+and layer model with safe `missing-detail` resolution. Local B5.4 connects that
+model to read-only cards and static PC/mobile detail over the same snapshot,
+without a second load or write. It is not staged, committed, pushed, or
+deployed. B5.5 synthetic integration is the next separate review gate.
 
 ## Completed v0.1 Slice
 
