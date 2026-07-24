@@ -27,10 +27,17 @@ The published B1 adapter prepares only immutable Library card data from an
 already supplied catalog. Published B2 adds a typed, one-call injected loader
 boundary and passes its result to B1 without exposing storage or write methods.
 Published B3 keeps fixtures as the default and permits exact
-`?mode=real-read-only` only in development. Local B4 uses that mode for a real
-read-only Knižnica with inactive creation and cards, truthful empty/failure
-copy, and no detail or writes. B5 will separately open one already loaded item
-read-only.
+`?mode=real-read-only` only in development. Published B4 uses that mode for a
+real read-only Knižnica with inactive creation and cards, truthful empty/failure
+copy, and no detail or writes.
+
+The docs-only B5 contract in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`
+separately defines read-only opening from the same single startup catalog
+snapshot. A click selects an immutable detail by ID in local React state; it
+does not call storage again or create an editable copy. PC keeps a read-only
+active and context panel, while mobile shows one layer panel at a time. Legacy
+items say `Pôvodná Iskra`, empty layers use calm truthful copy, and no UI claims
+autosave or successful storage work.
 
 ## Four Notebook Comfort
 

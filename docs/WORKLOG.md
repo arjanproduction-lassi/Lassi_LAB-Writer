@@ -1,6 +1,25 @@
 # Worklog
 
-## 2026-07-23 - Phase B4 real read-only Library (local only)
+## 2026-07-23 - Phase B5 read-only detail contract (docs only)
+
+- Inventoried the published B4 path from the single injected
+  `loadWriterPackageCatalog()` call before React render through the B2 provider
+  and into the real read-only Library component.
+- Confirmed that B2 currently returns only `WriterLibraryItem[]`; the local
+  catalog variable and full layer content are not available after mapping, and
+  disabled B4 cards have no click behavior.
+- Recommended evolving the existing B2 ready result into one deeply immutable
+  snapshot containing B1-ordered items and a read-only detail index built from
+  the same catalog load. A second provider, raw WriterPackages in React,
+  `getWriterPackageById()`, and reload-on-click are rejected.
+- Defined pure detail types, local ID-only selection, PC and mobile read-only
+  Dielňa behavior, truthful legacy/empty/error states, privacy boundaries,
+  checks, and B5.1-B5.5 review gates in
+  `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
+- Documentation only. No runtime, React, CSS, provider, storage, production App,
+  commit, push, or deploy is part of this review.
+
+## 2026-07-23 - Phase B4 real read-only Library
 
 - Added a small assembly boundary that calls the published B2 provider exactly
   once before React render only in exact DEV `real-read-only` mode.
@@ -11,8 +30,10 @@
 - Kept `Nová iskra` and real cards inactive. No real package opens, no selected
   ID is stored, and B5 detail does not exist.
 - Added only artificial assembly/presentation checks. Production App, storage
-  implementation, Writer DB, and Google Drive remain unchanged. B4 is not
-  staged, committed, pushed, or deployed.
+  implementation, Writer DB, and Google Drive remain unchanged. Published as
+  `08b06848e712bac3499d397e50cee5ca4c62a439` after 85/85 product-shell checks,
+  284/284 Writer DB checks, both builds, an isolated synthetic catalog test,
+  and production smoke verification passed.
 
 ## 2026-07-22 - Phase B3 development-only data mode
 

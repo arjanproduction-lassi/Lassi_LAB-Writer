@@ -603,7 +603,8 @@ Acceptance: navigation and hierarchy can be evaluated without touching user
 data or pretending the fixtures are real packages.
 
 Status: implemented as a separate fixture-only entry and manually reviewed on
-PC and mobile. Phase B real-data wiring still requires a separate decision.
+PC and mobile. The isolated Phase B read-only Knižnica is now also published;
+production navigation remains unchanged.
 
 ### Phase B — Library reads the existing package catalog
 
@@ -614,15 +615,19 @@ PC and mobile. Phase B real-data wiring still requires a separate decision.
 Acceptance: the same-id preference and legacy adapter behavior remain intact;
 opening is not yet allowed to mutate data.
 
-Design status: the docs-only boundary, view model, privacy rules, fixture/real
-mode isolation, and B1-B5 rollout are specified in
-`WRITER_LIBRARY_READ_ONLY_REVIEW.md`. No Phase B runtime wiring exists yet.
+Status: B1-B4 are published through
+`08b06848e712bac3499d397e50cee5ca4c62a439`. Exact DEV
+`?mode=real-read-only` performs one catalog load before React render and shows
+the real Knižnica without writes. The B5 read-only detail remains docs-only and
+is specified in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
 
 ### Phase C — open one real package read-only
 
 - Open a selected catalog item in the Workshop.
 - Display Iskra, notes, workshop text, and final text read-only.
 - Clearly handle legacy adapted packages whose later layers are empty.
+- Select only an immutable detail from the same single startup catalog snapshot;
+  do not reload storage on click, return, or layer change.
 
 Acceptance: one package ID remains the visible context across every layer and
 no stage mutation occurs.

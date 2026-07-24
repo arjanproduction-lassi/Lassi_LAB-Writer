@@ -18,8 +18,11 @@ not read or write production storage and does not replace the current runtime.
 Manual PC and mobile review approved its architecture as a baseline. The
 docs-only Phase B boundary is defined in `WRITER_LIBRARY_READ_ONLY_REVIEW.md`;
 the pure B1 view-model adapter, B2 injected provider, and B3 development-only
-mode boundary are published. B4 is prepared locally as an isolated real
-read-only Knižnica. It loads only under exact DEV selection and writes nothing.
+mode boundary are published. B4 is published at
+`08b06848e712bac3499d397e50cee5ca4c62a439` as an isolated real read-only
+Knižnica. It loads only under exact DEV selection and writes nothing. The B5
+detail proposal is docs-only in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md` and
+has no runtime implementation.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
@@ -71,11 +74,14 @@ The first code bridge is intentionally small:
 - do not change the Writer DB export/import format yet
 - do not change Google Drive sync payloads yet
 
-Next implementation decision after B4 review:
+Next implementation decision after the docs-only B5 review:
 
-- after a separate approval, implement B5 only: open one already loaded
-  catalog snapshot as read-only detail; do not re-read by ID, create editable
-  copies, add autosave, or change production App
+- after a separate approval, implement B5.1 only: a pure immutable
+  `WriterLibraryDetail` adapter with artificial checks
+- keep B5.2 provider snapshot, B5.3 local selection, B5.4 read-only UI, and
+  B5.5 synthetic integration as separately reviewed later steps
+- never re-read by ID, create editable copies, add autosave, or change the
+  production App in B5
 
 ## Closed Writer DB Technical Slice
 

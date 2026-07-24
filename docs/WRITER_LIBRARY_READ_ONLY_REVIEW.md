@@ -5,10 +5,13 @@
 This document defines Phase B: a read-only Knižnica backed by the existing
 WriterPackage catalog. B1 is published as a pure presentation adapter, B2 as a
 read-only provider with an injected loader, and B3 as the development-only
-fixture/real-read-only mode boundary. B4 is prepared locally: only the exact
-DEV real-read-only mode loads the existing catalog and renders a read-only
+fixture/real-read-only mode boundary. B4 is published at
+`08b06848e712bac3499d397e50cee5ca4c62a439`: only the exact DEV
+real-read-only mode loads the existing catalog and renders a read-only
 Knižnica. None of these steps writes storage or changes production App,
-import, export, recovery, persistence, or Google Drive.
+import, export, recovery, persistence, or Google Drive. The docs-only B5 detail
+contract is defined separately in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`;
+B5 runtime is not implemented.
 
 Phase B may read existing local content and display it in the isolated
 `product-shell.html` experience. It may not create, edit, migrate, delete,
@@ -467,9 +470,10 @@ checks.
 
 B2 covers the injected-loader, ready/failed, one-call, immutability,
 no-logging, and provider-isolation rules with artificial loaders. Published B3
-covers the fail-closed mode resolver. Local B4 covers one-call assembly before
-React render, fixture isolation, ordered read-only presentation, empty/failed
-states, inactive creation and detail, privacy, and production isolation.
+covers the fail-closed mode resolver. Published B4 covers one-call assembly
+before React render, fixture isolation, ordered read-only presentation,
+empty/failed states, inactive creation and detail, privacy, and production
+isolation.
 
 1. fixture mode remains the default and unchanged;
 2. unknown or production-mode query cannot activate local real data;
@@ -521,7 +525,7 @@ fixtures. B3 itself does not load a catalog or define storage behavior.
 
 ### B4 — Real read-only Knižnica
 
-Prepared locally. The isolated entry injects the existing
+Published at `08b06848e712bac3499d397e50cee5ca4c62a439`. The isolated entry injects the existing
 `loadWriterPackageCatalog()` into B2 only for exact DEV real-read-only mode and
 does so before React render. Fixture mode calls neither provider nor loader.
 The Knižnica preserves B1 order, shows at most one `Pokračovať` item, has
@@ -530,9 +534,13 @@ edit, save, migration, sync, import, or recovery behavior.
 
 ### B5 — Read-only package detail
 
-Open a selected visible catalog snapshot in Dielňa. Render all four layers and
-non-deleted notes read-only, with truthful legacy and empty-layer copy. Do not
-use `getWriterPackageById` as the universal path.
+The documentation-only contract is defined in
+`WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`. The recommended design evolves the
+existing B2 ready result into one immutable snapshot containing the current B1
+items and read-only details from the same single catalog load. Selection uses
+only a local ID lookup. It renders all four layers and non-deleted notes
+read-only, with truthful legacy and empty-layer copy, and never calls
+`getWriterPackageById` or reloads storage on click.
 
 B3 is kept separate as a reviewed fail-closed boundary before any catalog is
 loaded. B4 may connect the published provider only after B3 passes its own
@@ -551,14 +559,16 @@ author content adds a larger privacy and interaction surface.
 - recovery, persistence, rollback, or per-note merge;
 - new data formats, dependencies, routes, or storage keys;
 - screenshots, snapshots, logs, or fixtures containing real author text;
-- commit, push, deploy, or publication of this local B4 implementation slice.
+- commit, push, deploy, or runtime implementation in this B5 documentation slice.
 
 ## Decision Summary
 
-Phase B should read `loadWriterPackageCatalog()` through one injected provider,
-map its visible package-shaped results through the published pure B1 adapter,
-and keep the isolated shell read-only. Published B3 keeps fixture mode as the
-default and fails closed outside exact DEV selection. Local B4 connects B2
+Phase B reads `loadWriterPackageCatalog()` through one injected provider, maps
+its visible package-shaped results through the published pure B1 adapter, and
+keeps the isolated shell read-only. Published B3 keeps fixture mode as the
+default and fails closed outside exact DEV selection. Published B4 connects B2
 only inside that isolated real-read-only mode, renders no fixture content as
-real, and performs no writes. The smallest next implementation is B5: open one
-already loaded catalog snapshot as a separately reviewed read-only detail.
+real, and performs no writes. The separately reviewed B5 contract keeps the
+single loader call and adds immutable detail presentation from the same
+in-memory catalog. Its smallest future implementation step is the pure B5.1
+detail adapter and artificial checks; no B5 runtime exists yet.

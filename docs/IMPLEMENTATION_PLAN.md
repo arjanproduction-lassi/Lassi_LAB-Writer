@@ -23,10 +23,14 @@ published at `207801b17665a7669ffe52adb4887b5ed262b6b9` as a read-only provider
 that calls one injected loader and passes its result to B1. It has no write
 surface. B3 is published at `1fd2ac05065022a3a0a3d95307324b3bcbb34bd7` as
 the development-only, non-persistent fixture/real-read-only selector. B4 is
-prepared locally: exact DEV real-read-only mode injects the existing catalog
-loader into B2 once before React render and displays a read-only Knižnica;
-fixture and production behavior remain unchanged. The next future code slice
-is B5, read-only detail from the already loaded catalog snapshot.
+published at `08b06848e712bac3499d397e50cee5ca4c62a439`: exact DEV
+real-read-only mode injects the existing catalog loader into B2 once before
+React render and displays a read-only Knižnica; fixture and production behavior
+remain unchanged. The docs-only B5 contract is defined in
+`WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`. It recommends evolving the same B2
+ready result into one immutable `items + detailsById` snapshot built from that
+single catalog load. B5 is not implemented. Its smallest future code slice is
+B5.1, the pure detail adapter and artificial checks only.
 
 ## Completed v0.1 Slice
 
