@@ -29,11 +29,14 @@ React render and displays a read-only Knižnica; fixture and production behavior
 remain unchanged. The docs-only B5 contract is defined in
 `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`. It recommends evolving the same B2
 ready result into one immutable `items + detailsById` snapshot built from that
-single catalog load. B5.1 is prepared locally as a pure, deeply immutable
+single catalog load. B5.1 is published at
+`bbdebc1779faeb355d785245780f9f11e0aa0b64` as a pure, deeply immutable
 WriterPackage-to-detail adapter plus a tombstone-filtering, order-preserving
-detail-array builder. It has no storage, provider, React, or UI dependency and
-does not create `detailsById`. The smallest future code slice is B5.2, the
-separately reviewed one-call provider snapshot.
+detail-array builder. Local B5.2 now adds the separately reviewed pure snapshot
+builder and evolves the same B2 ready result to expose that snapshot after
+exactly one injected load. B4 still reads only `snapshot.items`; no selection,
+detail UI, React state, storage write, or production wiring is added. The
+smallest future code slice is B5.3, the local selection model.
 
 ## Completed v0.1 Slice
 

@@ -21,8 +21,10 @@ the pure B1 view-model adapter, B2 injected provider, and B3 development-only
 mode boundary are published. B4 is published at
 `08b06848e712bac3499d397e50cee5ca4c62a439` as an isolated real read-only
 Knižnica. It loads only under exact DEV selection and writes nothing. The B5
-detail proposal is docs-only in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md` and
-has no runtime implementation.
+detail contract is defined in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
+Published B5.1 supplies pure immutable detail presentation data. Local B5.2
+supplies one immutable item/detail snapshot from the existing one-call provider,
+but real cards remain inactive and no detail experience is rendered.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
@@ -74,15 +76,17 @@ The first code bridge is intentionally small:
 - do not change the Writer DB export/import format yet
 - do not change Google Drive sync payloads yet
 
-Next implementation decision after local B5.1 review:
+Next implementation decision after local B5.2 review:
 
-- B5.1 is prepared locally as a pure immutable `WriterLibraryDetail` adapter,
-  order-preserving detail-array builder, and artificial checks; it is not wired
-  to B2 or React and remains uncommitted
-- after a separate approval, implement B5.2 only: one provider snapshot with
+- B5.1 is published at `bbdebc1779faeb355d785245780f9f11e0aa0b64` as a
+  pure immutable `WriterLibraryDetail` adapter and order-preserving detail-array
+  builder
+- B5.2 is prepared locally: the provider returns one frozen snapshot containing
   B1-ordered `items` and immutable `detailsById` from one catalog load
-- keep B5.3 local selection, B5.4 read-only UI, and B5.5 synthetic integration
-  as separately reviewed later steps
+- after a separate approval, implement B5.3 only: pure/local selection and
+  layer transitions, including safe missing-detail behavior
+- keep B5.4 read-only UI and B5.5 synthetic integration as separately reviewed
+  later steps
 - never re-read by ID, create editable copies, add autosave, or change the
   production App in B5
 

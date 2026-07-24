@@ -1,6 +1,26 @@
 # Worklog
 
-## 2026-07-24 - Phase B5.1 pure read-only detail adapter (local only)
+## 2026-07-24 - Phase B5.2 immutable read-only Library snapshot (local only)
+
+- Added a pure `WriterLibraryReadOnlySnapshot` builder that creates the
+  published B1 items and B5.1 details from the exact same supplied catalog.
+- Added a frozen null-prototype `detailsById` lookup, verified one detail per
+  visible item, and rejected invalid duplicate IDs instead of silently
+  overwriting a detail.
+- Evolved the existing B2 ready result to expose the snapshot after exactly one
+  injected loader call. Existing empty and `failed/catalog-load-failed`
+  behavior remains stable; that public failure intentionally covers both loader
+  errors and snapshot construction or invariant-validation failures.
+- Kept B4 presentation on `snapshot.items` only. No selection, detail UI,
+  React state, second load, storage call, write, migration, or production
+  wiring was added.
+- Added 28 artificial snapshot checks and 3 static isolation checks. The full
+  product-shell harness now passes 143/143; existing B1, B2, B4, and B5.1 test
+  counts remain unchanged.
+- Local only: not staged, committed, pushed, or deployed. The next separately
+  reviewed step is B5.3, the local selection model.
+
+## 2026-07-24 - Phase B5.1 pure read-only detail adapter
 
 - Added a pure `WriterPackage -> WriterLibraryDetail` adapter that copies only
   presentation fields and reuses B1 title/origin rules.
@@ -13,11 +33,10 @@
   product-shell harness now passes 112/112 while the existing B1-B4 totals stay
   unchanged.
 - B5.1 reads no storage, browser global, current time, randomness, network, or
-  Google Drive. It does not create `detailsById` and is not connected to B2,
-  React, ProductShell, or production App.
-- Local only: not staged, committed, pushed, or deployed. The next separately
-  reviewed step is B5.2, one immutable `items + detailsById` snapshot from one
-  injected catalog load.
+  Google Drive. Its module does not create `detailsById` or import B2, React,
+  ProductShell, or production App; B5.2 now consumes its pure result.
+- Published at `bbdebc1779faeb355d785245780f9f11e0aa0b64`. Its detail mapping
+  contract remains pure and unchanged by B5.2.
 
 ## 2026-07-23 - Phase B5 read-only detail contract (docs only)
 

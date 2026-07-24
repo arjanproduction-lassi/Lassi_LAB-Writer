@@ -4,10 +4,11 @@
 
 This document defines the proposed Phase B5 contract for opening one work from
 the already loaded read-only Writer Library snapshot. The contract was
-published at `e40eb9b5d7b8724818e9c975956013f50efc91b8`. B5.1 is now prepared
-locally as a pure, deeply immutable detail adapter and artificial checks. It is
-not staged, committed, pushed, deployed, connected to the B2 provider, or
-connected to React. B5.2-B5.5 remain unimplemented.
+published at `e40eb9b5d7b8724818e9c975956013f50efc91b8`. B5.1 is published at
+`bbdebc1779faeb355d785245780f9f11e0aa0b64` as a pure, deeply immutable
+detail adapter. B5.2 is now prepared locally as the one-load immutable snapshot
+and provider result. It is not staged, committed, pushed, deployed, or used by
+detail selection or React detail UI. B5.3-B5.5 remain unimplemented.
 
 The only future runtime in scope is the isolated development entry:
 
@@ -41,8 +42,10 @@ type WriterLibraryReadOnlyResult =
 ```
 
 The provider invokes its injected loader inside one `try` block, passes the
-returned catalog to `buildWriterLibraryItems(catalog)`, and returns only the
-mapped items. A thrown loader error becomes `failed/catalog-load-failed`.
+returned catalog to the snapshot builder, and returns only the typed snapshot.
+The public contract intentionally maps both a thrown loader error and a snapshot
+construction or invariant-validation error to `failed/catalog-load-failed`.
+It exposes neither the exception nor an internal distinction to the UI.
 Because current lower-level loaders can also turn malformed or invalid stored
 data into empty arrays, an empty ready result is not reliable evidence that the
 underlying collections were healthy.
@@ -485,8 +488,8 @@ repository artifacts.
 6. changing any of four layers performs no loader call;
 7. fixture mode calls neither provider nor loader;
 8. missing detail produces the typed/local error presentation without a load;
-9. thrown loader still returns only `failed/catalog-load-failed` and logs no
-   record content;
+9. thrown loader or snapshot construction/invariant failure returns only
+   `failed/catalog-load-failed` and logs no record content;
 10. no raw WriterPackage is returned to React.
 
 ### UI and isolation checks
@@ -518,8 +521,9 @@ only the synthetic data and close the profile afterward.
 
 ### B5.1 - pure detail adapter and checks
 
-- Prepared locally in `src/writerLibraryDetailViewModel.ts` with artificial
-  checks in `src/writerLibraryDetailViewModelChecks.ts`.
+- Published at `bbdebc1779faeb355d785245780f9f11e0aa0b64` in
+  `src/writerLibraryDetailViewModel.ts` with artificial checks in
+  `src/writerLibraryDetailViewModelChecks.ts`.
 - Adds `WriterLibraryDetail` and `WriterLibraryDetailNote`.
 - Maps a supplied package without storage or React.
 - Reuses the published B1 item adapter for the shared title fallback and origin
@@ -530,16 +534,28 @@ only the synthetic data and close the profile afterward.
 - Adds 24 pure checks and 3 static isolation checks, bringing the product-shell
   harness from 85/85 to 112/112.
 
-This local slice does not create `detailsById`, change B2, or expose detail data
-to React. It remains uncommitted. The next separately reviewed step is B5.2.
+This published slice does not create `detailsById`, change B2, or expose detail
+data to React. Those boundaries remain unchanged inside B5.1.
 
 ### B5.2 - one immutable Library snapshot
 
-- evolve the B2 ready result to one `WriterLibraryReadOnlySnapshot`;
-- call the injected loader exactly once;
-- build `items` and `detailsById` from that same catalog;
-- preserve current failed/empty semantics and all B2/B4 isolation checks;
-- pass no loader or raw package objects to React.
+- Prepared locally in `src/writerLibraryReadOnlySnapshot.ts` with artificial
+  checks in `src/writerLibraryReadOnlySnapshotChecks.ts`.
+- Evolves the B2 ready result to one `WriterLibraryReadOnlySnapshot` after the
+  injected loader is called exactly once.
+- Builds the existing B1 `items` and B5.1 details from that same catalog.
+- Stores details as own properties of a frozen null-prototype object, including
+  safe string IDs such as `__proto__`.
+- Requires exactly one detail for every visible item and rejects invalid
+  duplicate IDs rather than silently choosing one.
+- Maps that invalid direct-catalog invariant failure through the existing public
+  provider reason `catalog-load-failed`, shared intentionally with loader and
+  other snapshot-construction failures.
+- Preserves current failed/empty semantics and all B2/B4 isolation checks.
+- Passes no loader or raw package objects onward; B4 reads only
+  `snapshot.items` and still exposes no detail selection.
+- Adds 28 snapshot checks and 3 isolation checks, bringing the complete
+  product-shell harness from 112/112 to 143/143.
 
 Keep B5.1 and B5.2 separate. B5.1 is a pure mapping contract; B5.2 changes the
 published provider result and deserves an independent review.
@@ -595,6 +611,7 @@ injected `loadWriterPackageCatalog()` call before React render will produce one
 deeply immutable snapshot: existing ordered B1 items plus a frozen detail index
 for those same live IDs. React will receive only presentation models. Opening,
 returning, and switching layers remain future local in-memory actions that must
-never read or write storage. Local B5.1 now supplies only the pure immutable
-detail and array builder. The smallest next implementation after separate
-approval is B5.2, the one-call `items + detailsById` provider snapshot.
+never read or write storage. Published B5.1 supplies the pure immutable detail
+and array builder. Local B5.2 supplies the one-call `items + detailsById`
+provider snapshot while B4 continues to use only its items. The smallest next
+implementation after separate approval is B5.3, the local selection model.

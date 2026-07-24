@@ -1,15 +1,15 @@
 import type { WriterPackage } from "./types";
 import {
-  buildWriterLibraryItems,
-  type WriterLibraryItem
-} from "./writerLibraryViewModel";
+  buildWriterLibraryReadOnlySnapshot,
+  type WriterLibraryReadOnlySnapshot
+} from "./writerLibraryReadOnlySnapshot";
 
 export type WriterPackageCatalogLoader = () => readonly WriterPackage[];
 
 export type WriterLibraryReadOnlyResult =
   | Readonly<{
       status: "ready";
-      items: readonly WriterLibraryItem[];
+      snapshot: WriterLibraryReadOnlySnapshot;
     }>
   | Readonly<{
       status: "failed";
@@ -23,7 +23,7 @@ export function loadWriterLibraryReadOnly(
     const catalog = loader();
     return Object.freeze({
       status: "ready",
-      items: buildWriterLibraryItems(catalog)
+      snapshot: buildWriterLibraryReadOnlySnapshot(catalog)
     });
   } catch {
     return Object.freeze({

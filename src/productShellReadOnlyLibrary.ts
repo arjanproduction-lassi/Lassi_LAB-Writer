@@ -68,17 +68,19 @@ export function createWriterLibraryPresentation(
     return Object.freeze({ status: "failed" });
   }
 
-  if (result.items.length === 0) {
+  const items = result.snapshot.items;
+
+  if (items.length === 0) {
     return Object.freeze({
       status: "empty",
-      items: result.items
+      items
     });
   }
 
   return Object.freeze({
     status: "ready",
-    items: result.items,
-    continueItem: result.items[0]
+    items,
+    continueItem: items[0]
   });
 }
 

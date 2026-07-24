@@ -47,6 +47,7 @@ try {
       "src/productShellReadOnlyLibraryChecks.ts",
       "src/writerLibraryViewModelChecks.ts",
       "src/writerLibraryDetailViewModelChecks.ts",
+      "src/writerLibraryReadOnlySnapshotChecks.ts",
       "src/writerLibraryReadOnlyProviderChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
@@ -84,6 +85,16 @@ try {
 
   if (detailRun.status !== 0) {
     process.exit(detailRun.status ?? 1);
+  }
+
+  const snapshotRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerLibraryReadOnlySnapshotChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (snapshotRun.status !== 0) {
+    process.exit(snapshotRun.status ?? 1);
   }
 
   const providerRun = spawnSync(
@@ -247,6 +258,79 @@ try {
 
   console.log(
     `Writer library detail isolation checks: ${detailIsolationChecks}/${detailIsolationChecks} passed.`
+  );
+
+  const writerLibrarySnapshotSource = readFileSync(
+    resolve(repoRoot, "src/writerLibraryReadOnlySnapshot.ts"),
+    "utf8"
+  ).toLowerCase();
+  const snapshotRuntimeForbiddenPatterns = [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "writerlibraryreadonlyprovider",
+    "loadwriterpackagecatalog",
+    "getwriterpackagebyid",
+    "localstorage",
+    "sessionstorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "indexeddb",
+    "caches.",
+    "date.now",
+    "new date",
+    "performance.",
+    "settimeout",
+    "setinterval",
+    "math.random",
+    "crypto.",
+    "console.",
+    "setitem",
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "deletewriter"
+  ];
+  const snapshotNetworkForbiddenPatterns = [
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "http://",
+    "https://",
+    "googledrive"
+  ];
+  let snapshotIsolationChecks = 0;
+
+  for (const pattern of snapshotRuntimeForbiddenPatterns) {
+    if (writerLibrarySnapshotSource.includes(pattern)) {
+      throw new Error(`Writer Library snapshot contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  snapshotIsolationChecks += 1;
+
+  for (const pattern of snapshotNetworkForbiddenPatterns) {
+    if (writerLibrarySnapshotSource.includes(pattern)) {
+      throw new Error(`Writer Library snapshot contains forbidden network dependency: ${pattern}`);
+    }
+  }
+  snapshotIsolationChecks += 1;
+
+  if (
+    !writerLibrarySnapshotSource.includes("buildwriterlibraryitems(catalog)") ||
+    !writerLibrarySnapshotSource.includes("buildwriterlibrarydetails(catalog)") ||
+    !writerLibrarySnapshotSource.includes("object.create(null)") ||
+    writerLibrarySnapshotSource.includes("new map") ||
+    writerLibrarySnapshotSource.includes("loader")
+  ) {
+    throw new Error("Writer Library snapshot must remain a pure B1/B5.1 aggregation boundary.");
+  }
+  snapshotIsolationChecks += 1;
+
+  console.log(
+    `Writer library snapshot isolation checks: ${snapshotIsolationChecks}/${snapshotIsolationChecks} passed.`
   );
 
   const writerLibraryProviderSource = readFileSync(

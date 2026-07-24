@@ -7,6 +7,7 @@ import {
   type ProductShellDataAssemblyInput
 } from "./productShellReadOnlyLibrary";
 import type { WriterLibraryItem } from "./writerLibraryViewModel";
+import type { WriterLibraryReadOnlySnapshot } from "./writerLibraryReadOnlySnapshot";
 
 let passed = 0;
 
@@ -50,6 +51,17 @@ function createItem(overrides: Partial<WriterLibraryItem> = {}): WriterLibraryIt
   });
 }
 
+function createSnapshot(
+  items: readonly WriterLibraryItem[]
+): WriterLibraryReadOnlySnapshot {
+  return Object.freeze({
+    items,
+    detailsById: Object.freeze(
+      Object.create(null) as Record<string, never>
+    )
+  });
+}
+
 let fixtureLoaderCalls = 0;
 let fixtureProviderCalls = 0;
 const fixtureResult = assembleProductShellData({
@@ -60,7 +72,7 @@ const fixtureResult = assembleProductShellData({
   },
   provider: () => {
     fixtureProviderCalls += 1;
-    return { status: "ready", items: [] };
+    return { status: "ready", snapshot: createSnapshot(Object.freeze([])) };
   }
 } as ProductShellDataAssemblyInput);
 check(
@@ -77,7 +89,7 @@ const injectedResult = assembleProductShellData({
   provider: (loader) => {
     realProviderCalls += 1;
     receivedLoader = loader;
-    return { status: "ready", items: [] };
+    return { status: "ready", snapshot: createSnapshot(Object.freeze([])) };
   }
 });
 check(
@@ -123,14 +135,16 @@ check(
   "ready items use the original B1 order",
   integratedResult.mode === "real-read-only" &&
     integratedResult.library.status === "ready" &&
-    integratedResult.library.items.map((item) => item.id).join(",") === "newer,older"
+    integratedResult.library.snapshot.items.map((item) => item.id).join(",") ===
+      "newer,older"
 );
 check(
   "tombstones stay hidden and deleted notes do not increase the B1 count",
   integratedResult.mode === "real-read-only" &&
     integratedResult.library.status === "ready" &&
-    integratedResult.library.items.every((item) => item.id !== "deleted") &&
-    integratedResult.library.items.find((item) => item.id === "older")?.noteCount === 1
+    integratedResult.library.snapshot.items.every((item) => item.id !== "deleted") &&
+    integratedResult.library.snapshot.items.find((item) => item.id === "older")
+      ?.noteCount === 1
 );
 
 const suppliedItems = Object.freeze([
@@ -139,7 +153,7 @@ const suppliedItems = Object.freeze([
 ]);
 const readyPresentation = createWriterLibraryPresentation({
   status: "ready",
-  items: suppliedItems
+  snapshot: createSnapshot(suppliedItems)
 });
 check(
   "B4 does not sort or filter supplied items again",
@@ -165,7 +179,7 @@ check(
 
 const emptyPresentation = createWriterLibraryPresentation({
   status: "ready",
-  items: Object.freeze([])
+  snapshot: createSnapshot(Object.freeze([]))
 });
 check(
   "empty ready items produce a distinct empty presentation",

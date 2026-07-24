@@ -40,8 +40,10 @@ check(
 );
 check(
   readyResult.status === "ready" &&
-    readyResult.items.length === 1 &&
-    readyResult.items[0].title === "Umelý balík" &&
+    readyResult.snapshot.items.length === 1 &&
+    readyResult.snapshot.items[0].title === "Umelý balík" &&
+    readyResult.snapshot.detailsById["fixture-package"].title ===
+      "Umelý balík" &&
     Object.isFrozen(readyResult),
   "A valid catalog must return a ready Library result."
 );
@@ -49,8 +51,9 @@ check(
 const emptyResult = loadWriterLibraryReadOnly(() => []);
 check(
   emptyResult.status === "ready" &&
-    emptyResult.items.length === 0 &&
-    Object.isFrozen(emptyResult.items),
+    emptyResult.snapshot.items.length === 0 &&
+    Object.keys(emptyResult.snapshot.detailsById).length === 0 &&
+    Object.isFrozen(emptyResult.snapshot),
   "An empty catalog must remain a successful empty Library."
 );
 
@@ -66,7 +69,7 @@ const orderedResult = loadWriterLibraryReadOnly(() => [
 ]);
 check(
   orderedResult.status === "ready" &&
-    orderedResult.items.map((item) => item.id).join(",") === "newer,older",
+    orderedResult.snapshot.items.map((item) => item.id).join(",") === "newer,older",
   "The provider result must use B1 Library sorting."
 );
 
@@ -74,9 +77,11 @@ const legacyResult = loadWriterLibraryReadOnly(() => [
   createPackage({ legacy: { source: "spark", stage: "notes" } })
 ]);
 check(
-  legacyResult.status === "ready" &&
-    legacyResult.items[0].origin === "legacy-spark" &&
-    !("storageSource" in legacyResult.items[0]),
+    legacyResult.status === "ready" &&
+    legacyResult.snapshot.items[0].origin === "legacy-spark" &&
+    legacyResult.snapshot.detailsById["fixture-package"].origin ===
+      "legacy-spark" &&
+    !("storageSource" in legacyResult.snapshot.items[0]),
   "Legacy origin must remain a presentation fact without storage provenance."
 );
 
@@ -89,19 +94,26 @@ const tombstoneResult = loadWriterLibraryReadOnly(() => [
 ]);
 check(
   tombstoneResult.status === "ready" &&
-    tombstoneResult.items.map((item) => item.id).join(",") === "visible",
+    tombstoneResult.snapshot.items.map((item) => item.id).join(",") === "visible" &&
+    !("deleted" in tombstoneResult.snapshot.detailsById),
   "The provider must preserve B1 tombstone filtering."
 );
 
 const failedResult = loadWriterLibraryReadOnly(() => {
   throw new Error("synthetic loader failure");
 });
+const invalidCatalogResult = loadWriterLibraryReadOnly(() => [
+  createPackage({ id: "duplicate", title: "First artificial package" }),
+  createPackage({ id: "duplicate", title: "Second artificial package" })
+]);
 check(
   failedResult.status === "failed" &&
     failedResult.reason === "catalog-load-failed" &&
     Object.isFrozen(failedResult) &&
-    Object.keys(failedResult).join(",") === "status,reason",
-  "A loader exception must return only the stable typed failure."
+    Object.keys(failedResult).join(",") === "status,reason" &&
+    invalidCatalogResult.status === "failed" &&
+    invalidCatalogResult.reason === "catalog-load-failed",
+  "Loader and snapshot construction failures must share the stable typed failure."
 );
 
 const originalConsole = {
@@ -179,7 +191,8 @@ check(
     firstRun !== secondRun &&
     firstRun.status === "ready" &&
     secondRun.status === "ready" &&
-    firstRun.items !== secondRun.items,
+    firstRun.snapshot !== secondRun.snapshot &&
+    firstRun.snapshot.items !== secondRun.snapshot.items,
   "The same loader result must produce equivalent independently allocated results."
 );
 
