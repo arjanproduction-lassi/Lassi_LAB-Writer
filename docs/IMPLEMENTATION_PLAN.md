@@ -36,10 +36,21 @@ detail-array builder. B5.2 is published at
 `8ec9fe3431ee71aab78085cca07661dc25c31633` as the pure snapshot builder and
 one-load B2 provider result. B5.3 is published at
 `22973efd5c0b6a49f51d0a954073ffb603b31345` as the pure immutable selection
-and layer model with safe `missing-detail` resolution. Local B5.4 connects that
-model to read-only cards and static PC/mobile detail over the same snapshot,
-without a second load or write. It is not staged, committed, pushed, or
-deployed. B5.5 synthetic integration is the next separate review gate.
+and layer model with safe `missing-detail` resolution. B5.4 and its final
+synthetic integration/isolation gate are published at
+`f268d569a1c45214090dcac326633afab76c6968`. Phase B5 is closed: the isolated
+PC/mobile detail still uses the same snapshot, performs no second load, and
+writes nothing.
+
+## Legacy Spark Retirement Planning
+
+The docs-only retirement protocol is defined in
+`WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`. The accepted target is a
+package-only product without migrating legacy Spark stages. The safest route is
+R1-R7: read-only inventory, verified backups, separate local tombstoning,
+multi-device/Drive propagation, an observation window, optional hard purge,
+and only then the package-only product cutover. Each phase has its own gate;
+the smallest next implementation is R1 only, with no writes or runtime cutover.
 
 ## Completed v0.1 Slice
 

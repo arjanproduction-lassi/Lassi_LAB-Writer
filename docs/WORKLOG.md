@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-07-24 - Legacy Spark retirement review (docs only)
+
+- Inventoried the current Spark, WriterPackage, draft, Writer DB v2,
+  persistence/recovery, App, and v1 Google Drive behavior without changing it.
+- Documented why local clear, one-device tombstones, an empty Drive file, or an
+  early hard purge can resurrect legacy data under newest-wins merge rules.
+- Defined the conservative R1-R7 sequence: read-only inventory, verified local
+  and Drive backups, local tombstones, device/profile convergence, observation,
+  optional purge, and a separately reviewed package-only product cutover.
+- Chose a temporary Data wizard as the eventual reset surface, with preview,
+  explicit backup evidence, typed confirmation, and no logging of author text.
+- Added no runtime, CSS, storage, Google Drive, import/export, migration,
+  deletion, staging, commit, push, or deployment change.
+
+## 2026-07-24 - Phase B5 read-only detail published
+
+- Published B5.4 together with the final synthetic integration and isolation
+  review at `f268d569a1c45214090dcac326633afab76c6968`.
+- Phase B5 is closed. The isolated exact-DEV detail remains read-only, uses the
+  one immutable startup snapshot, and performs no second load or write.
+
 ## 2026-07-24 - Phase B5.4 read-only detail UI (local only)
 
 - Connected the published B5.3 selection model to the isolated exact DEV

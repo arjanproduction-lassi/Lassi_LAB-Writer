@@ -49,6 +49,21 @@ Dielňa, PC shows context plus active content, and mobile shows one active panel
 The ID is local React state only; there is no second load, editor, save, or
 autosave, and `Nová iskra` stays disabled.
 
+## Legacy Reset And Package-Only UX Direction
+
+Legacy Sparks are test-only transition data. Their notebook stages must not be
+presented as migrated package layers. The eventual package-only product shows
+only real WriterPackages, and `Nová iskra` creates a WriterPackage directly.
+
+Any retirement control belongs temporarily under **Dáta** as a guided reset
+wizard, not as a casual Library action or DevTools instruction. It must first
+show a read-only inventory, require verified local and v1 Drive backups, name
+the affected devices/profiles, explain possible resurrection, and require an
+explicit typed confirmation before a separately reviewed destructive phase.
+Author text must not be logged, snapshotted into tests, or included in the
+confirmation phrase. Full safety rules are in
+`WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

@@ -25,8 +25,17 @@ detail contract is defined in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
 Published B5.1 supplies pure immutable detail presentation data and published
 B5.2 supplies one immutable item/detail snapshot from the existing one-call
 provider. B5.3 is published at `22973efd5c0b6a49f51d0a954073ffb603b31345`.
-Local B5.4 opens static read-only detail from that already-loaded snapshot,
-switches the four layers, and returns without another load or any write.
+B5.4 and its final isolation/integration review are published at
+`f268d569a1c45214090dcac326633afab76c6968`. Phase B5 is closed; it opens
+static read-only detail from the already-loaded snapshot, switches the four
+layers, and returns without another load or any write.
+
+The accepted next product direction is eventual package-only operation. Legacy
+Sparks are test-only and their four-stage history will not be migrated. Before
+any destructive work, follow `WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`. The
+next smallest code slice is only R1: a pure, read-only inventory/preview model
+for a future Data wizard. Do not tombstone, purge, sync, or activate package
+editing in R1.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
@@ -78,7 +87,7 @@ The first code bridge is intentionally small:
 - do not change the Writer DB export/import format yet
 - do not change Google Drive sync payloads yet
 
-Next implementation decision after local B5.4 review:
+Closed Phase B5 implementation record:
 
 - B5.1 is published at `bbdebc1779faeb355d785245780f9f11e0aa0b64` as a
   pure immutable `WriterLibraryDetail` adapter and order-preserving detail-array

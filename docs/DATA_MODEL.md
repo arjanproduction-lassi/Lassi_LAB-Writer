@@ -27,6 +27,13 @@ not a replacement for future structured draft/workshop models.
 
 ## Target Direction: Writer Package
 
+The accepted long-term product target is now package-only: one creative work
+is one `WriterPackage` with one stable ID. Legacy `Spark` records are test-only
+transition data; their `stage` values will not be migrated into package layers.
+They remain untouched for now. Safe retirement first requires the separately
+reviewed backup, multi-device Google Drive tombstone, observation, and
+package-integrity gates in `WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`.
+
 The current `Spark` record is a useful first storage shape, but the target
 Writer object is a **Writer Package / Tvorivá jednotka**: one creative work with
 one id and connected layers.
@@ -59,15 +66,16 @@ it is not the final workspace model. `stage` says where a card currently sits.
 The Writer Package model says how one work grows from first capture to clean
 text while keeping the original spark visible.
 
-The safest future migration is additive:
+The already implemented compatibility bridge is additive:
 
 - add `WriterPackage` as the new primary type
 - keep old `Spark` records readable as legacy
-- save new captures as packages
+- eventually save new captures as packages after the package-only cutover
 - show old Spark records as simple packages with `sparkText` filled
 - keep manual JSON export/import and Google Drive sync on the same bridge
 - let the whole package travel as one record
-- only rename or split the data model after the layered workflow is proven
+- retire the compatibility path only after the reviewed legacy reset protocol
+  has completed safely on every relevant device and Drive profile
 
 ## Core Objects
 

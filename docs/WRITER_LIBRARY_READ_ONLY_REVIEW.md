@@ -15,13 +15,21 @@ Its pure B5.1 detail adapter is published at
 `bbdebc1779faeb355d785245780f9f11e0aa0b64`, and its one-load immutable B5.2
 snapshot is published at `8ec9fe3431ee71aab78085cca07661dc25c31633`.
 B5.3 is published at `22973efd5c0b6a49f51d0a954073ffb603b31345` as the
-pure selection/layer/resolution model over `snapshot.detailsById`. Local B5.4
-connects only that model and snapshot to the isolated read-only detail UI;
-B5.5 final synthetic integration remains pending.
+pure selection/layer/resolution model over `snapshot.detailsById`. B5.4 and
+the final B5 isolation/integration review are published at
+`f268d569a1c45214090dcac326633afab76c6968`; Phase B5 is closed. The detail UI
+still uses only that model and the already-loaded immutable snapshot.
 
 Phase B may read existing local content and display it in the isolated
 `product-shell.html` experience. It may not create, edit, migrate, delete,
 restore, autosave, or otherwise persist any Spark or WriterPackage.
+
+The Library remains intentionally dual-source until the separate retirement
+protocol in `WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md` has safely converged
+legacy Sparks across all relevant local stores and v1 Drive profiles. Once no
+visible legacy Spark remains, the existing catalog naturally presents only
+real WriterPackages; this document does not authorize that retirement or any
+runtime change.
 
 ## Evidence And Existing Contracts
 

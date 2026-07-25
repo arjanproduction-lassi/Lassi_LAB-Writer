@@ -17,6 +17,14 @@ Current published baseline:
 This review changes no runtime code, data format, storage key, import behavior,
 recovery behavior, export behavior, or sync behavior.
 
+The later product target is package-only: `Knižnica` contains real
+WriterPackages and `Nová iskra` creates a WriterPackage directly. Legacy Sparks
+are test-only transition data and their stage values will not be migrated into
+package layers. The required backup, Drive/device convergence, observation,
+and package-integrity gates are defined in
+`WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`. That review performs no cutover;
+the current dual-source compatibility behavior remains in place.
+
 ## Local Phase A Prototype
 
 A separate static product shell exists at `/product-shell.html`. Its source is
