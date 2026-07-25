@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-07-25 - R1 pure Legacy Spark retirement inventory
+
+- Added a pure inventory kernel over supplied typed Spark sources, real
+  WriterPackages, Drive v1 export shape, and Writer DB v2 backup shape.
+- Added deterministic union IDs, latest observed timestamps, per-source
+  live/tombstone counts, Package count, draft presence, duplicate blocking, and
+  a conservative resurrection-risk flag without exposing author text.
+- Froze the complete result and limited its only preview status to
+  `ready-for-backup`; no delete-ready, purge-ready, or completed state exists.
+- Added a separate `check:legacy-spark-retirement` harness with 28 artificial
+  checks. The original Writer DB runner remains unchanged at 284 checks.
+- Added no React, UI, loader, browser storage, current time, randomness,
+  network, Google Drive request, backup, tombstone construction, reset, write,
+  migration, or new storage key. R2 remains unimplemented.
+
 ## 2026-07-24 - Legacy Spark retirement review (docs only)
 
 - Inventoried the current Spark, WriterPackage, draft, Writer DB v2,

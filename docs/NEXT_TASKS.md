@@ -33,9 +33,12 @@ layers, and returns without another load or any write.
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before
 any destructive work, follow `WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`. The
-next smallest code slice is only R1: a pure, read-only inventory/preview model
-for a future Data wizard. Do not tombstone, purge, sync, or activate package
-editing in R1.
+pure R1 inventory kernel is implemented and verified separately from Writer DB.
+It accepts only supplied typed sources, exposes frozen text-free metadata, and
+stops at `ready-for-backup`; it does not call real loaders, UI, storage, Drive,
+or any write path. The next smallest step is a separately reviewed R2 backup
+contract. Do not start backup UI, tombstones, reset, sync changes, or Package
+editing as part of R1 closure.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

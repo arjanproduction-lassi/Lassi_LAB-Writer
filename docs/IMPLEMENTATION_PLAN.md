@@ -50,7 +50,11 @@ package-only product without migrating legacy Spark stages. The safest route is
 R1-R7: read-only inventory, verified backups, separate local tombstoning,
 multi-device/Drive propagation, an observation window, optional hard purge,
 and only then the package-only product cutover. Each phase has its own gate;
-the smallest next implementation is R1 only, with no writes or runtime cutover.
+the pure R1 inventory kernel is implemented with the single terminal preview
+state `ready-for-backup`. It runs through the separate
+`check:legacy-spark-retirement` harness and performs no real loader call, UI,
+write, tombstone creation, backup, or runtime cutover. R2 backup preparation is
+the next separate review gate and is not implemented.
 
 ## Completed v0.1 Slice
 

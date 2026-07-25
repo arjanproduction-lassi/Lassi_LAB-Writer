@@ -11,6 +11,15 @@ Google Drive, add a reset command, migrate Sparks, edit WriterPackages, or
 change production UI. Every destructive phase below requires a separate code
 review and explicit user confirmation.
 
+The R1 pure inventory kernel is now implemented in
+`src/legacySparkRetirementInventory.ts`. It accepts only explicitly supplied,
+already typed artificial/runtime inputs and returns frozen metadata with the
+single status `ready-for-backup`. It has no loader, UI, storage, network,
+current-time, randomness, tombstone creation, reset, or persistence surface.
+Its 28 artificial checks run separately through
+`npm run check:legacy-spark-retirement`; the Writer DB harness remains an
+independent 284-check boundary.
+
 Accepted product decision:
 
 ```text
@@ -36,8 +45,9 @@ The review is grounded in these implementations:
 - `src/writerDbRecovery.ts`
 - `src/App.tsx`
 
-No current-data counts are inferred from these loaders. Counts must be read
-and validated on each actual browser profile during a future R1 inventory.
+No current-data counts are inferred from these loaders. The implemented R1
+kernel does not call them: a separately reviewed future adapter must validate
+and inject each actual browser/Drive profile before any backup phase.
 
 ## Current Local Storage Inventory
 
@@ -534,14 +544,22 @@ import-specific transaction marker for a different operation.
 
 ### R1 — Pure read-only inventory and preview
 
-- inspect raw Spark, Package, draft, relevant backup, sync preference, recovery,
-  and Drive v1 state through injected readers;
-- classify invalid versus truly empty collections;
-- compute union IDs, maximum timestamps, proposed tombstones, counts, and
-  Package hashes;
-- perform no writes, sync, logs of author text, or new storage keys.
+- implemented over existing `Spark`, `WriterPackage`, Drive v1 export, and
+  `WriterDbV2` types supplied explicitly by the caller;
+- computes a deterministic union of Spark IDs, maximum observed `updatedAt`,
+  per-source live/tombstone counts, Package count, draft presence, and a
+  conservative live-copy resurrection-risk flag;
+- rejects duplicate source IDs, duplicate Spark IDs within one source, and
+  duplicate Package IDs;
+- exposes no Spark, draft, or Package text and returns runtime-frozen metadata;
+- ends only at `ready-for-backup`; it has no `ready-to-delete`, `safe-to-purge`,
+  or `completed` state;
+- performs no raw storage load, Drive request, Package hash, backup, proposed
+  tombstone construction, write, sync, reset, author-text log, or new key.
 
-This is the smallest safe implementation step.
+The pure R1 kernel is complete. Any real-data reader/validation boundary and
+backup/hash creation belong to the separately reviewed R2 preparation; R1
+itself remains disconnected from production UI and data.
 
 ### R2 — Backup creation and verification
 
