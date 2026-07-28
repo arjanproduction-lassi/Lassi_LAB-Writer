@@ -1,6 +1,24 @@
 # Worklog
 
-## 2026-07-28 - R2.2 pure Writer DB v2 backup verifier (local only)
+## 2026-07-28 - R2.3 pure Drive v1 backup verifier (local only)
+
+- Added a pure verifier for explicit `present`, `not-applicable`, and
+  `required-but-missing` Drive source states without calling Drive or sync.
+- Reused the existing read-only Writer DB v1 parser for app/schema, Spark, stage,
+  timestamp, tombstone, tag, and record validation; required strict declared
+  count equality and unique Spark IDs without merge or deduplication.
+- Emitted only frozen text-free metadata: schema, validated `exportedAt`, total,
+  live/tombstone counts, and deterministically sorted Spark IDs.
+- Kept `structure-verified` explicitly below raw-hash, byte-exact, and overall
+  `backup-verified`; no SHA-256 is calculated and raw JSON is not reproduced.
+- Added 42 synthetic R2.3 checks while preserving R2.2 43/43, R2.1 48/48, and
+  R1 28/28, for 161/161 retirement checks in the combined harness.
+- No Google Drive API, sync, fetch, upload, merge, storage, filesystem, hash,
+  backup file, UI, write, tombstone API, or real-data access was added.
+- R2.3 remains local and uncommitted. The next smallest step is R2.4, the
+  Package baseline and semantic fingerprint contract.
+
+## 2026-07-28 - R2.2 pure Writer DB v2 backup verifier
 
 - Added a pure verifier for one explicitly supplied raw Writer DB v2 JSON
   string, reusing the existing read-only parser and record validators.
@@ -16,8 +34,8 @@
   119/119 retirement checks in the combined harness.
 - No hash, filename, manifest, backup file, storage, Drive, network, UI,
   tombstone API, import, write, or real-data access was added.
-- R2.2 remains local and uncommitted. The next smallest step is R2.3, a pure raw
-  Drive v1 backup verifier.
+- Published as `625472dd02b75152162bb3d6e573f4f586d335d6`. The next
+  smallest step is R2.3, a pure raw Drive v1 backup verifier.
 
 ## 2026-07-28 - R2.1 pure Legacy Spark backup plan
 

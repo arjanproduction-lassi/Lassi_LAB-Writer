@@ -527,7 +527,7 @@ This is the smallest safe next implementation step.
 - add strict count, uniqueness, tombstone, and immutability checks;
 - no artifact download or write.
 
-Implemented locally in
+Published in
 `src/legacySparkRetirementWriterDbBackupVerifier.ts`. It accepts one explicit
 raw JSON string, reuses the existing read-only Writer DB parser, requires v2,
 strict count equality, valid records/timestamps, and unique same-collection
@@ -537,9 +537,19 @@ hash and reads or creates no file, storage value, manifest, or Drive artifact.
 
 ### R2.3 - Pure raw Drive v1 verifier
 
-- verify exact bytes and a separately decoded validation copy;
-- distinguish verified, missing, not applicable, and invalid;
+- verify one caller-supplied raw JSON string structurally without a raw hash;
+- distinguish structure-verified, missing, not applicable, and invalid;
 - no Google client or fetch.
+
+Implemented locally in
+`src/legacySparkRetirementDriveV1BackupVerifier.ts`. It accepts only explicit
+`present`, `not-applicable`, or `required-but-missing` input. Present content
+reuses the existing read-only v1 parser and requires the exact app/schema,
+strict Spark count equality, valid Sparks/timestamps, and unique IDs. It emits
+only frozen text-free counts, validated `exportedAt`, and sorted IDs. Its
+`structure-verified` status proves neither byte-exact integrity nor raw-hash or
+overall `backup-verified` status. It calls no Drive, sync, storage, file, hash,
+merge, or upload path.
 
 ### R2.4 - Package baseline and fingerprints
 
@@ -663,8 +673,9 @@ integrity. WriterPackages are protected by a baseline that later R3-R6 phases
 must reproduce exactly.
 
 The highest R2 state is `backup-verified`. It does not authorize deletion.
-R2.1 is published as a pure plan and text-free manifest model; its highest
-state is only `planned`. R2.2 is prepared locally as a pure Writer DB v2
-structure/content verifier over synthetic input. The smallest next
-implementation is R2.3, the pure raw Drive v1 verifier, still with no runtime
-loader, file creation, storage mutation, Drive write, or UI.
+R2.1 and R2.2 are published. R2.1 stops at `planned`; R2.2 stops at artifact
+`structure-verified`. R2.3 is prepared locally as a pure raw Drive v1
+structure/content verifier over synthetic input and likewise proves no hash.
+The smallest next implementation is R2.4, the Package baseline and semantic
+fingerprint contract, still with no runtime loader, file creation, storage
+mutation, Drive write, or UI.
