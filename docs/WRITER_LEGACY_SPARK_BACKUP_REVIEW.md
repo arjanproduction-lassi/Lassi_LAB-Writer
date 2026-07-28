@@ -541,7 +541,7 @@ hash and reads or creates no file, storage value, manifest, or Drive artifact.
 - distinguish structure-verified, missing, not applicable, and invalid;
 - no Google client or fetch.
 
-Implemented locally in
+Published at `a1c16610a7d404d401a28295bc161c40d6168a6d` in
 `src/legacySparkRetirementDriveV1BackupVerifier.ts`. It accepts only explicit
 `present`, `not-applicable`, or `required-but-missing` input. Present content
 reuses the existing read-only v1 parser and requires the exact app/schema,
@@ -553,9 +553,27 @@ merge, or upload path.
 
 ### R2.4 - Package baseline and fingerprints
 
-- canonical Package and Spark serialization;
-- injected standard SHA-256 implementation;
-- pure, deterministic, immutable, text-free report.
+- validate explicitly supplied WriterPackages without filtering or defaults;
+- sort top-level Packages by code-unit ID so source Package order is irrelevant;
+- preserve note order because it is semantically significant;
+- canonicalize every Package field, text layer, timestamp, tombstone,
+  `packageVersion`, note, deleted note, and legacy field in fixed field order;
+- asynchronously await canonical UTF-8 JSON hashing through an injected
+  standard SHA-256 hasher that may return a string or Promise;
+- optionally carry a separately supplied, validated raw Package storage hash;
+- return a pure, deterministic, immutable, text-free `baseline-built` report.
+
+Implemented locally in `src/legacySparkRetirementPackageBaseline.ts`. Its
+Promise-based builder supports synchronous test hashers and a future
+asynchronous Web Crypto adapter without importing either implementation. It emits
+total/live/tombstoned Package counts, total/deleted note counts, sorted Package
+IDs, the semantic SHA-256, and an optional exact raw-storage SHA-256. Unknown
+runtime fields, duplicate IDs, invalid records, explicit `undefined` optional
+fields, hasher failures, and non-lowercase/non-64-character hashes are typed
+invalid results. Creative text is used only inside the canonical hasher input
+and is never returned or logged. This slice imports no crypto, storage, Drive,
+filesystem, or runtime loader and does not create a backup or reach
+`backup-verified`.
 
 ### R2.5 - Read-only assembly
 
@@ -673,9 +691,9 @@ integrity. WriterPackages are protected by a baseline that later R3-R6 phases
 must reproduce exactly.
 
 The highest R2 state is `backup-verified`. It does not authorize deletion.
-R2.1 and R2.2 are published. R2.1 stops at `planned`; R2.2 stops at artifact
-`structure-verified`. R2.3 is prepared locally as a pure raw Drive v1
-structure/content verifier over synthetic input and likewise proves no hash.
-The smallest next implementation is R2.4, the Package baseline and semantic
-fingerprint contract, still with no runtime loader, file creation, storage
-mutation, Drive write, or UI.
+R2.1, R2.2, and R2.3 are published. R2.1 stops at `planned`; R2.2 and
+R2.3 stop at artifact `structure-verified`. R2.4 is prepared locally as a pure
+Package baseline over synthetic input and stops at `baseline-built`. It uses
+only an injected hasher and creates no backup or real hash itself. The smallest
+next implementation is R2.5 read-only assembly, still separately reviewed and
+without storage mutation, Drive write, sync, tombstones, reset, or UI.

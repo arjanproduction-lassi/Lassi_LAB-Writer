@@ -1,6 +1,26 @@
 # Worklog
 
-## 2026-07-28 - R2.3 pure Drive v1 backup verifier (local only)
+## 2026-07-28 - R2.4 pure WriterPackage baseline (local only)
+
+- Added an asynchronous pure baseline builder for explicitly supplied
+  WriterPackages and an injected SHA-256 hasher that may return either a string
+  or a Promise; no crypto or storage implementation is imported.
+- Reused the existing Package validator, rejected duplicate IDs, unknown
+  runtime fields, and explicitly present `undefined` optional fields.
+- Canonicalized all Package text layers, timestamps, tombstones,
+  `packageVersion`, notes/deleted notes, and legacy metadata in fixed field
+  order. Top-level Packages are sorted by code-unit ID; note order is preserved.
+- Returned only frozen text-free counts, sorted Package IDs, semantic hash, and
+  an optional separately supplied validated raw-storage hash. Success is
+  `baseline-built`, not `backup-verified`.
+- Added 70 synthetic R2.4 checks, including synchronous, Promise-based,
+  rejected, and invalid async hashers, while preserving R2.3 42/42, R2.2
+  43/43, R2.1 48/48, and R1 28/28, for 231/231 retirement checks.
+- No real user data, storage/Drive access, file creation, UI, sync, merge,
+  write, tombstone, reset, commit, push, or deployment is part of R2.4.
+- The next smallest step is separately reviewed R2.5 read-only assembly.
+
+## 2026-07-28 - R2.3 pure Drive v1 backup verifier
 
 - Added a pure verifier for explicit `present`, `not-applicable`, and
   `required-but-missing` Drive source states without calling Drive or sync.
@@ -15,8 +35,8 @@
   R1 28/28, for 161/161 retirement checks in the combined harness.
 - No Google Drive API, sync, fetch, upload, merge, storage, filesystem, hash,
   backup file, UI, write, tombstone API, or real-data access was added.
-- R2.3 remains local and uncommitted. The next smallest step is R2.4, the
-  Package baseline and semantic fingerprint contract.
+- Published as `a1c16610a7d404d401a28295bc161c40d6168a6d`. The next smallest
+  step is R2.4, the Package baseline and semantic fingerprint contract.
 
 ## 2026-07-28 - R2.2 pure Writer DB v2 backup verifier
 

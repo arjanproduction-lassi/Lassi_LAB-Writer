@@ -59,11 +59,15 @@ now defined in `WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. Pure R2.1 is published:
 stable filenames, a frozen text-free manifest plan, typed reason codes, and
 metadata validation using artificial inputs only. Pure R2.2 is published and
 verifies only one supplied Writer DB v2 JSON artifact's structure. Pure R2.3 is
-prepared locally and verifies only an explicitly supplied Drive v1 JSON
-artifact or explicit missing/not-applicable source status. Both artifact
-verifiers stop at `structure-verified`, compute no hash, and create no file.
-The next separate step is R2.4, the Package baseline and semantic fingerprint
-contract; no R2 runtime or real backup exists.
+published at `a1c16610a7d404d401a28295bc161c40d6168a6d` and verifies only an
+explicitly supplied Drive v1 JSON artifact or explicit missing/not-applicable
+source status. Both artifact verifiers stop at `structure-verified`, compute no
+hash, and create no file. Pure R2.4 is prepared locally: it validates supplied
+WriterPackages, records text-free counts and sorted IDs, and computes a
+semantic fingerprint only through an injected sync-or-Promise SHA-256 hasher
+that the asynchronous builder always awaits. It stops at
+`baseline-built`; no R2 runtime or real backup exists. The next separate step
+is R2.5 read-only assembly.
 
 ## Completed v0.1 Slice
 

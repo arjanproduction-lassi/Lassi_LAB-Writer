@@ -330,13 +330,18 @@ filenames and abbreviated checks below with three explicit artifacts: a
 validated Writer DB v2 backup, an exact raw-byte Drive v1 backup (or a proven
 not-applicable result), and a text-free manifest containing raw SHA-256 hashes,
 semantic fingerprints, validation evidence, and the WriterPackage baseline.
-The pure R2.1 plan/model and R2.2 Writer DB v2 artifact verifier are published.
-The pure R2.3 Drive v1 artifact verifier is prepared locally and stops at
-`structure-verified`. These slices create no backup or hash; R2.3 also calls no
-Drive or sync path and proves no byte-exact integrity. The remaining R2 slices
-are not implemented, and even the future highest `backup-verified` result
-grants no permission to create tombstones, delete data, reset storage, sync, or
-begin R3.
+The pure R2.1 plan/model, R2.2 Writer DB v2 artifact verifier, and R2.3 Drive v1
+artifact verifier are published; R2.3 is at
+`a1c16610a7d404d401a28295bc161c40d6168a6d` and stops at
+`structure-verified`. Pure R2.4 is prepared locally and stops at
+`baseline-built`: it validates supplied WriterPackages and produces only
+text-free counts, sorted IDs, and an awaited injected semantic SHA-256 result
+compatible with a future asynchronous Web Crypto adapter. These
+slices create no backup; R2.3 calls no Drive or sync path and proves no
+byte-exact integrity, while R2.4 calls no crypto or storage implementation.
+The remaining R2 slices are not implemented, and even the future highest
+`backup-verified` result grants no permission to create tombstones, delete
+data, reset storage, sync, or begin R3.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use

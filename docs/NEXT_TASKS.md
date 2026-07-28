@@ -37,13 +37,16 @@ pure R1 inventory kernel is implemented and verified separately from Writer DB.
 It accepts only supplied typed sources, exposes frozen text-free metadata, and
 stops at `ready-for-backup`; it does not call real loaders, UI, storage, Drive,
 or any write path. The docs-only R2 backup contract is now defined in
-`WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. R2.1 and pure R2.2 are published. R2.3
-is prepared locally as a pure Drive v1 structure/content verifier over explicit
-synthetic raw JSON, missing, or not-applicable input. It emits only frozen
-text-free metadata, computes no hash, and calls no Drive/sync path. The next
-smallest implementation step is R2.4 only: the Package baseline and semantic
-fingerprint contract. Do not start real-data reads, downloads, backup UI,
-tombstones, reset, sync changes, or Package editing.
+`WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. R2.1, pure R2.2, and pure R2.3 are
+published; R2.3 is at `a1c16610a7d404d401a28295bc161c40d6168a6d`. Pure
+R2.4 is prepared locally and builds a frozen, text-free Package baseline from
+explicitly supplied WriterPackages and an injected sync-or-Promise SHA-256
+hasher that is always awaited. It preserves
+note order, makes top-level Package order irrelevant by sorting IDs, and stops
+at `baseline-built`, never `backup-verified`. The next smallest implementation
+step is R2.5 only: separately reviewed read-only assembly. Do not start
+tombstones, reset, sync changes, Package editing, or UI; R2.5 must retain
+injected reads and must not write storage or Drive.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
