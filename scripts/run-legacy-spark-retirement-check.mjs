@@ -24,7 +24,7 @@ try {
       "--esModuleInterop",
       "--outDir",
       outputDir,
-      "src/legacySparkRetirementInventoryChecks.ts"
+      "src/legacySparkRetirementChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -35,7 +35,7 @@ try {
 
   const run = spawnSync(
     process.execPath,
-    [join(outputDir, "legacySparkRetirementInventoryChecks.js")],
+    [join(outputDir, "legacySparkRetirementChecks.js")],
     { cwd: repoRoot, stdio: "inherit" }
   );
 

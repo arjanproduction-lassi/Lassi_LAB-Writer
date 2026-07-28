@@ -55,10 +55,11 @@ state `ready-for-backup`. It runs through the separate
 `check:legacy-spark-retirement` harness and performs no real loader call, UI,
 write, tombstone creation, backup, or runtime cutover. The docs-only R2
 artifact, verification, manifest, Package-invariant, and rollback contract is
-now defined in `WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`; no R2 runtime or real
-backup exists. The smallest separately reviewed implementation step is R2.1:
-pure types, stable filenames, manifest shapes, and typed reason codes using
-artificial inputs only.
+now defined in `WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. Pure R2.1 is prepared
+locally: stable filenames, a frozen text-free manifest plan, typed reason codes,
+and metadata validation using artificial inputs only. It stops at `planned`,
+computes no hash, and creates no file. The next separate step is R2.2, a pure
+Writer DB v2 backup verifier; no R2 runtime or real backup exists.
 
 ## Completed v0.1 Slice
 

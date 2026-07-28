@@ -221,4 +221,5 @@ const specialId = buildLegacySparkRetirementInventory({
 });
 check(specialId.uniqueSparkIds[0] === "__proto__", "Special string ids must remain safe data values.");
 
+export const legacySparkRetirementInventoryCheckCount = passed;
 console.log(`Legacy Spark retirement inventory checks: ${passed}/${passed} passed.`);

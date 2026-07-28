@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-28 - R2.1 pure Legacy Spark backup plan (local only)
+
+- Added pure backup artifact, stable filename, text-free manifest-plan, typed
+  reason-code, safe metadata input, and discriminated build-result types.
+- Added deterministic filename generation from an explicit canonical UTC
+  `.000Z` timestamp; no current-time fallback or silent timestamp repair exists.
+- Added count, tombstone, note, duplicate Package ID, schema, and Drive metadata
+  validation with deterministic Package ID ordering.
+- Deep-froze the plan, artifacts, manifest, nested metadata, and detached
+  Package ID array. The highest state is `planned`; the only next step is
+  `verify-backup`.
+- Added 48 synthetic R2.1 checks while preserving all 28 R1 checks, for 76/76
+  retirement checks in the combined harness.
+- No hash was calculated and no real backup file, author data, storage, Drive,
+  network, UI, tombstone, reset, or runtime path was read or changed.
+- R2.1 remains local and uncommitted. The next smallest step is R2.2, a pure
+  Writer DB v2 backup verifier over synthetic inputs.
+
 ## 2026-07-25 - R2 Legacy Spark backup contract review (docs only)
 
 - Audited the current Writer DB v2 export, parser/preview, import backup,

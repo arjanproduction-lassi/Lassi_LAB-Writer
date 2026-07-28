@@ -512,6 +512,12 @@ confirmation, and its own review. R2 does not implement it.
 - pure validation of manifest shape and no private text fields;
 - no crypto, bytes, parser, loader, file, storage, network, or UI.
 
+Implemented locally in `src/legacySparkRetirementBackupPlan.ts` with artificial
+checks only. It accepts explicit safe metadata, requires canonical UTC
+`.000Z` timestamps, creates frozen filename/manifest/artifact plans, uses only
+`null` hash placeholders, and stops at `planned` with
+`nextAllowedStep: "verify-backup"`. It does not create or verify a backup.
+
 This is the smallest safe next implementation step.
 
 ### R2.2 - Pure Writer DB v2 verifier
@@ -648,7 +654,8 @@ file integrity; canonical SHA-256 fingerprints prove Spark and Package semantic
 integrity. WriterPackages are protected by a baseline that later R3-R6 phases
 must reproduce exactly.
 
-The highest R2 state is `backup-verified`. It does not authorize deletion. The
-smallest next implementation is R2.1 only: pure types, filenames, manifest, and
-reason codes with artificial checks and no bytes, crypto, loader, file, storage,
-network, or UI.
+The highest R2 state is `backup-verified`. It does not authorize deletion.
+R2.1 is prepared locally as a pure plan and text-free manifest model; its
+highest state is only `planned`. The smallest next implementation is R2.2, the
+pure Writer DB v2 backup verifier, still with synthetic input only and no
+loader, file creation, storage, Drive, network, or UI.
