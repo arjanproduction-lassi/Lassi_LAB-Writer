@@ -53,8 +53,12 @@ and only then the package-only product cutover. Each phase has its own gate;
 the pure R1 inventory kernel is implemented with the single terminal preview
 state `ready-for-backup`. It runs through the separate
 `check:legacy-spark-retirement` harness and performs no real loader call, UI,
-write, tombstone creation, backup, or runtime cutover. R2 backup preparation is
-the next separate review gate and is not implemented.
+write, tombstone creation, backup, or runtime cutover. The docs-only R2
+artifact, verification, manifest, Package-invariant, and rollback contract is
+now defined in `WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`; no R2 runtime or real
+backup exists. The smallest separately reviewed implementation step is R2.1:
+pure types, stable filenames, manifest shapes, and typed reason codes using
+artificial inputs only.
 
 ## Completed v0.1 Slice
 

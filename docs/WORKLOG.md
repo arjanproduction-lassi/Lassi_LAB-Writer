@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-25 - R2 Legacy Spark backup contract review (docs only)
+
+- Audited the current Writer DB v2 export, parser/preview, import backup,
+  persistence/recovery, Spark storage, WriterPackage storage, production export,
+  and v1 Google Drive sync boundaries without changing runtime code.
+- Defined three future R2 artifacts: a validated v2 backup, an exact raw-byte
+  Drive v1 copy or proven not-applicable result, and a text-free verification
+  manifest with raw SHA-256 hashes and deterministic semantic fingerprints.
+- Defined strict count and duplicate checks, the immutable WriterPackage
+  baseline, typed `backup-verified`/`incomplete`/`invalid` outcomes, a declared
+  device/profile checklist, and independently reviewable R2.1-R2.7 gates.
+- Recorded that normal newest-wins import is not a reliable post-tombstone undo;
+  the recommended future rollback is a separately reviewed exact Spark-only
+  restore while sync is paused, with WriterPackages preserved and reverified.
+- Created no backup file, read no real author data, and added no runtime, CSS,
+  storage, Drive, deletion, tombstone, staging, commit, push, or deployment
+  change. R2 remains unimplemented.
+
 ## 2026-07-25 - R1 pure Legacy Spark retirement inventory
 
 - Added a pure inventory kernel over supplied typed Spark sources, real

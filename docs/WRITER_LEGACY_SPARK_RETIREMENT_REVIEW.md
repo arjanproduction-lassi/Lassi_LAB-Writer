@@ -324,6 +324,20 @@ storage setter.
 
 ## Mandatory Backup Contract
 
+The detailed docs-only R2 contract is defined in
+`WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. It supersedes the illustrative
+filenames and abbreviated checks below with three explicit artifacts: a
+validated Writer DB v2 backup, an exact raw-byte Drive v1 backup (or a proven
+not-applicable result), and a text-free manifest containing raw SHA-256 hashes,
+semantic fingerprints, validation evidence, and the WriterPackage baseline.
+R2 is not implemented, and even its highest `backup-verified` result grants no
+permission to create tombstones, delete data, reset storage, sync, or begin R3.
+
+The existing Drive sync request is not a raw-backup reader: it parses JSON and
+then participates in merge/upload behavior. A future R2 implementation must use
+a separately reviewed read-only byte path that cannot call sync, merge, local
+storage writes, Drive upload, or file creation in Drive.
+
 ### Primary full backup
 
 Create a validated Writer DB v2 file before R3:

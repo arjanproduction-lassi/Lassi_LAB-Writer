@@ -36,9 +36,11 @@ any destructive work, follow `WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`. The
 pure R1 inventory kernel is implemented and verified separately from Writer DB.
 It accepts only supplied typed sources, exposes frozen text-free metadata, and
 stops at `ready-for-backup`; it does not call real loaders, UI, storage, Drive,
-or any write path. The next smallest step is a separately reviewed R2 backup
-contract. Do not start backup UI, tombstones, reset, sync changes, or Package
-editing as part of R1 closure.
+or any write path. The docs-only R2 backup contract is now defined in
+`WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. Its next smallest implementation step
+is R2.1 only: pure artifact/manifest types, stable filenames, and typed reason
+codes with artificial inputs. Do not start runtime hashing, real-data reads,
+downloads, backup UI, tombstones, reset, sync changes, or Package editing.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
