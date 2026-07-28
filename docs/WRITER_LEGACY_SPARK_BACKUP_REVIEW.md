@@ -512,8 +512,8 @@ confirmation, and its own review. R2 does not implement it.
 - pure validation of manifest shape and no private text fields;
 - no crypto, bytes, parser, loader, file, storage, network, or UI.
 
-Implemented locally in `src/legacySparkRetirementBackupPlan.ts` with artificial
-checks only. It accepts explicit safe metadata, requires canonical UTC
+Published in `src/legacySparkRetirementBackupPlan.ts` with artificial checks
+only. It accepts explicit safe metadata, requires canonical UTC
 `.000Z` timestamps, creates frozen filename/manifest/artifact plans, uses only
 `null` hash placeholders, and stops at `planned` with
 `nextAllowedStep: "verify-backup"`. It does not create or verify a backup.
@@ -522,10 +522,18 @@ This is the smallest safe next implementation step.
 
 ### R2.2 - Pure Writer DB v2 verifier
 
-- exact input bytes plus injected expected hash;
+- explicit raw JSON string supplied by the caller, with no hash yet;
 - reuse the existing read-only parser;
 - add strict count, uniqueness, tombstone, and immutability checks;
 - no artifact download or write.
+
+Implemented locally in
+`src/legacySparkRetirementWriterDbBackupVerifier.ts`. It accepts one explicit
+raw JSON string, reuses the existing read-only Writer DB parser, requires v2,
+strict count equality, valid records/timestamps, and unique same-collection
+IDs, and returns only frozen text-free summary metadata. Its successful status
+is `structure-verified`, not the overall R2 `backup-verified`. It calculates no
+hash and reads or creates no file, storage value, manifest, or Drive artifact.
 
 ### R2.3 - Pure raw Drive v1 verifier
 
@@ -655,7 +663,8 @@ integrity. WriterPackages are protected by a baseline that later R3-R6 phases
 must reproduce exactly.
 
 The highest R2 state is `backup-verified`. It does not authorize deletion.
-R2.1 is prepared locally as a pure plan and text-free manifest model; its
-highest state is only `planned`. The smallest next implementation is R2.2, the
-pure Writer DB v2 backup verifier, still with synthetic input only and no
-loader, file creation, storage, Drive, network, or UI.
+R2.1 is published as a pure plan and text-free manifest model; its highest
+state is only `planned`. R2.2 is prepared locally as a pure Writer DB v2
+structure/content verifier over synthetic input. The smallest next
+implementation is R2.3, the pure raw Drive v1 verifier, still with no runtime
+loader, file creation, storage mutation, Drive write, or UI.

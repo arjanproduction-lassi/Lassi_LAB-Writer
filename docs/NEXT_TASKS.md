@@ -37,12 +37,13 @@ pure R1 inventory kernel is implemented and verified separately from Writer DB.
 It accepts only supplied typed sources, exposes frozen text-free metadata, and
 stops at `ready-for-backup`; it does not call real loaders, UI, storage, Drive,
 or any write path. The docs-only R2 backup contract is now defined in
-`WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. R2.1 is prepared locally as a pure,
-deep-frozen `planned` artifact/manifest model with stable filenames, safe
-metadata validation, typed reason codes, and null hash placeholders. The next
-smallest implementation step is R2.2 only: a pure Writer DB v2 backup verifier
-over synthetic input. Do not start runtime hashing, real-data reads, downloads,
-backup UI, tombstones, reset, sync changes, or Package editing.
+`WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. R2.1 is published as a pure,
+deep-frozen `planned` artifact/manifest model. R2.2 is prepared locally as a
+pure Writer DB v2 structure/content verifier over synthetic raw JSON and emits
+only a frozen text-free `structure-verified` summary or typed invalid reasons.
+The next smallest implementation step is R2.3 only: a pure raw Drive v1 backup
+verifier. Do not start runtime hashing, real-data reads, downloads, backup UI,
+tombstones, reset, sync changes, or Package editing.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

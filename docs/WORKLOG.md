@@ -1,6 +1,25 @@
 # Worklog
 
-## 2026-07-28 - R2.1 pure Legacy Spark backup plan (local only)
+## 2026-07-28 - R2.2 pure Writer DB v2 backup verifier (local only)
+
+- Added a pure verifier for one explicitly supplied raw Writer DB v2 JSON
+  string, reusing the existing read-only parser and record validators.
+- Required the exact app and v2 schema, valid declared counts, strict count-to-
+  array equality, valid Sparks/Packages/notes/timestamps, and unique IDs within
+  each collection. No merge, deduplication, repair, or timestamp rewrite occurs.
+- Preserved tombstones and deleted notes in frozen text-free summary counts and
+  emitted deterministic sorted Spark and Package IDs without creative text.
+- Used `structure-verified` for artifact-level success so it cannot be confused
+  with overall R2 `backup-verified`; invalid results contain only frozen typed
+  reason codes.
+- Added 43 synthetic R2.2 checks while preserving R2.1 48/48 and R1 28/28, for
+  119/119 retirement checks in the combined harness.
+- No hash, filename, manifest, backup file, storage, Drive, network, UI,
+  tombstone API, import, write, or real-data access was added.
+- R2.2 remains local and uncommitted. The next smallest step is R2.3, a pure raw
+  Drive v1 backup verifier.
+
+## 2026-07-28 - R2.1 pure Legacy Spark backup plan
 
 - Added pure backup artifact, stable filename, text-free manifest-plan, typed
   reason-code, safe metadata input, and discriminated build-result types.
@@ -15,8 +34,9 @@
   retirement checks in the combined harness.
 - No hash was calculated and no real backup file, author data, storage, Drive,
   network, UI, tombstone, reset, or runtime path was read or changed.
-- R2.1 remains local and uncommitted. The next smallest step is R2.2, a pure
-  Writer DB v2 backup verifier over synthetic inputs.
+- Published as `40c56c85874b74fe6ce503ba3f2a8fc2c47f36be`. The next
+  smallest step is R2.2, a pure Writer DB v2 backup verifier over synthetic
+  inputs.
 
 ## 2026-07-25 - R2 Legacy Spark backup contract review (docs only)
 
