@@ -44,12 +44,14 @@ builds a frozen, text-free Package baseline from
 explicitly supplied WriterPackages and an injected sync-or-Promise SHA-256
 hasher that is always awaited. It preserves
 note order, makes top-level Package order irrelevant by sorting IDs, and stops
-at `baseline-built`, never `backup-verified`. Pure R2.5 is prepared locally: it
-coordinates only injected synthetic bytes/readers, strict decoding, R2.2-R2.4
-verification, and exact-byte hashes; it returns at most `assembly-verified`.
-The next smallest step is R2.6 review of a temporary read-only backup guide and
-explicit production adapters. Do not start tombstones, reset, sync changes, or
-Package editing, and do not treat assembly as a saved or reloaded backup.
+at `baseline-built`, never `backup-verified`. Pure R2.5 is published at
+`ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28`: it coordinates only injected
+synthetic bytes/readers, strict decoding, R2.2-R2.4 verification, and
+exact-byte hashes; it returns at most `assembly-verified`. R2.6 docs-only guide
+review is captured in `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`. The next
+smallest implementation step is R2.6.1 pure guide types, reason codes, state
+machine, and transition checks. Do not start tombstones, reset, sync changes,
+Package editing, real storage/Drive reads, UI, downloads, or file creation.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

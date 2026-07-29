@@ -67,11 +67,15 @@ hash, and create no file. Pure R2.4 is published at
 WriterPackages, records text-free counts and sorted IDs, and computes a
 semantic fingerprint only through an injected sync-or-Promise SHA-256 hasher
 that the asynchronous builder always awaits. It stops at
-`baseline-built`. Pure R2.5 is prepared locally as an asynchronous coordinator
-over injected synthetic bytes, Package reads, strict decoding, and hashers. It
+`baseline-built`. Pure R2.5 is published at
+`ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28` as an asynchronous coordinator over
+injected synthetic bytes, Package reads, strict decoding, and hashers. It
 hashes exact byte snapshots, compares current and backup Package baselines, and
-stops at `assembly-verified`, `incomplete`, or `invalid`. No production adapter,
-file, download, or real backup exists. The next separate step is R2.6 review.
+stops at `assembly-verified`, `incomplete`, or `invalid`. No production
+adapter, file, download, or real backup exists. R2.6 is now a docs-only backup
+guide and production adapter review in
+`WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`; its smallest future
+implementation step is pure guide types and a status machine.
 
 ## Completed v0.1 Slice
 

@@ -64,6 +64,15 @@ Author text must not be logged, snapshotted into tests, or included in the
 confirmation phrase. Full safety rules are in
 `WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`.
 
+R2.6 narrows the first temporary **DĂˇta** surface to a backup guide only. It
+should use explicit, non-destructive states: prerequisites, read-only snapshot,
+backup presented, downloads triggered, files reselected, and `backup-verified`.
+It must not infer that a file was saved from a browser click alone. The guide
+shows filenames, counts, short hash identifiers, Drive state, Package baseline
+match, and privacy warnings, but never author text. R2 uses an explicit action
+and privacy acknowledgement; typed confirmation waits for the later R3
+tombstone/reset phase.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

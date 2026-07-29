@@ -340,13 +340,16 @@ text-free counts, sorted IDs, and an awaited injected semantic SHA-256 result
 compatible with a future asynchronous Web Crypto adapter. These
 slices create no backup; R2.3 calls no Drive or sync path and proves no
 byte-exact integrity, while R2.4 calls no crypto or storage implementation.
-Pure R2.5 is prepared locally and coordinates injected synthetic exact bytes,
-strict decoding, hashing, structure verification, and current/backup Package
-baseline comparison. It stops at `assembly-verified`, `incomplete`, or
-`invalid`, creates/downloads no file, and has no production storage, Drive, or
-crypto adapter. The remaining R2 slices are not implemented, and even the future highest
-`backup-verified` result grants no permission to create tombstones, delete
-data, reset storage, sync, or begin R3.
+Pure R2.5 is published at
+`ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28` and coordinates injected synthetic
+exact bytes, strict decoding, hashing, structure verification, and
+current/backup Package baseline comparison. It stops at `assembly-verified`,
+`incomplete`, or `invalid`, creates/downloads no file, and has no production
+storage, Drive, or crypto adapter. R2.6 is the docs-only backup guide and
+production adapter review in `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`. The
+remaining R2 implementation slices are not implemented, and even the future
+highest `backup-verified` result grants no permission to create tombstones,
+delete data, reset storage, sync, or begin R3.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use

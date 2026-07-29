@@ -1,5 +1,25 @@
 # Worklog
 
+## 2026-07-29 - R2.6 backup guide and adapter review (docs only)
+
+- Added `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md` to define the future
+  temporary Data backup guide without implementing runtime behavior.
+- Documented the published R2.5 boundary at
+  `ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28`: success reaches only
+  `assembly-verified` and permits only `present-backup-download`, not R3.
+- Reviewed current Spark, WriterPackage, Writer DB v2 export, App Data, product
+  shell, and Google Drive sync boundaries. The current Drive sync path parses,
+  merges, creates, and uploads, so it is forbidden for raw backup reading.
+- Specified future production adapters for one captured local snapshot, raw
+  Drive v1 GET-only bytes, current WriterPackages, raw Package storage bytes,
+  strict UTF-8, and browser Web Crypto SHA-256.
+- Defined the download/reselect boundary, manifest cross-check,
+  `backup-verified` status machine, auth/Drive errors, privacy rules, R2.6.1
+  through R2.6.8 phases, synthetic tests, and manual verification plan.
+- No TypeScript, App, CSS, runtime adapter, localStorage read, Google Drive
+  call, Blob/download, backup file, real data hash, stage, commit, push, or
+  deployment is part of this docs-only step.
+
 ## 2026-07-28 - R2.5 dependency-injected backup assembly (local only)
 
 - Added an asynchronous coordinator over synthetic `Uint8Array` Writer DB v2

@@ -587,18 +587,27 @@ filesystem, or runtime loader and does not create a backup or reach
   `assembly-verified`/`incomplete`/`invalid` status;
 - never call sync, merge, storage setters, Drive writes, or file downloads.
 
-Implemented locally in `src/legacySparkRetirementBackupAssembly.ts` using only
-fake dependencies and synthetic tests. No production localStorage, Writer DB
-export, Drive fetch, Web Crypto, Blob, download, or UI adapter exists. A valid
-assembly allows only `present-backup-download`; it does not prove that files
-were saved or reloaded and is not `backup-verified`.
+Published at `ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28` in
+`src/legacySparkRetirementBackupAssembly.ts` using only injected dependencies
+and synthetic tests. No production localStorage, Writer DB export, Drive fetch,
+Web Crypto, Blob, download, or UI adapter exists. A valid assembly allows only
+`present-backup-download`; it does not prove that files were saved or reloaded
+and is not `backup-verified`.
 
-### R2.6 - Temporary Data UI guide
+### R2.6 - Backup guide and production adapter review
 
-- show R1 counts, artifact progress, hashes, Package baseline, and typed status;
-- never render or log creative content;
-- provide downloads, not automatic repository or cloud storage;
-- stop at `backup-verified`.
+R2.6 is documented in
+`WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`. It is a docs-only review of the
+future temporary Data guide and its explicit production adapters:
+
+- a thin Writer DB v2 bytes adapter over one captured local snapshot;
+- a strict GET-only raw Drive v1 byte reader;
+- current WriterPackages and raw Package storage byte adapters;
+- browser UTF-8 and Web Crypto SHA-256 adapters;
+- a download/reselect flow that can reach at most `backup-verified`.
+
+This review still adds no runtime adapter, UI, CSS, file, Blob, real data read,
+Drive call, sync, merge, upload, tombstone, reset, commit, push, or deployment.
 
 ### R2.7 - Synthetic integration and manual backup
 
@@ -702,8 +711,9 @@ The highest R2 state is `backup-verified`. It does not authorize deletion.
 R2.1, R2.2, and R2.3 are published. R2.1 stops at `planned`; R2.2 and
 R2.3 stop at artifact `structure-verified`. R2.4 is published at
 `5ae5cbaa4ad044b9ebd62bf15d8d5bff50ba4ed1` and stops at
-`baseline-built`. R2.5 is prepared locally over synthetic injected data and
-stops at `assembly-verified`, `incomplete`, or `invalid`. It creates no backup
-file and has no production adapter. The smallest next step is R2.6 review of a
-temporary read-only backup guide and explicit adapters; storage mutation,
-Drive writes, sync, tombstones, reset, and R3 remain forbidden.
+`baseline-built`. R2.5 is published at
+`ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28` and stops at
+`assembly-verified`, `incomplete`, or `invalid`. It creates no backup file and
+has no production adapter. R2.6 is the docs-only backup guide and production
+adapter review in `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`; storage
+mutation, Drive writes, sync, tombstones, reset, and R3 remain forbidden.
