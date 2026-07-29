@@ -62,12 +62,16 @@ verifies only one supplied Writer DB v2 JSON artifact's structure. Pure R2.3 is
 published at `a1c16610a7d404d401a28295bc161c40d6168a6d` and verifies only an
 explicitly supplied Drive v1 JSON artifact or explicit missing/not-applicable
 source status. Both artifact verifiers stop at `structure-verified`, compute no
-hash, and create no file. Pure R2.4 is prepared locally: it validates supplied
+hash, and create no file. Pure R2.4 is published at
+`5ae5cbaa4ad044b9ebd62bf15d8d5bff50ba4ed1`: it validates supplied
 WriterPackages, records text-free counts and sorted IDs, and computes a
 semantic fingerprint only through an injected sync-or-Promise SHA-256 hasher
 that the asynchronous builder always awaits. It stops at
-`baseline-built`; no R2 runtime or real backup exists. The next separate step
-is R2.5 read-only assembly.
+`baseline-built`. Pure R2.5 is prepared locally as an asynchronous coordinator
+over injected synthetic bytes, Package reads, strict decoding, and hashers. It
+hashes exact byte snapshots, compares current and backup Package baselines, and
+stops at `assembly-verified`, `incomplete`, or `invalid`. No production adapter,
+file, download, or real backup exists. The next separate step is R2.6 review.
 
 ## Completed v0.1 Slice
 

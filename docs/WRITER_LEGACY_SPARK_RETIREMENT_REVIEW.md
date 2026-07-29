@@ -333,13 +333,18 @@ semantic fingerprints, validation evidence, and the WriterPackage baseline.
 The pure R2.1 plan/model, R2.2 Writer DB v2 artifact verifier, and R2.3 Drive v1
 artifact verifier are published; R2.3 is at
 `a1c16610a7d404d401a28295bc161c40d6168a6d` and stops at
-`structure-verified`. Pure R2.4 is prepared locally and stops at
+`structure-verified`. Pure R2.4 is published at
+`5ae5cbaa4ad044b9ebd62bf15d8d5bff50ba4ed1` and stops at
 `baseline-built`: it validates supplied WriterPackages and produces only
 text-free counts, sorted IDs, and an awaited injected semantic SHA-256 result
 compatible with a future asynchronous Web Crypto adapter. These
 slices create no backup; R2.3 calls no Drive or sync path and proves no
 byte-exact integrity, while R2.4 calls no crypto or storage implementation.
-The remaining R2 slices are not implemented, and even the future highest
+Pure R2.5 is prepared locally and coordinates injected synthetic exact bytes,
+strict decoding, hashing, structure verification, and current/backup Package
+baseline comparison. It stops at `assembly-verified`, `incomplete`, or
+`invalid`, creates/downloads no file, and has no production storage, Drive, or
+crypto adapter. The remaining R2 slices are not implemented, and even the future highest
 `backup-verified` result grants no permission to create tombstones, delete
 data, reset storage, sync, or begin R3.
 

@@ -39,14 +39,17 @@ stops at `ready-for-backup`; it does not call real loaders, UI, storage, Drive,
 or any write path. The docs-only R2 backup contract is now defined in
 `WRITER_LEGACY_SPARK_BACKUP_REVIEW.md`. R2.1, pure R2.2, and pure R2.3 are
 published; R2.3 is at `a1c16610a7d404d401a28295bc161c40d6168a6d`. Pure
-R2.4 is prepared locally and builds a frozen, text-free Package baseline from
+R2.4 is published at `5ae5cbaa4ad044b9ebd62bf15d8d5bff50ba4ed1` and
+builds a frozen, text-free Package baseline from
 explicitly supplied WriterPackages and an injected sync-or-Promise SHA-256
 hasher that is always awaited. It preserves
 note order, makes top-level Package order irrelevant by sorting IDs, and stops
-at `baseline-built`, never `backup-verified`. The next smallest implementation
-step is R2.5 only: separately reviewed read-only assembly. Do not start
-tombstones, reset, sync changes, Package editing, or UI; R2.5 must retain
-injected reads and must not write storage or Drive.
+at `baseline-built`, never `backup-verified`. Pure R2.5 is prepared locally: it
+coordinates only injected synthetic bytes/readers, strict decoding, R2.2-R2.4
+verification, and exact-byte hashes; it returns at most `assembly-verified`.
+The next smallest step is R2.6 review of a temporary read-only backup guide and
+explicit production adapters. Do not start tombstones, reset, sync changes, or
+Package editing, and do not treat assembly as a saved or reloaded backup.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

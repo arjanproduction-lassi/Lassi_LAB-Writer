@@ -577,13 +577,21 @@ filesystem, or runtime loader and does not create a backup or reach
 
 ### R2.5 - Read-only assembly
 
-- inject validated raw storage reads, v2 export read, raw Drive byte read, clock,
-  and hasher;
-- create downloadable artifacts only after every read/validation gate passes;
-- never call sync, merge, storage setters, or Drive writes.
+- inject Writer DB v2 and raw Drive `Uint8Array` reads, current Packages,
+  optional raw Package storage bytes, strict UTF-8 decoding, explicit
+  `createdAt`, and byte/canonical hashers;
+- copy bytes before processing, verify decoded copies through R2.2/R2.3, and
+  hash exact byte snapshots without reserialization;
+- compare current and backup R2.4 Package baselines before success;
+- return only a frozen text-free manifest and
+  `assembly-verified`/`incomplete`/`invalid` status;
+- never call sync, merge, storage setters, Drive writes, or file downloads.
 
-This is the first slice allowed to read real data or create real user files and
-must remain separately reviewed from R2.1-R2.4.
+Implemented locally in `src/legacySparkRetirementBackupAssembly.ts` using only
+fake dependencies and synthetic tests. No production localStorage, Writer DB
+export, Drive fetch, Web Crypto, Blob, download, or UI adapter exists. A valid
+assembly allows only `present-backup-download`; it does not prove that files
+were saved or reloaded and is not `backup-verified`.
 
 ### R2.6 - Temporary Data UI guide
 
@@ -600,10 +608,10 @@ must remain separately reviewed from R2.1-R2.4.
 - delete only temporary synthetic test artifacts, never the verified real
   retirement backup set.
 
-Keep R2.1-R2.4 independently reviewable. R2.2 and R2.4 may share a later
+Keep R2.1-R2.5 independently reviewable. R2.2 and R2.4 may share a later
 canonicalization utility only after its contract is reviewed; do not combine
-their commits merely for convenience. R2.5, R2.6, and R2.7 must remain separate
-because they introduce real reads, UI, and manual operational evidence.
+their commits merely for convenience. R2.6 and R2.7 must remain separate
+because they introduce production adapters/UI and manual operational evidence.
 
 ## Automated Test Plan
 
@@ -692,8 +700,10 @@ must reproduce exactly.
 
 The highest R2 state is `backup-verified`. It does not authorize deletion.
 R2.1, R2.2, and R2.3 are published. R2.1 stops at `planned`; R2.2 and
-R2.3 stop at artifact `structure-verified`. R2.4 is prepared locally as a pure
-Package baseline over synthetic input and stops at `baseline-built`. It uses
-only an injected hasher and creates no backup or real hash itself. The smallest
-next implementation is R2.5 read-only assembly, still separately reviewed and
-without storage mutation, Drive write, sync, tombstones, reset, or UI.
+R2.3 stop at artifact `structure-verified`. R2.4 is published at
+`5ae5cbaa4ad044b9ebd62bf15d8d5bff50ba4ed1` and stops at
+`baseline-built`. R2.5 is prepared locally over synthetic injected data and
+stops at `assembly-verified`, `incomplete`, or `invalid`. It creates no backup
+file and has no production adapter. The smallest next step is R2.6 review of a
+temporary read-only backup guide and explicit adapters; storage mutation,
+Drive writes, sync, tombstones, reset, and R3 remain forbidden.

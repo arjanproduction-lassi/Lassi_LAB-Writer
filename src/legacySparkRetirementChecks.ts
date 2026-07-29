@@ -1,4 +1,5 @@
 import { legacySparkRetirementBackupPlanCheckCount } from "./legacySparkRetirementBackupPlanChecks";
+import { legacySparkRetirementBackupAssemblyCheckCount } from "./legacySparkRetirementBackupAssemblyChecks";
 import { legacySparkRetirementDriveV1BackupVerifierCheckCount } from "./legacySparkRetirementDriveV1BackupVerifierChecks";
 import { legacySparkRetirementInventoryCheckCount } from "./legacySparkRetirementInventoryChecks";
 import { legacySparkRetirementPackageBaselineCheckCount } from "./legacySparkRetirementPackageBaselineChecks";
@@ -7,6 +8,7 @@ import { legacySparkRetirementWriterDbBackupVerifierCheckCount } from "./legacyS
 async function runLegacySparkRetirementChecks() {
   const total = legacySparkRetirementInventoryCheckCount +
     legacySparkRetirementBackupPlanCheckCount +
+    await legacySparkRetirementBackupAssemblyCheckCount +
     legacySparkRetirementDriveV1BackupVerifierCheckCount +
     await legacySparkRetirementPackageBaselineCheckCount +
     legacySparkRetirementWriterDbBackupVerifierCheckCount;

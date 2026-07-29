@@ -1,6 +1,28 @@
 # Worklog
 
-## 2026-07-28 - R2.4 pure WriterPackage baseline (local only)
+## 2026-07-28 - R2.5 dependency-injected backup assembly (local only)
+
+- Added an asynchronous coordinator over synthetic `Uint8Array` Writer DB v2
+  and Drive v1 artifacts, current WriterPackages, optional raw Package storage
+  bytes, strict UTF-8 decoding, and injected byte/canonical SHA-256 functions.
+- Copied every supplied byte array before processing, decoded a separate copy,
+  structurally verified through R2.2/R2.3, and hashed the exact snapshot bytes
+  without parse/stringify normalization.
+- Compared independently built current and backup R2.4 Package baselines,
+  including counts, tombstones, notes, deleted notes, sorted IDs, and semantic
+  hash. Any difference returns `PACKAGE_BASELINE_MISMATCH`.
+- Returned only a deeply frozen text-free manifest and
+  `assembly-verified`/`incomplete`/`invalid`; success allows only
+  `present-backup-download` and is not `backup-verified` or R3 permission.
+- Added 55 synthetic R2.5 checks for exact bytes, async failures, baseline
+  mismatch, privacy, immutability, and isolation. The retirement harness is
+  286/286 with all 231 earlier R1-R2.4 checks retained.
+- No production storage, Drive, export, Web Crypto, download, Blob, UI, file,
+  real user data, write, sync, tombstone, reset, commit, push, or deployment is
+  part of R2.5. The next separate step is R2.6 review of a temporary read-only
+  backup guide and explicit production adapters.
+
+## 2026-07-28 - R2.4 pure WriterPackage baseline
 
 - Added an asynchronous pure baseline builder for explicitly supplied
   WriterPackages and an injected SHA-256 hasher that may return either a string
@@ -17,7 +39,8 @@
   rejected, and invalid async hashers, while preserving R2.3 42/42, R2.2
   43/43, R2.1 48/48, and R1 28/28, for 231/231 retirement checks.
 - No real user data, storage/Drive access, file creation, UI, sync, merge,
-  write, tombstone, reset, commit, push, or deployment is part of R2.4.
+  write, tombstone, reset, or deployment is part of R2.4.
+- Published as `5ae5cbaa4ad044b9ebd62bf15d8d5bff50ba4ed1`.
 - The next smallest step is separately reviewed R2.5 read-only assembly.
 
 ## 2026-07-28 - R2.3 pure Drive v1 backup verifier
