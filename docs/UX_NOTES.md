@@ -71,7 +71,8 @@ It must not infer that a file was saved from a browser click alone. The guide
 shows filenames, counts, short hash identifiers, Drive state, Package baseline
 match, and privacy warnings, but never author text. R2 uses an explicit action
 and privacy acknowledgement; typed confirmation waits for the later R3
-tombstone/reset phase.
+tombstone/reset phase. R2.6.1 keeps this as a pure state model only, with no
+React wiring or visible UI yet.
 
 ## Four Notebook Comfort
 

@@ -336,6 +336,20 @@ reviewed action.
 R2.6.1: Pure guide types, reason codes, state machine, and transition checks.
 No storage, Drive, file, crypto, or UI.
 
+R2.6.1 is implemented in
+`src/legacySparkRetirementBackupGuideState.ts` and
+`src/legacySparkRetirementBackupGuideStateChecks.ts`. It exposes
+`createLegacySparkRetirementBackupGuideState()` and
+`transitionLegacySparkRetirementBackupGuide(currentState, event)`. Transition
+results are only `transitioned` or `rejected`. The module is pure and
+deterministic: it carries only safe metadata, freezes states and transition
+results, rejects invalid transitions with typed reason codes, and does not
+verify artifacts itself. `backup-verified` can be entered only from
+`downloaded-files-reselected` after a future re-verifier explicitly confirms raw
+hash match, Writer DB structure verification, Drive structure verification or
+`not-applicable`, manifest cross-check, and Package baseline match. It exposes
+no R3, tombstone, delete, reset, storage, Drive, crypto, Blob, file, or UI API.
+
 R2.6.2: Browser UTF-8 and Web Crypto adapters with synthetic unit checks. No
 real data.
 

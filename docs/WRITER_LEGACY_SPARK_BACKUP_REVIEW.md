@@ -609,6 +609,12 @@ future temporary Data guide and its explicit production adapters:
 This review still adds no runtime adapter, UI, CSS, file, Blob, real data read,
 Drive call, sync, merge, upload, tombstone, reset, commit, push, or deployment.
 
+The first implementation slice, R2.6.1, is implemented as a pure state model
+only. It defines guide statuses/events, allowed transitions, typed transition
+rejections, safe text-free metadata, and the `backup-verified` boundary. It
+does not read storage or Drive, hash bytes, create artifacts, download files,
+render UI, or approve R3.
+
 ### R2.7 - Synthetic integration and manual backup
 
 - automated integration uses artificial data only;
@@ -714,6 +720,7 @@ R2.3 stop at artifact `structure-verified`. R2.4 is published at
 `baseline-built`. R2.5 is published at
 `ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28` and stops at
 `assembly-verified`, `incomplete`, or `invalid`. It creates no backup file and
-has no production adapter. R2.6 is the docs-only backup guide and production
-adapter review in `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`; storage
-mutation, Drive writes, sync, tombstones, reset, and R3 remain forbidden.
+has no production adapter. R2.6 docs are published in
+`WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`; R2.6.1 is the pure guide state
+machine slice. Storage mutation, Drive writes, sync, tombstones, reset, and R3
+remain forbidden.

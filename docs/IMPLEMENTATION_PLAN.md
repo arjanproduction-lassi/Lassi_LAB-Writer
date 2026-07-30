@@ -75,7 +75,12 @@ stops at `assembly-verified`, `incomplete`, or `invalid`. No production
 adapter, file, download, or real backup exists. R2.6 is now a docs-only backup
 guide and production adapter review in
 `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`; its smallest future
-implementation step is pure guide types and a status machine.
+implementation step is pure guide types and a status machine. R2.6.1 implements
+only pure statuses, events, transitions, typed rejection reasons, safe text-free
+metadata, and frozen results. It has no UI, storage,
+Drive, crypto, filesystem, Blob/download, real-data, or R3 behavior. The next
+separate implementation step is R2.6.2 strict UTF-8 and browser Web Crypto
+adapters using synthetic checks.
 
 ## Completed v0.1 Slice
 

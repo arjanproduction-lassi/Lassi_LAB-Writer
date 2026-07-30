@@ -1,5 +1,25 @@
 # Worklog
 
+## 2026-07-29 - R2.6.1 pure backup guide state model
+
+- Added a pure deterministic backup-guide state model with the approved R2.6
+  statuses from `idle` through `backup-verified`, plus `incomplete` and
+  `invalid`.
+- Added typed events, allowed transition checks, `transitioned`/`rejected`
+  results, rejected transition reason codes, safe text-free metadata, and
+  immutable transition results.
+- Required `backup-verified` to come only from `downloaded-files-reselected`
+  after an explicit future re-verification event confirms raw hash match,
+  Writer DB structure verification, Drive verification or `not-applicable`,
+  manifest cross-check, and Package baseline match.
+- Added 42 synthetic R2.6.1 checks and connected them to the existing retirement
+  harness. The retirement harness is now 328/328 with all 286 prior R1-R2.5
+  checks retained.
+- No React, UI, CSS, storage, Drive, crypto, filesystem, Blob/download, File
+  API, real data, backup artifact, tombstone, reset, R3, or deployment is part
+  of this slice. The next separate step is R2.6.2 strict UTF-8 and browser Web
+  Crypto adapters.
+
 ## 2026-07-29 - R2.6 backup guide and adapter review (docs only)
 
 - Added `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md` to define the future
