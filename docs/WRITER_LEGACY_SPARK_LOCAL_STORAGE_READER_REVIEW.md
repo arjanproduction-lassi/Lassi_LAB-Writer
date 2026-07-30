@@ -135,7 +135,13 @@ not part of c1 and requires separate explicit approval for c2.
 
 ## Decision
 
-Implement R2.6.3c1 first as a pure injected synchronous coordinator with
-synthetic tests. Do not combine it with c2. The first actual `localStorage`
-read belongs only to the later R2.6.3c2 browser wrapper after separate review
-and explicit approval.
+R2.6.3c1 is prepared locally in
+`src/legacySparkRetirementLocalStorageCapture.ts` with 44 synthetic checks. It
+uses only injected `readStorageValue`, reads exactly Spark -> Package -> Draft,
+then transparently delegates to R2.6.3a. Read failures are frozen, text-free,
+fail-fast invalid results and cannot create a partial snapshot. It contains no
+browser global and has not read real localStorage or author data.
+
+Do not combine c1 with c2. The smallest next step is a separate review of the
+R2.6.3c2 browser wrapper. Only c2 may perform the first actual
+`window.localStorage.getItem` after explicit approval.

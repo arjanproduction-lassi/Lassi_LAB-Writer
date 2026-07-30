@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-07-30 - R2.6.3c1 pure injected local capture (local only)
+
+- Added a pure coordinator with one injected `readStorageValue` dependency and
+  the three reviewed keys owned inside the retirement module.
+- Reads Spark -> Package -> Draft exactly once each before delegating all raw
+  interpretation and canonical `createdAt` validation to published R2.6.3a.
+- Maps `null` to missing and every string unchanged to present. Separate typed
+  read failures stop immediately, return no partial snapshot or exception text,
+  and freeze both wrapper and reasons.
+- Added 44 synthetic checks; the retirement harness is 520/520. No browser
+  storage, real author data, bytes, crypto, Drive, network, file/download, UI,
+  storage write, tombstone, R3, commit, push, or deployment is part of c1.
+- The next smallest step is a separate R2.6.3c2 browser-wrapper review. c2 is
+  the first slice that may call real `window.localStorage.getItem`.
+
 ## 2026-07-30 - R2.6.3c localStorage reader review (docs only)
 
 - Published R2.6.3b at `389b6347ec84d5472aa62a86d11fdff3416fed6d`

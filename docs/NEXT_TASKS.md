@@ -68,9 +68,11 @@ blocks, and a valid non-empty draft returns `incomplete` with `DRAFT_PRESENT`.
 R2.6.3b exact Writer DB v2 bytes from the captured snapshot is published at
 `389b6347ec84d5472aa62a86d11fdff3416fed6d`. It uses an injected encoder,
 returns only copied bytes and text-free metadata, and creates no file. The
-R2.6.3c review is in `WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`:
-implement pure injected c1 first; c2 is the separately approved first real
-localStorage read.
+R2.6.3c review is in `WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`.
+Pure injected c1 is prepared locally with 44 synthetic checks, exactly three
+ordered reads, fail-fast text-free errors, and no real storage access. The next
+step is a separate c2 browser-wrapper review; c2 is the first real localStorage
+read and still requires explicit approval.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

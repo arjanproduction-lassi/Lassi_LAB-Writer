@@ -407,8 +407,10 @@ summary. It does not read localStorage or create Writer DB bytes. R2.6.3b exact
 v2 byte construction is published at
 `389b6347ec84d5472aa62a86d11fdff3416fed6d`, using the existing payload
 builder, R2.2 self-verification, and injected UTF-8 encoding. Bytes stay in
-memory behind a fresh-copy accessor. The R2.6.3c reader review splits pure
-injected c1 from the separately approved first real localStorage read in c2.
+memory behind a fresh-copy accessor. Pure injected R2.6.3c1 is prepared locally
+with fixed three-key order and fail-fast read errors, still without browser
+storage or real data. The next separately reviewed c2 wrapper is the first
+permitted real localStorage read.
 
 ## Test Plan
 

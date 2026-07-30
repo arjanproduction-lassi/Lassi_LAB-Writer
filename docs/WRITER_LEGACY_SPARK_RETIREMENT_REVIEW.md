@@ -365,9 +365,11 @@ uses only explicit synthetic raw strings, and stops at `snapshot-captured`,
 `incomplete`, or `invalid`. It creates no backup bytes and grants no R3
 permission. R2.6.3b exact Writer DB v2 byte construction is published at
 `389b6347ec84d5472aa62a86d11fdff3416fed6d`; it creates only an in-memory
-copied artifact and remains below backup assembly or verification. R2.6.3c is
-split into pure injected c1 and a separately reviewed c2 browser wrapper; only
-c2 may first read localStorage.
+copied artifact and remains below backup assembly or verification. Pure
+injected R2.6.3c1 is prepared locally with fixed three-key order and no partial
+snapshot after read failure. It uses R2.6.3a and reads no real storage. The
+separately reviewed c2 browser wrapper is the only next slice that may first
+read localStorage.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use

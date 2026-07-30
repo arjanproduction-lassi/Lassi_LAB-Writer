@@ -637,8 +637,9 @@ storage read. Pure R2.6.3b is published at
 `389b6347ec84d5472aa62a86d11fdff3416fed6d` and creates exact in-memory v2
 JSON/bytes from that snapshot through existing payload/verification paths and
 an injected encoder. It hashes or downloads nothing. R2.6.3c is reviewed in
-`WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`; pure injected c1 precedes
-the first real localStorage read in c2.
+`WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`. Pure injected c1 is
+prepared locally and delegates only to R2.6.3a after three successful reads;
+the separately reviewed c2 remains the first real localStorage read.
 
 ### R2.7 - Synthetic integration and manual backup
 

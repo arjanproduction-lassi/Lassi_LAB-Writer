@@ -98,9 +98,10 @@ author data only inside a detached frozen in-memory snapshot. It creates no
 Writer DB bytes. R2.6.3b is published at
 `389b6347ec84d5472aa62a86d11fdff3416fed6d` as a pure exact v2 JSON/byte
 builder over that snapshot, using the existing payload builder, R2.2 verifier,
-and an injected UTF-8 encoder. The R2.6.3c review splits the next step into a
-pure injected c1 coordinator and the separately reviewed first real
-localStorage read in c2.
+and an injected UTF-8 encoder. Pure injected R2.6.3c1 is prepared locally with
+fixed Spark -> Package -> Draft reads and transparent R2.6.3a delegation. It
+uses no browser storage. The next separate step is review of c2, the first real
+localStorage read.
 
 ## Completed v0.1 Slice
 
