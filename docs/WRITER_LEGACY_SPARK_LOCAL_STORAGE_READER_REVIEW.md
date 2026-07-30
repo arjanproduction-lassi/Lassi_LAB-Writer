@@ -135,13 +135,15 @@ not part of c1 and requires separate explicit approval for c2.
 
 ## Decision
 
-R2.6.3c1 is prepared locally in
+R2.6.3c1 is published at `9d8168e1237d16eea0cbd06de0d923142f7de8cf` in
 `src/legacySparkRetirementLocalStorageCapture.ts` with 44 synthetic checks. It
 uses only injected `readStorageValue`, reads exactly Spark -> Package -> Draft,
 then transparently delegates to R2.6.3a. Read failures are frozen, text-free,
 fail-fast invalid results and cannot create a partial snapshot. It contains no
 browser global and has not read real localStorage or author data.
 
-Do not combine c1 with c2. The smallest next step is a separate review of the
-R2.6.3c2 browser wrapper. Only c2 may perform the first actual
-`window.localStorage.getItem` after explicit approval.
+Do not combine c1 with c2. R2.6.3c2 is reviewed in
+`WRITER_LEGACY_SPARK_BROWSER_LOCAL_STORAGE_READER_REVIEW.md` and is split into
+import-safe c2a and separately approved user-invoked c2b. Only c2b may perform
+the first actual real-data `window.localStorage.getItem` after explicit
+approval.

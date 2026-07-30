@@ -638,8 +638,9 @@ storage read. Pure R2.6.3b is published at
 JSON/bytes from that snapshot through existing payload/verification paths and
 an injected encoder. It hashes or downloads nothing. R2.6.3c is reviewed in
 `WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`. Pure injected c1 is
-prepared locally and delegates only to R2.6.3a after three successful reads;
-the separately reviewed c2 remains the first real localStorage read.
+published at `9d8168e1237d16eea0cbd06de0d923142f7de8cf` and delegates only
+to R2.6.3a after three successful reads. The docs-only c2 review separates
+import-safe c2a from user-invoked c2b, the first permitted real-data read.
 
 ### R2.7 - Synthetic integration and manual backup
 

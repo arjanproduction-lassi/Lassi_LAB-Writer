@@ -1,6 +1,25 @@
 # Worklog
 
-## 2026-07-30 - R2.6.3c1 pure injected local capture (local only)
+## 2026-07-30 - R2.6.3c2 browser boundary review (docs only)
+
+- Published pure injected R2.6.3c1 at
+  `9d8168e1237d16eea0cbd06de0d923142f7de8cf` after 44/44 c1 and 520/520 total
+  retirement checks; Writer DB remained 284/284 and product shell 200/200.
+- Split c2 into import-safe, unwired c2a and separately approved user-invoked
+  c2b. Only c2b may perform the first real Writer localStorage read.
+- Proposed one invocation-time `window.localStorage` acquisition, one retained
+  Storage object, delegation to published c1, and text-free frozen
+  `LOCAL_STORAGE_UNAVAILABLE` for acquisition failure.
+- Prohibited import/render/effect/startup reads, automatic capture, storage
+  writes/enumeration, implicit clocks, logs, analytics, clipboard, network,
+  Drive, bytes, files, download, and raw author data in UI state.
+- Defined synthetic c2a checks, the separately authorized c2b manual checklist,
+  reference release on completion/`START_OVER`, and a separate R2.6.3d
+  post-Drive exact raw consistency boundary.
+- No browser wrapper, UI, real storage/data read, backup artifact, staging,
+  commit, push, or deployment is part of this docs-only slice.
+
+## 2026-07-30 - R2.6.3c1 pure injected local capture (published)
 
 - Added a pure coordinator with one injected `readStorageValue` dependency and
   the three reviewed keys owned inside the retirement module.
@@ -9,11 +28,12 @@
 - Maps `null` to missing and every string unchanged to present. Separate typed
   read failures stop immediately, return no partial snapshot or exception text,
   and freeze both wrapper and reasons.
-- Added 44 synthetic checks; the retirement harness is 520/520. No browser
-  storage, real author data, bytes, crypto, Drive, network, file/download, UI,
-  storage write, tombstone, R3, commit, push, or deployment is part of c1.
-- The next smallest step is a separate R2.6.3c2 browser-wrapper review. c2 is
-  the first slice that may call real `window.localStorage.getItem`.
+- Added 44 synthetic checks; the retirement harness is 520/520. Published at
+  `9d8168e1237d16eea0cbd06de0d923142f7de8cf` without browser storage, real
+  author data, bytes, crypto, Drive, network, file/download, UI, storage write,
+  tombstone, R3, or deployment.
+- The next step is split into import-safe c2a and separately approved c2b. Only
+  user-invoked c2b may first call real `window.localStorage.getItem`.
 
 ## 2026-07-30 - R2.6.3c localStorage reader review (docs only)
 

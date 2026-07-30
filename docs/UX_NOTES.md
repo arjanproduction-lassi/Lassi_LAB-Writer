@@ -87,6 +87,12 @@ must be user-initiated, keep author text out of UI/logs, and release in-memory
 snapshot references when the attempt ends. Pure c1 has no UI or browser read;
 c2 is the first separately approved real localStorage read.
 
+The docs-only c2 review in
+`WRITER_LEGACY_SPARK_BROWSER_LOCAL_STORAGE_READER_REVIEW.md` separates an
+import-safe, unwired c2a wrapper from c2b. Only a clear c2b user action such as
+**Pripraviť lokálnu zálohu** may trigger the first real read. UI receives only
+text-free status/summary, and `START_OVER` must release snapshot references.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

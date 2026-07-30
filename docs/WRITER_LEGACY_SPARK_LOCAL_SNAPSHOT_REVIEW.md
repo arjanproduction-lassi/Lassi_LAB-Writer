@@ -327,8 +327,8 @@ creates no Writer DB bytes. R2.6.3b is published at
 payload builder, serializes with two-space JSON, self-verifies through R2.2,
 and keeps injected UTF-8 bytes behind a fresh-copy accessor. It reads no
 storage, hashes nothing, and creates no file/download. R2.6.3c is specified in
-`WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`. Pure c1 is prepared
-locally: it injects `readStorageValue`, captures Spark -> Package -> Draft once
-each, fails without partial snapshot, and delegates to this published parser.
-It reads no real storage. The smallest next step is a separate c2 review; c2 is
-the first actual `localStorage.getItem` wrapper.
+`WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`. Pure c1 is published at
+`9d8168e1237d16eea0cbd06de0d923142f7de8cf`: it injects `readStorageValue`,
+captures Spark -> Package -> Draft once each, fails without partial snapshot,
+and delegates to this parser. The docs-only c2 review keeps c2a import-safe and
+unwired; c2b is the first actual real-data `localStorage.getItem` invocation.
