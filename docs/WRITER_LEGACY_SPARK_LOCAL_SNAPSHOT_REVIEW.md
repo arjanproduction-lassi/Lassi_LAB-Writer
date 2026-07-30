@@ -316,10 +316,14 @@ real `localStorage.getItem` step.
 
 ## Smallest Next Step
 
-R2.6.3a is prepared locally in
+R2.6.3a is published at `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3` in
 `src/legacySparkRetirementLocalSnapshot.ts`. It is a pure parser/model over
 explicit synthetic raw strings, uses typed reasons and frozen detached results,
 distinguishes missing from stored `[]`, preserves tombstones/deleted notes, and
 returns only text-free public summary metadata. It reads no localStorage and
-creates no Writer DB bytes. The smallest next step is R2.6.3b only: exact Writer
-DB v2 bytes built from this captured snapshot through the published encoder.
+creates no Writer DB bytes. R2.6.3b is prepared locally in
+`src/legacySparkRetirementWriterDbBytesBuilder.ts`: it reuses the existing v2
+payload builder, serializes with two-space JSON, self-verifies through R2.2,
+and keeps injected UTF-8 bytes behind a fresh-copy accessor. It reads no
+storage, hashes nothing, and creates no file/download. The smallest next step
+is R2.6.3c, a thin separately reviewed read-only `localStorage.getItem` adapter.

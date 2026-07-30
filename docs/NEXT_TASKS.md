@@ -62,11 +62,13 @@ The R2.6.3 docs-only review now lives in
 R2.6.3a only: pure raw storage parsing and a frozen snapshot model over
 synthetic strings, still without real `localStorage`.
 
-R2.6.3a is now prepared locally and passes synthetic isolation checks. Missing
+R2.6.3a is published at `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3`. Missing
 keys remain distinct from stored `[]`; damaged, invalid, or duplicate data
 blocks, and a valid non-empty draft returns `incomplete` with `DRAFT_PRESENT`.
-The next step is R2.6.3b exact Writer DB v2 bytes from the captured snapshot,
-still without a real localStorage reader.
+R2.6.3b exact Writer DB v2 bytes from the captured snapshot is prepared
+locally. It uses an injected encoder, returns only copied bytes and text-free
+metadata, and creates no file. The next step is R2.6.3c, the first thin
+read-only localStorage capture adapter.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

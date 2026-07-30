@@ -628,11 +628,14 @@ collections including tombstones and deleted notes, and one injected
 because they filter invalid records, hide tombstones, adapt Sparks into catalog
 Packages, or perform separate runtime reads.
 
-The pure R2.6.3a parser/model is prepared locally over synthetic raw strings.
+The pure R2.6.3a parser/model is published at
+`fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3` over synthetic raw strings.
 It distinguishes missing from stored empty arrays, blocks corrupt, invalid, or
 duplicate collections, preserves full tombstone/note content in a frozen
 in-memory snapshot, and exposes only text-free summary metadata. It performs no
-storage read and creates no Writer DB bytes; R2.6.3b remains the next step.
+storage read. Pure R2.6.3b is prepared locally and creates exact in-memory v2
+JSON/bytes from that snapshot through existing payload/verification paths and
+an injected encoder. It hashes or downloads nothing. R2.6.3c is next.
 
 ### R2.7 - Synthetic integration and manual backup
 

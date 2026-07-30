@@ -7,6 +7,7 @@ import { legacySparkRetirementInventoryCheckCount } from "./legacySparkRetiremen
 import { legacySparkRetirementLocalSnapshotCheckCount } from "./legacySparkRetirementLocalSnapshotChecks";
 import { legacySparkRetirementPackageBaselineCheckCount } from "./legacySparkRetirementPackageBaselineChecks";
 import { legacySparkRetirementWriterDbBackupVerifierCheckCount } from "./legacySparkRetirementWriterDbBackupVerifierChecks";
+import { legacySparkRetirementWriterDbBytesBuilderCheckCount } from "./legacySparkRetirementWriterDbBytesBuilderChecks";
 
 async function runLegacySparkRetirementChecks() {
   const total = legacySparkRetirementInventoryCheckCount +
@@ -17,6 +18,7 @@ async function runLegacySparkRetirementChecks() {
     await legacySparkRetirementBrowserAdaptersCheckCount +
     legacySparkRetirementDriveV1BackupVerifierCheckCount +
     await legacySparkRetirementPackageBaselineCheckCount +
+    legacySparkRetirementWriterDbBytesBuilderCheckCount +
     legacySparkRetirementWriterDbBackupVerifierCheckCount;
   console.log(`Legacy Spark retirement total checks: ${total}/${total} passed.`);
 }

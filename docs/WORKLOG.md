@@ -1,6 +1,24 @@
 # Worklog
 
-## 2026-07-30 - R2.6.3a pure raw local snapshot model (local only)
+## 2026-07-30 - R2.6.3b exact Writer DB v2 bytes builder (local only)
+
+- Added a pure builder that accepts only a successful R2.6.3a snapshot and an
+  injected UTF-8 encoder.
+- Reused `createWriterDbV2Payload`, preserved snapshot collection order,
+  tombstones, notes/deleted notes, timestamps, and legacy metadata, serialized
+  exactly with `JSON.stringify(payload, null, 2)`, and self-verified through
+  the published R2.2 structure verifier.
+- Copied dependency bytes immediately into a closure-owned buffer. The public
+  artifact exposes only frozen text-free metadata and
+  `copyWriterDbV2Bytes()`, which returns a fresh copy on every call.
+- Added 50 synthetic R2.6.3b checks while preserving all prior 426 checks; the
+  retirement harness is 476/476.
+- No localStorage, real data, direct TextEncoder, hashing, Drive, network,
+  Blob/download, UI, manifest, file, write, R3, commit, push, or deployment is
+  part of this local slice. R2.6.3c thin read-only `localStorage.getItem`
+  adapter is the next separately reviewed step.
+
+## 2026-07-30 - R2.6.3a pure raw local snapshot model
 
 - Added a pure parser/model that accepts only explicit synthetic raw Spark,
   Package, and draft storage values plus an injected canonical `createdAt`.
@@ -17,8 +35,9 @@
 - Added 61 synthetic R2.6.3a checks while preserving all earlier 365 checks;
   the retirement harness is 426/426.
 - No localStorage, browser global, encoder, crypto, Drive, network, React,
-  Writer DB bytes, Blob/download, file, real data, write, R3, commit, push, or
-  deployment is part of this local slice. R2.6.3b exact Writer DB v2 bytes over
+  Writer DB bytes, Blob/download, file, real data, write, R3, or deployment is
+  part of this slice. Published at
+  `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3`. R2.6.3b exact Writer DB v2 bytes over
   this captured snapshot is the next separately reviewed step.
 
 ## 2026-07-30 - R2.6.3 local snapshot review (docs only)
