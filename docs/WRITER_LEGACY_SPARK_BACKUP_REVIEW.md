@@ -628,6 +628,12 @@ collections including tombstones and deleted notes, and one injected
 because they filter invalid records, hide tombstones, adapt Sparks into catalog
 Packages, or perform separate runtime reads.
 
+The pure R2.6.3a parser/model is prepared locally over synthetic raw strings.
+It distinguishes missing from stored empty arrays, blocks corrupt, invalid, or
+duplicate collections, preserves full tombstone/note content in a frozen
+in-memory snapshot, and exposes only text-free summary metadata. It performs no
+storage read and creates no Writer DB bytes; R2.6.3b remains the next step.
+
 ### R2.7 - Synthetic integration and manual backup
 
 - automated integration uses artificial data only;

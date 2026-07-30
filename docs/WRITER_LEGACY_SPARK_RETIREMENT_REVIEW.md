@@ -360,6 +360,11 @@ keeps the review docs-only, defines the future read-only local snapshot
 adapter, and recommends that the first implementation slice remain pure over
 synthetic raw strings before any real `localStorage.getItem` adapter exists.
 
+R2.6.3a is prepared locally as that pure parser/model. It reads no storage,
+uses only explicit synthetic raw strings, and stops at `snapshot-captured`,
+`incomplete`, or `invalid`. It creates no backup bytes and grants no R3
+permission. R2.6.3b exact Writer DB v2 byte construction is next.
+
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use
 a separately reviewed read-only byte path that cannot call sync, merge, local

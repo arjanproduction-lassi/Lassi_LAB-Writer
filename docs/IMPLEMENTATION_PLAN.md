@@ -91,6 +91,12 @@ Spark, Package, and new-Spark-draft storage keys, documents why current product
 loaders are not raw-backup-safe, and splits implementation into pure synthetic
 snapshot parsing before any real `localStorage.getItem` adapter.
 
+R2.6.3a is prepared locally as a pure raw snapshot parser/model. It accepts only
+explicit synthetic raw strings, blocks corrupt/invalid/duplicate records,
+preserves missing versus stored empty collections and all tombstones, and keeps
+author data only inside a detached frozen in-memory snapshot. It creates no
+Writer DB bytes. The next separate step is R2.6.3b exact v2 byte construction.
+
 ## Completed v0.1 Slice
 
 Build only the true v0.1 loop:

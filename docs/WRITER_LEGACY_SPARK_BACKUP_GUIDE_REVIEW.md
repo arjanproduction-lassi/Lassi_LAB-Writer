@@ -400,6 +400,12 @@ first touch real local data, Drive, files, UI, and manual operational evidence.
 The smallest safe next implementation step is R2.6.3a, the pure raw storage
 parser and snapshot model over synthetic strings.
 
+R2.6.3a is prepared locally as a pure implementation. It receives explicit raw
+strings only, reuses existing record validation paths, preserves collection
+order and tombstones, and returns a frozen internal snapshot plus text-free
+summary. It does not read localStorage or create Writer DB bytes. R2.6.3b exact
+v2 byte construction is the next separate step.
+
 ## Test Plan
 
 Automated tests use synthetic data only:

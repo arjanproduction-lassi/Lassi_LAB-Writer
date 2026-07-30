@@ -316,6 +316,10 @@ real `localStorage.getItem` step.
 
 ## Smallest Next Step
 
-Implement R2.6.3a only: a pure parser/model over injected synthetic raw strings,
-with typed reasons, frozen results, no real localStorage, and no Writer DB bytes
-yet.
+R2.6.3a is prepared locally in
+`src/legacySparkRetirementLocalSnapshot.ts`. It is a pure parser/model over
+explicit synthetic raw strings, uses typed reasons and frozen detached results,
+distinguishes missing from stored `[]`, preserves tombstones/deleted notes, and
+returns only text-free public summary metadata. It reads no localStorage and
+creates no Writer DB bytes. The smallest next step is R2.6.3b only: exact Writer
+DB v2 bytes built from this captured snapshot through the published encoder.

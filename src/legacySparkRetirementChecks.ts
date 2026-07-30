@@ -4,11 +4,13 @@ import { legacySparkRetirementBackupGuideStateCheckCount } from "./legacySparkRe
 import { legacySparkRetirementBrowserAdaptersCheckCount } from "./legacySparkRetirementBrowserAdaptersChecks";
 import { legacySparkRetirementDriveV1BackupVerifierCheckCount } from "./legacySparkRetirementDriveV1BackupVerifierChecks";
 import { legacySparkRetirementInventoryCheckCount } from "./legacySparkRetirementInventoryChecks";
+import { legacySparkRetirementLocalSnapshotCheckCount } from "./legacySparkRetirementLocalSnapshotChecks";
 import { legacySparkRetirementPackageBaselineCheckCount } from "./legacySparkRetirementPackageBaselineChecks";
 import { legacySparkRetirementWriterDbBackupVerifierCheckCount } from "./legacySparkRetirementWriterDbBackupVerifierChecks";
 
 async function runLegacySparkRetirementChecks() {
   const total = legacySparkRetirementInventoryCheckCount +
+    legacySparkRetirementLocalSnapshotCheckCount +
     legacySparkRetirementBackupPlanCheckCount +
     await legacySparkRetirementBackupAssemblyCheckCount +
     legacySparkRetirementBackupGuideStateCheckCount +

@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-07-30 - R2.6.3a pure raw local snapshot model (local only)
+
+- Added a pure parser/model that accepts only explicit synthetic raw Spark,
+  Package, and draft storage values plus an injected canonical `createdAt`.
+- Reused the existing Writer DB Spark parser and WriterPackage validator;
+  invalid JSON, wrong top-level types, invalid records, and duplicate IDs block
+  the complete collection without filtering, repair, adaptation, or migration.
+- Preserved missing versus stored `[]`, collection order, Spark and Package
+  tombstones, notes, deleted notes, exact raw strings, and deeply frozen
+  detached in-memory records. Public summary metadata is text-free with sorted
+  IDs and counts only.
+- A valid non-empty draft returns text-free `incomplete` with `DRAFT_PRESENT`;
+  malformed or invalid draft storage is `invalid`. Draft text is never returned
+  in reasons or summary and is not part of Writer DB data.
+- Added 61 synthetic R2.6.3a checks while preserving all earlier 365 checks;
+  the retirement harness is 426/426.
+- No localStorage, browser global, encoder, crypto, Drive, network, React,
+  Writer DB bytes, Blob/download, file, real data, write, R3, commit, push, or
+  deployment is part of this local slice. R2.6.3b exact Writer DB v2 bytes over
+  this captured snapshot is the next separately reviewed step.
+
 ## 2026-07-30 - R2.6.3 local snapshot review (docs only)
 
 - Added `WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md` as a docs-only contract
@@ -11,8 +32,9 @@
 - Defined one synchronous raw local snapshot, missing/empty/corrupt rules,
   Writer DB v2 exact-byte creation, draft blocking, typed reason codes, privacy
   rules, synthetic tests, and R2.6.3a-R2.6.3d implementation slices.
-- No runtime, UI, CSS, storage read, Drive call, backup/download, real data,
-  staging, commit, push, or deployment is part of this docs-only review. The
+- No runtime, UI, CSS, storage read, Drive call, backup/download, real data, or
+  deployment is part of this docs-only review. Published at
+  `a273353ef784f8343a176e8057b59ba4526f259f`. The
   next smallest implementation step is R2.6.3a pure raw storage parser and
   snapshot model over synthetic strings.
 
