@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-30 - R2.6.3c localStorage reader review (docs only)
+
+- Published R2.6.3b at `389b6347ec84d5472aa62a86d11fdff3416fed6d`
+  after 476/476 retirement, 284/284 Writer DB, and 200/200 product-shell checks.
+- Inventoried the exact Spark, Package, and draft keys and documented why the
+  product loaders cannot preserve raw failure states.
+- Fixed the synchronous read order to Spark -> Package -> Draft, exactly once
+  each, with explicit missing states and typed text-free read failures.
+- Kept `createdAt` explicit and routed success through R2.6.3a and optional
+  R2.6.3b without duplicating parsing or byte construction.
+- Split future work into c1 pure injected synthetic coordinator and c2 thin
+  browser wrapper. Only c2 is allowed to perform the first real storage read.
+- Kept R2.6.3d as a separate post-Drive consistency check and prohibited
+  writes, logs, network, Drive, files, downloads, caching, and long-lived raw
+  author-data references.
+- No runtime implementation, localStorage read, real-data use, backup artifact,
+  staging, commit, push, or deployment is part of this docs-only slice.
+
 ## 2026-07-30 - R2.6.3b exact Writer DB v2 bytes builder (local only)
 
 - Added a pure builder that accepts only a successful R2.6.3a snapshot and an

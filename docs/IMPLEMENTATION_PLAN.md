@@ -95,10 +95,12 @@ R2.6.3a is published at `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3` as a pure raw
 explicit synthetic raw strings, blocks corrupt/invalid/duplicate records,
 preserves missing versus stored empty collections and all tombstones, and keeps
 author data only inside a detached frozen in-memory snapshot. It creates no
-Writer DB bytes. R2.6.3b is prepared locally as a pure exact v2 JSON/byte
+Writer DB bytes. R2.6.3b is published at
+`389b6347ec84d5472aa62a86d11fdff3416fed6d` as a pure exact v2 JSON/byte
 builder over that snapshot, using the existing payload builder, R2.2 verifier,
-and an injected UTF-8 encoder. The next separate step is R2.6.3c read-only
-storage capture.
+and an injected UTF-8 encoder. The R2.6.3c review splits the next step into a
+pure injected c1 coordinator and the separately reviewed first real
+localStorage read in c2.
 
 ## Completed v0.1 Slice
 

@@ -65,10 +65,12 @@ synthetic strings, still without real `localStorage`.
 R2.6.3a is published at `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3`. Missing
 keys remain distinct from stored `[]`; damaged, invalid, or duplicate data
 blocks, and a valid non-empty draft returns `incomplete` with `DRAFT_PRESENT`.
-R2.6.3b exact Writer DB v2 bytes from the captured snapshot is prepared
-locally. It uses an injected encoder, returns only copied bytes and text-free
-metadata, and creates no file. The next step is R2.6.3c, the first thin
-read-only localStorage capture adapter.
+R2.6.3b exact Writer DB v2 bytes from the captured snapshot is published at
+`389b6347ec84d5472aa62a86d11fdff3416fed6d`. It uses an injected encoder,
+returns only copied bytes and text-free metadata, and creates no file. The
+R2.6.3c review is in `WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`:
+implement pure injected c1 first; c2 is the separately approved first real
+localStorage read.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

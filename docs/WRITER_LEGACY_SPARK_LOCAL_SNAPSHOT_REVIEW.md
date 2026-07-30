@@ -321,9 +321,12 @@ R2.6.3a is published at `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3` in
 explicit synthetic raw strings, uses typed reasons and frozen detached results,
 distinguishes missing from stored `[]`, preserves tombstones/deleted notes, and
 returns only text-free public summary metadata. It reads no localStorage and
-creates no Writer DB bytes. R2.6.3b is prepared locally in
+creates no Writer DB bytes. R2.6.3b is published at
+`389b6347ec84d5472aa62a86d11fdff3416fed6d` in
 `src/legacySparkRetirementWriterDbBytesBuilder.ts`: it reuses the existing v2
 payload builder, serializes with two-space JSON, self-verifies through R2.2,
 and keeps injected UTF-8 bytes behind a fresh-copy accessor. It reads no
-storage, hashes nothing, and creates no file/download. The smallest next step
-is R2.6.3c, a thin separately reviewed read-only `localStorage.getItem` adapter.
+storage, hashes nothing, and creates no file/download. R2.6.3c is specified in
+`WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`. The smallest next step is
+c1, a pure injected three-read coordinator; c2 is the separately reviewed
+first actual `localStorage.getItem` wrapper.

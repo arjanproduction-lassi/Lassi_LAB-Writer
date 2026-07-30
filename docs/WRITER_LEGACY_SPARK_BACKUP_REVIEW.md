@@ -633,9 +633,12 @@ The pure R2.6.3a parser/model is published at
 It distinguishes missing from stored empty arrays, blocks corrupt, invalid, or
 duplicate collections, preserves full tombstone/note content in a frozen
 in-memory snapshot, and exposes only text-free summary metadata. It performs no
-storage read. Pure R2.6.3b is prepared locally and creates exact in-memory v2
+storage read. Pure R2.6.3b is published at
+`389b6347ec84d5472aa62a86d11fdff3416fed6d` and creates exact in-memory v2
 JSON/bytes from that snapshot through existing payload/verification paths and
-an injected encoder. It hashes or downloads nothing. R2.6.3c is next.
+an injected encoder. It hashes or downloads nothing. R2.6.3c is reviewed in
+`WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`; pure injected c1 precedes
+the first real localStorage read in c2.
 
 ### R2.7 - Synthetic integration and manual backup
 

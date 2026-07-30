@@ -81,6 +81,12 @@ future guide should treat a valid non-empty new-Spark draft as an incomplete
 prerequisite, not as a backed-up record, because draft text is outside Writer DB
 v2 and must not appear in backup manifests, logs, or public status.
 
+R2.6.3c is reviewed in
+`WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`. Future real local capture
+must be user-initiated, keep author text out of UI/logs, and release in-memory
+snapshot references when the attempt ends. Pure c1 has no UI or browser read;
+c2 is the first separately approved real localStorage read.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

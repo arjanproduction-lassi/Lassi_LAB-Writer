@@ -404,9 +404,11 @@ R2.6.3a is published at `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3`. It receives 
 strings only, reuses existing record validation paths, preserves collection
 order and tombstones, and returns a frozen internal snapshot plus text-free
 summary. It does not read localStorage or create Writer DB bytes. R2.6.3b exact
-v2 byte construction is prepared locally using the existing payload builder,
-R2.2 self-verification, and injected UTF-8 encoding. Bytes stay in memory
-behind a fresh-copy accessor. R2.6.3c read-only localStorage capture is next.
+v2 byte construction is published at
+`389b6347ec84d5472aa62a86d11fdff3416fed6d`, using the existing payload
+builder, R2.2 self-verification, and injected UTF-8 encoding. Bytes stay in
+memory behind a fresh-copy accessor. The R2.6.3c reader review splits pure
+injected c1 from the separately approved first real localStorage read in c2.
 
 ## Test Plan
 

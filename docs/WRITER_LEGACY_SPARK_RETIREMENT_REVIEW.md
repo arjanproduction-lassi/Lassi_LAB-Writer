@@ -363,9 +363,11 @@ synthetic raw strings before any real `localStorage.getItem` adapter exists.
 R2.6.3a is published at `fc741821a49a957b85d1f3fc9a0c4d72d6f9faa3` as that pure parser/model. It reads no storage,
 uses only explicit synthetic raw strings, and stops at `snapshot-captured`,
 `incomplete`, or `invalid`. It creates no backup bytes and grants no R3
-permission. R2.6.3b exact Writer DB v2 byte construction is prepared locally;
-it creates only an in-memory copied artifact and remains below backup assembly
-or verification. R2.6.3c read-only local capture is next.
+permission. R2.6.3b exact Writer DB v2 byte construction is published at
+`389b6347ec84d5472aa62a86d11fdff3416fed6d`; it creates only an in-memory
+copied artifact and remains below backup assembly or verification. R2.6.3c is
+split into pure injected c1 and a separately reviewed c2 browser wrapper; only
+c2 may first read localStorage.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use
