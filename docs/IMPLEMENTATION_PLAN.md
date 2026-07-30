@@ -74,13 +74,16 @@ hashes exact byte snapshots, compares current and backup Package baselines, and
 stops at `assembly-verified`, `incomplete`, or `invalid`. No production
 adapter, file, download, or real backup exists. R2.6 is now a docs-only backup
 guide and production adapter review in
-`WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`; its smallest future
-implementation step is pure guide types and a status machine. R2.6.1 implements
-only pure statuses, events, transitions, typed rejection reasons, safe text-free
-metadata, and frozen results. It has no UI, storage,
-Drive, crypto, filesystem, Blob/download, real-data, or R3 behavior. The next
-separate implementation step is R2.6.2 strict UTF-8 and browser Web Crypto
-adapters using synthetic checks.
+`WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`; its smallest implementation
+steps are separate adapter/model slices. R2.6.1 is published at
+`e64b6aa43015b142369ec286b051e5c41e5be468` and implements only pure statuses,
+events, transitions, typed rejection reasons, safe text-free metadata, and
+frozen results. R2.6.2 adds strict browser UTF-8 plus Web Crypto SHA-256
+adapters compatible with the R2.5 injected dependency signatures. It copies
+bytes before async digest, uses no Node crypto or new dependency, and creates no
+backup/download/manifest. No UI, storage, Drive, filesystem, Blob/download,
+real-data, or R3 behavior exists. The next separate step is the R2.6.3
+docs-only local read-only snapshot review.
 
 ## Completed v0.1 Slice
 

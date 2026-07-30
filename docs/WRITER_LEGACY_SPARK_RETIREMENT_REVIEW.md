@@ -348,9 +348,12 @@ current/backup Package baseline comparison. It stops at `assembly-verified`,
 storage, Drive, or crypto adapter. R2.6 is the docs-only backup guide and
 production adapter review in `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`.
 R2.6.1 is a pure guide state model with no UI, storage, Drive, crypto, file, or
-artifact behavior. The remaining R2 implementation slices are not implemented,
-and even the future highest `backup-verified` result grants no permission to
-create tombstones, delete data, reset storage, sync, or begin R3.
+artifact behavior. R2.6.2 adds strict browser UTF-8 plus Web Crypto SHA-256
+adapters with synthetic checks, byte copies before async digest, and no Node
+crypto, storage, Drive, Blob/File/download, real data, or artifact creation.
+The next R2 slice is the R2.6.3 docs-only local snapshot review, and even the
+future highest `backup-verified` result grants no permission to create
+tombstones, delete data, reset storage, sync, or begin R3.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use

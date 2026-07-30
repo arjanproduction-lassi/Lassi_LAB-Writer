@@ -1,5 +1,31 @@
 # Worklog
 
+## 2026-07-30 - R2.6.2 strict browser adapters
+
+- Added local-only browser adapters for R2.5-compatible UTF-8 and SHA-256
+  dependencies in `src/legacySparkRetirementBrowserAdapters.ts`.
+- Encoding uses `TextEncoder` without trim, Unicode normalization, or newline
+  changes. Strict decoding uses `TextDecoder("utf-8", { fatal: true,
+  ignoreBOM: false })`, so invalid UTF-8 is rejected and a UTF-8 BOM is
+  consumed only for the decoded text while raw hashing still covers the
+  original BOM bytes.
+- SHA-256 uses only `globalThis.crypto.subtle.digest("SHA-256", copiedBytes)`.
+  The adapter copies bytes before async digest, returns 64-character lowercase
+  hex, and reports only safe internal error codes for missing crypto or digest
+  failure.
+- Added 37 synthetic R2.6.2 checks for UTF-8, BOM, hash vectors, mutable byte
+  snapshots, canonical text hashing, R2.5 signature compatibility, frozen
+  bundle output, privacy, and side-effect boundaries. The retirement harness is
+  now 365/365.
+- Verified locally with `check:legacy-spark-retirement` 365/365,
+  `check:writer-db` 284/284, and `check:product-shell` 200/200. The sandbox
+  build still hits the known Vite/esbuild `spawn EPERM`; the unchanged build
+  passes outside the sandbox, including with empty `VITE_GOOGLE_CLIENT_ID`.
+- No Node crypto, Buffer, dependency, React, UI, CSS, storage, Drive, Blob,
+  File/download, filesystem, real data, backup artifact, tombstone, reset, R3,
+  or deployment is part of this slice. The next separate step is R2.6.3
+  docs-only local read-only snapshot review.
+
 ## 2026-07-29 - R2.6.1 pure backup guide state model
 
 - Added a pure deterministic backup-guide state model with the approved R2.6

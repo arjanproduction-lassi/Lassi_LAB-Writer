@@ -72,7 +72,9 @@ shows filenames, counts, short hash identifiers, Drive state, Package baseline
 match, and privacy warnings, but never author text. R2 uses an explicit action
 and privacy acknowledgement; typed confirmation waits for the later R3
 tombstone/reset phase. R2.6.1 keeps this as a pure state model only, with no
-React wiring or visible UI yet.
+React wiring or visible UI yet. R2.6.2 adds only browser UTF-8 and Web Crypto
+adapters for that future guide; it still has no React wiring, visible UI,
+storage read, Drive read, Blob/download, or real backup artifact.
 
 ## Four Notebook Comfort
 

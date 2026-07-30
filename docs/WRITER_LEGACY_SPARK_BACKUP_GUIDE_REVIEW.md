@@ -353,6 +353,22 @@ no R3, tombstone, delete, reset, storage, Drive, crypto, Blob, file, or UI API.
 R2.6.2: Browser UTF-8 and Web Crypto adapters with synthetic unit checks. No
 real data.
 
+R2.6.2 is implemented in
+`src/legacySparkRetirementBrowserAdapters.ts` and
+`src/legacySparkRetirementBrowserAdaptersChecks.ts`. It exposes
+`encodeLegacySparkRetirementUtf8(text)`,
+`decodeLegacySparkRetirementUtf8Strict(bytes)`,
+`sha256LegacySparkRetirementBytes(bytes)`,
+`sha256LegacySparkRetirementCanonicalUtf8(text)`, and
+`createLegacySparkRetirementBrowserAdapters()`. The adapter bundle is frozen
+and directly supplies the R2.5 `decodeUtf8Strict`, `sha256Bytes`, and
+`sha256CanonicalUtf8` signatures. Strict decoding rejects invalid UTF-8,
+explicitly consumes a UTF-8 BOM in decoded text, and raw byte hashing still
+covers BOM bytes. Web Crypto hashing copies bytes before async digest, uses
+only `globalThis.crypto.subtle.digest("SHA-256", copiedBytes)`, returns 64
+lowercase hex, and emits only safe internal error codes. It does not use Node
+crypto, Buffer, storage, Drive, Blob/File/download, real data, or logging.
+
 R2.6.3: Read-only local snapshot adapter. This is the first phase that reads
 real author data from the active browser profile.
 
@@ -368,12 +384,12 @@ R2.6.7: Temporary Data-section UI guide wired to the reviewed adapters.
 
 R2.6.8: Synthetic integration test plus explicit manual PC backup evidence.
 
-R2.6.1 and R2.6.2 may be combined only if the diff remains pure and synthetic.
-R2.6.3, R2.6.4, R2.6.5, R2.6.6, R2.6.7, and R2.6.8 should remain separate
-review points because they first touch real local data, Drive, files, UI, and
-manual operational evidence.
+R2.6.1 and R2.6.2 remain pure and synthetic slices. R2.6.3, R2.6.4, R2.6.5,
+R2.6.6, R2.6.7, and R2.6.8 should remain separate review points because they
+first touch real local data, Drive, files, UI, and manual operational evidence.
 
-The smallest safe next implementation step is R2.6.1.
+The smallest safe next implementation step is R2.6.3 local read-only snapshot
+adapter.
 
 ## Test Plan
 
@@ -416,7 +432,9 @@ Manual preview/production test after implementation approval:
 
 ## Out Of Scope
 
-R2.6 review does not implement runtime adapters, Web Crypto, Drive GET, Blob,
-download, file picker, UI, real backup, import, rollback, tombstones, reset,
-purge, R3, package-only product cutover, Drive schema v2, a new OAuth client,
-billing changes, commit, push, or deployment.
+The original R2.6 review does not itself implement Drive GET, Blob, download,
+file picker, UI, real backup, import, rollback, tombstones, reset, purge, R3,
+package-only product cutover, Drive schema v2, a new OAuth client, billing
+changes, commit, push, or deployment. The later R2.6.2 adapter slice adds only
+browser UTF-8 and Web Crypto functions and still does not read storage or
+Drive, create files, or touch real data.

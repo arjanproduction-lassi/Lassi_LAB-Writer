@@ -613,7 +613,12 @@ The first implementation slice, R2.6.1, is implemented as a pure state model
 only. It defines guide statuses/events, allowed transitions, typed transition
 rejections, safe text-free metadata, and the `backup-verified` boundary. It
 does not read storage or Drive, hash bytes, create artifacts, download files,
-render UI, or approve R3.
+render UI, or approve R3. R2.6.2 adds strict browser UTF-8 plus Web Crypto
+SHA-256 adapters compatible with the R2.5 injected dependency
+signatures. It copies byte snapshots before async digest and uses no Node
+crypto, Buffer, storage, Drive, Blob/File/download, real data, or new
+dependency. The next separate slice is the R2.6.3 docs-only local snapshot
+review.
 
 ### R2.7 - Synthetic integration and manual backup
 

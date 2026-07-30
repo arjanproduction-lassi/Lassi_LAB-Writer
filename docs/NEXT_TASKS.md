@@ -48,12 +48,14 @@ at `baseline-built`, never `backup-verified`. Pure R2.5 is published at
 `ffd7090bf0d5a911d0a074ce1d764dd4ab0e8a28`: it coordinates only injected
 synthetic bytes/readers, strict decoding, R2.2-R2.4 verification, and
 exact-byte hashes; it returns at most `assembly-verified`. R2.6 docs-only guide
-review is captured in `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`. The next
-smallest implementation step is now R2.6.2 strict UTF-8 and browser Web Crypto
-adapters. R2.6.1 is the pure guide state-machine slice: guide types, reason
-codes, transition checks, frozen text-free metadata, and no production adapter.
-Do not start tombstones, reset, sync changes, Package editing, real
-storage/Drive reads, UI, downloads, or file creation.
+review is captured in `WRITER_LEGACY_SPARK_BACKUP_GUIDE_REVIEW.md`. R2.6.1 is
+published at `e64b6aa43015b142369ec286b051e5c41e5be468` as the pure guide
+state-machine slice: guide types, reason codes, transition checks, frozen
+text-free metadata, and no production adapter. R2.6.2 adds strict browser UTF-8
+adapters and Web Crypto SHA-256 adapters compatible with R2.5, using synthetic
+checks and no real data. The next smallest step is the R2.6.3 docs-only local
+snapshot review. Do not start tombstones, reset, sync changes, Package editing,
+real storage/Drive reads, UI, downloads, or file creation.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
