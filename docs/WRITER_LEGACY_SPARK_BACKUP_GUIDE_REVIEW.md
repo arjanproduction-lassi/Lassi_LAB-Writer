@@ -134,12 +134,12 @@ parsed package data. It must never parse before computing the raw hash.
 ### UTF-8 adapters
 
 Generated backup artifacts must be UTF-8 without BOM. Strict verification
-decoding uses `new TextDecoder("utf-8", { fatal: true, ignoreBOM: true })` so
-invalid UTF-8 is a typed failure and the BOM is not silently removed from the
-decoded text. Re-read files must not be normalized. If a BOM appears in
-user-selected input, hash the exact bytes first and let the structure verifier
-decide from the exact decoded text; do not strip the BOM to make a failing
-artifact pass.
+decoding uses `new TextDecoder("utf-8", { fatal: true, ignoreBOM: false })` so
+invalid UTF-8 is a typed failure and a UTF-8 BOM is consumed according to the
+browser `TextDecoder` contract. Re-read files must not be normalized. If a BOM
+appears in user-selected input, hash the exact bytes first, including the BOM,
+and let the structure verifier decide from the exact decoded text; do not strip
+bytes to make a failing artifact pass.
 
 ### SHA-256 adapters
 
@@ -372,6 +372,15 @@ crypto, Buffer, storage, Drive, Blob/File/download, real data, or logging.
 R2.6.3: Read-only local snapshot adapter. This is the first phase that reads
 real author data from the active browser profile.
 
+The docs-only R2.6.3 local snapshot review is captured in
+`WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md`. It specifies the Spark,
+Package, and draft storage inventory, one synchronous raw local snapshot,
+missing/empty/corrupt boundaries, Writer DB v2 exact-byte creation, draft
+blocking rules, typed reason codes, privacy rules, synthetic tests, and
+R2.6.3a-R2.6.3d implementation slices. The first implementation slice should be
+R2.6.3a, a pure raw storage parser/model over synthetic strings without real
+`localStorage`.
+
 R2.6.4: GET-only raw Drive v1 reader. This is the first phase that may read
 real remote author data after explicit sign-in/token availability.
 
@@ -388,8 +397,8 @@ R2.6.1 and R2.6.2 remain pure and synthetic slices. R2.6.3, R2.6.4, R2.6.5,
 R2.6.6, R2.6.7, and R2.6.8 should remain separate review points because they
 first touch real local data, Drive, files, UI, and manual operational evidence.
 
-The smallest safe next implementation step is R2.6.3 local read-only snapshot
-adapter.
+The smallest safe next implementation step is R2.6.3a, the pure raw storage
+parser and snapshot model over synthetic strings.
 
 ## Test Plan
 

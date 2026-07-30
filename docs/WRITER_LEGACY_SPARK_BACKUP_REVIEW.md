@@ -620,6 +620,14 @@ crypto, Buffer, storage, Drive, Blob/File/download, real data, or new
 dependency. The next separate slice is the R2.6.3 docs-only local snapshot
 review.
 
+R2.6.3 is reviewed in `WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md`. It
+requires one synchronous raw local snapshot before any future async Drive read:
+Spark raw storage, Package raw storage, draft metadata, validated full
+collections including tombstones and deleted notes, and one injected
+`createdAt`/`exportedAt`. Existing product loaders are explicitly unsuitable
+because they filter invalid records, hide tombstones, adapt Sparks into catalog
+Packages, or perform separate runtime reads.
+
 ### R2.7 - Synthetic integration and manual backup
 
 - automated integration uses artificial data only;

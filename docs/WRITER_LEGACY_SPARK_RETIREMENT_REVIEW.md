@@ -355,6 +355,11 @@ The next R2 slice is the R2.6.3 docs-only local snapshot review, and even the
 future highest `backup-verified` result grants no permission to create
 tombstones, delete data, reset storage, sync, or begin R3.
 
+R2.6.3 is documented in `WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md`. It
+keeps the review docs-only, defines the future read-only local snapshot
+adapter, and recommends that the first implementation slice remain pure over
+synthetic raw strings before any real `localStorage.getItem` adapter exists.
+
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use
 a separately reviewed read-only byte path that cannot call sync, merge, local

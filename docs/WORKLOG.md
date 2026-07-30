@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-30 - R2.6.3 local snapshot review (docs only)
+
+- Added `WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md` as a docs-only contract
+  for the future read-only local snapshot adapter.
+- Inventoried Spark, Package, and new-Spark-draft storage keys and documented
+  why the current product loaders are not raw-backup-safe: they filter invalid
+  records, hide tombstones in UI paths, adapt Sparks into catalog Packages, or
+  perform separate runtime reads.
+- Defined one synchronous raw local snapshot, missing/empty/corrupt rules,
+  Writer DB v2 exact-byte creation, draft blocking, typed reason codes, privacy
+  rules, synthetic tests, and R2.6.3a-R2.6.3d implementation slices.
+- No runtime, UI, CSS, storage read, Drive call, backup/download, real data,
+  staging, commit, push, or deployment is part of this docs-only review. The
+  next smallest implementation step is R2.6.3a pure raw storage parser and
+  snapshot model over synthetic strings.
+
 ## 2026-07-30 - R2.6.2 strict browser adapters
 
 - Added local-only browser adapters for R2.5-compatible UTF-8 and SHA-256

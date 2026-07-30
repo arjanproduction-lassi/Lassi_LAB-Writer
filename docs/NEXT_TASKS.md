@@ -57,6 +57,11 @@ checks and no real data. The next smallest step is the R2.6.3 docs-only local
 snapshot review. Do not start tombstones, reset, sync changes, Package editing,
 real storage/Drive reads, UI, downloads, or file creation.
 
+The R2.6.3 docs-only review now lives in
+`WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md`. The next implementation step is
+R2.6.3a only: pure raw storage parsing and a frozen snapshot model over
+synthetic strings, still without real `localStorage`.
+
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
 works.

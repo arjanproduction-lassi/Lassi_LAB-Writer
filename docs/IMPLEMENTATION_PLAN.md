@@ -85,6 +85,12 @@ backup/download/manifest. No UI, storage, Drive, filesystem, Blob/download,
 real-data, or R3 behavior exists. The next separate step is the R2.6.3
 docs-only local read-only snapshot review.
 
+The R2.6.3 docs-only review is defined in
+`WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md`. It inventories the current
+Spark, Package, and new-Spark-draft storage keys, documents why current product
+loaders are not raw-backup-safe, and splits implementation into pure synthetic
+snapshot parsing before any real `localStorage.getItem` adapter.
+
 ## Completed v0.1 Slice
 
 Build only the true v0.1 loop:

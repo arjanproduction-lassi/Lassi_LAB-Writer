@@ -76,6 +76,11 @@ React wiring or visible UI yet. R2.6.2 adds only browser UTF-8 and Web Crypto
 adapters for that future guide; it still has no React wiring, visible UI,
 storage read, Drive read, Blob/download, or real backup artifact.
 
+R2.6.3 is reviewed in `WRITER_LEGACY_SPARK_LOCAL_SNAPSHOT_REVIEW.md`. The
+future guide should treat a valid non-empty new-Spark draft as an incomplete
+prerequisite, not as a backed-up record, because draft text is outside Writer DB
+v2 and must not appear in backup manifests, logs, or public status.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook
