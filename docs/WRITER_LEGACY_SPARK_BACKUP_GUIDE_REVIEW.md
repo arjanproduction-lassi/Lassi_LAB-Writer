@@ -409,8 +409,9 @@ v2 byte construction is published at
 builder, R2.2 self-verification, and injected UTF-8 encoding. Bytes stay in
 memory behind a fresh-copy accessor. Pure injected R2.6.3c1 is published at
 `9d8168e1237d16eea0cbd06de0d923142f7de8cf` with fixed three-key order and
-fail-fast read errors. The docs-only c2 review separates an import-safe unwired
-c2a module from c2b; only c2b may first read real localStorage after a click.
+fail-fast read errors. Import-safe c2a is prepared locally with one lazy Storage
+acquisition, synthetic doubles, and no App/UI wiring or real-data read. The next
+step is docs-only c2b review; only c2b may first read real data after a click.
 
 ## Test Plan
 

@@ -147,3 +147,8 @@ Do not combine c1 with c2. R2.6.3c2 is reviewed in
 import-safe c2a and separately approved user-invoked c2b. Only c2b may perform
 the first actual real-data `window.localStorage.getItem` after explicit
 approval.
+
+R2.6.3c2a is prepared locally with an injected storage-acquisition helper and
+a lazy public wrapper. It acquires one object, delegates to this published c1,
+and returns text-free `LOCAL_STORAGE_UNAVAILABLE` before c1 when unavailable.
+It is not wired into App/UI and has not read real localStorage or Writer data.

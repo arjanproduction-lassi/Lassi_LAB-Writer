@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-07-30 - R2.6.3c2a import-safe browser wrapper (local only)
+
+- Added an injected browser-storage acquisition helper and a thin public lazy
+  wrapper above published c1. Neither module import nor function reference
+  acquisition touches browser storage.
+- Acquires one Storage-like object per explicit call, validates `getItem`, and
+  reuses that object for c1's Spark -> Package -> Draft reads.
+- Returns frozen text-free `LOCAL_STORAGE_UNAVAILABLE` before c1 for missing,
+  invalid, or throwing acquisition; per-key failures remain owned by c1.
+- Added 39 synthetic/nonbrowser checks; retirement is 559/559. The public
+  wrapper was not invoked against real localStorage or Writer data.
+- Added no App/UI wiring, user gesture, automatic invocation, storage write,
+  clock, Drive/network, crypto, Blob/download, backup, c2b, c3d, or R3 behavior.
+- The next smallest step is a docs-only review of c2b user-gesture wiring. Only
+  later explicitly approved c2b may perform the first real Writer-data read.
+
 ## 2026-07-30 - R2.6.3c2 browser boundary review (docs only)
 
 - Published pure injected R2.6.3c1 at

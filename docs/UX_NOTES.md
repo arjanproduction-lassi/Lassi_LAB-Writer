@@ -92,6 +92,8 @@ The docs-only c2 review in
 import-safe, unwired c2a wrapper from c2b. Only a clear c2b user action such as
 **Pripraviť lokálnu zálohu** may trigger the first real read. UI receives only
 text-free status/summary, and `START_OVER` must release snapshot references.
+The c2a wrapper is prepared locally but remains unwired; its existence and
+import do not create a user-visible action or storage read.
 
 ## Four Notebook Comfort
 
