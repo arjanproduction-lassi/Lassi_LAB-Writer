@@ -92,8 +92,12 @@ The docs-only c2 review in
 import-safe, unwired c2a wrapper from c2b. Only a clear c2b user action such as
 **Pripraviť lokálnu zálohu** may trigger the first real read. UI receives only
 text-free status/summary, and `START_OVER` must release snapshot references.
-The c2a wrapper is prepared locally but remains unwired; its existence and
-import do not create a user-visible action or storage read.
+The c2a wrapper is published but remains unwired; its existence and import do
+not create a user-visible action or storage read. c2b1 stays outside React as a
+pure one-shot session. A later c2b2 may add one isolated retirement subsection
+to the existing Writer **Dáta / Ručný prenos DB** area; the first real read
+happens only inside the actual **Pripraviť lokálnu zálohu** click handler. The
+read-only product shell is not the owner of this sensitive operation.
 
 ## Four Notebook Comfort
 

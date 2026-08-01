@@ -1,6 +1,19 @@
 # Worklog
 
-## 2026-07-30 - R2.6.3c2a import-safe browser wrapper (local only)
+## 2026-07-30 - R2.6.3c2b user-gesture capture review (docs only)
+
+- Added `WRITER_LEGACY_SPARK_USER_GESTURE_CAPTURE_REVIEW.md` without runtime,
+  UI, storage, Drive, or real-data changes.
+- Inventoried the existing pure guide state machine and current UI: there is no
+  retirement-guide wiring in `App.tsx`, and the product shell is read-only.
+- Split c2b into c2b1, a pure injected one-shot session outside React, and
+  c2b2, a later separately approved Writer Data-section integration.
+- Defined click, concurrency, timestamp factory, guide transitions, internal
+  snapshot/public state, release, privacy, retry, manual gate, tests, and the
+  later c3d boundary. The first real read remains the future approved c2b2
+  click.
+
+## 2026-07-30 - R2.6.3c2a import-safe browser wrapper (published)
 
 - Added an injected browser-storage acquisition helper and a thin public lazy
   wrapper above published c1. Neither module import nor function reference
@@ -13,8 +26,9 @@
   wrapper was not invoked against real localStorage or Writer data.
 - Added no App/UI wiring, user gesture, automatic invocation, storage write,
   clock, Drive/network, crypto, Blob/download, backup, c2b, c3d, or R3 behavior.
-- The next smallest step is a docs-only review of c2b user-gesture wiring. Only
-  later explicitly approved c2b may perform the first real Writer-data read.
+- Published at `58b99036878b9975c527373f66b82e248bee9408`. The next smallest
+  implementation is pure synthetic c2b1; only later explicitly approved c2b2
+  may perform the first real Writer-data read after the user click.
 
 ## 2026-07-30 - R2.6.3c2 browser boundary review (docs only)
 

@@ -101,10 +101,11 @@ builder over that snapshot, using the existing payload builder, R2.2 verifier,
 and an injected UTF-8 encoder. Pure injected R2.6.3c1 is published at
 `9d8168e1237d16eea0cbd06de0d923142f7de8cf` with fixed Spark -> Package ->
 Draft reads and transparent R2.6.3a delegation. The docs-only c2 review splits
-an import-safe, unwired c2a wrapper from c2b. c2a is prepared locally with 39
-synthetic checks, one lazy Storage acquisition, and no real data access. The
-next step is docs-only c2b user-gesture review; only approved c2b may first read
-real localStorage data.
+an import-safe, unwired c2a wrapper from c2b. c2a is published at
+`58b99036878b9975c527373f66b82e248bee9408` with 39 synthetic checks, one lazy
+Storage acquisition, and no real data access. The docs-only c2b review splits
+c2b1 pure session logic from later c2b2 UI wiring; only approved c2b2 may first
+read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice
 

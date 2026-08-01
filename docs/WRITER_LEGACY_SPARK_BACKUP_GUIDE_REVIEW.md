@@ -409,9 +409,12 @@ v2 byte construction is published at
 builder, R2.2 self-verification, and injected UTF-8 encoding. Bytes stay in
 memory behind a fresh-copy accessor. Pure injected R2.6.3c1 is published at
 `9d8168e1237d16eea0cbd06de0d923142f7de8cf` with fixed three-key order and
-fail-fast read errors. Import-safe c2a is prepared locally with one lazy Storage
-acquisition, synthetic doubles, and no App/UI wiring or real-data read. The next
-step is docs-only c2b review; only c2b may first read real data after a click.
+fail-fast read errors. Import-safe c2a is published at
+`58b99036878b9975c527373f66b82e248bee9408` with one lazy Storage acquisition,
+synthetic doubles, and no App/UI wiring or real-data read. The c2b review reuses
+the existing `checking-prerequisites -> snapshot-capturing -> drive-reading`
+transitions: c2b1 is pure session logic, while c2b2 is later UI wiring and the
+only phase allowed to trigger the first real read after a click.
 
 ## Test Plan
 

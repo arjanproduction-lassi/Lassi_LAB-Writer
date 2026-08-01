@@ -330,6 +330,8 @@ storage, hashes nothing, and creates no file/download. R2.6.3c is specified in
 `WRITER_LEGACY_SPARK_LOCAL_STORAGE_READER_REVIEW.md`. Pure c1 is published at
 `9d8168e1237d16eea0cbd06de0d923142f7de8cf`: it injects `readStorageValue`,
 captures Spark -> Package -> Draft once each, fails without partial snapshot,
-and delegates to this parser. Import-safe c2a is prepared locally, remains
-unwired, and delegates its one acquired Storage object through c1 to this
-parser. c2b remains the first authorized real-data invocation.
+and delegates to this parser. Import-safe c2a is published at
+`58b99036878b9975c527373f66b82e248bee9408`, remains unwired, and delegates its
+one acquired Storage object through c1 to this parser. The user-gesture review
+splits pure c2b1 session logic from c2b2, which remains the first authorized
+real-data invocation after an explicit click.

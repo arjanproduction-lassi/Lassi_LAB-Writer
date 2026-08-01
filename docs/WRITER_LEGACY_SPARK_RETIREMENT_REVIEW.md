@@ -368,10 +368,12 @@ permission. R2.6.3b exact Writer DB v2 byte construction is published at
 copied artifact and remains below backup assembly or verification. Pure
 injected R2.6.3c1 is published at
 `9d8168e1237d16eea0cbd06de0d923142f7de8cf` with fixed three-key order and no
-partial snapshot after read failure. Import-safe c2a is prepared locally with
-39 synthetic checks, one lazy Storage acquisition, and no App/UI wiring or real
-data read. Only separately approved user-invoked c2b may first read real
-localStorage data.
+partial snapshot after read failure. Import-safe c2a is published at
+`58b99036878b9975c527373f66b82e248bee9408` with 39 synthetic checks, one lazy
+Storage acquisition, and no App/UI wiring or real data read. The user-gesture
+review separates pure c2b1 one-shot session logic from later c2b2 UI wiring.
+Only approved c2b2 may first read real localStorage data after a click; it does
+not authorize retirement or deletion.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use

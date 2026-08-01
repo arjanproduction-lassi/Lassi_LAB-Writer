@@ -202,9 +202,10 @@ This review does not implement a browser wrapper, UI/button, user gesture,
 actual localStorage read, Writer DB bytes, Drive GET, hashing, assembly,
 manifest, Blob/download, consistency checker, R3, tombstones, reset, or purge.
 
-## Current Local c2a Status And Smallest Next Step
+## Published c2a Status And Smallest Next Step
 
-R2.6.3c2a is prepared locally in
+R2.6.3c2a is published at
+`58b99036878b9975c527373f66b82e248bee9408` in
 `src/legacySparkRetirementBrowserLocalStorageCapture.ts` with 39 synthetic
 checks. Its injected helper acquires one Storage-like object exactly once,
 validates `getItem`, delegates the same object to published c1, and returns a
@@ -212,6 +213,7 @@ frozen text-free `LOCAL_STORAGE_UNAVAILABLE` when acquisition fails. The public
 wrapper is lazy and import-safe; it has no App/UI wiring and was exercised only
 in a nonbrowser Node fallback, never against real localStorage or Writer data.
 
-Do not combine c2a with c2b. The smallest next step is a docs-only review of
-c2b user-gesture wiring. The first real Writer-data read remains a later,
-explicitly approved c2b integration.
+Do not combine c2a with c2b. The completed docs-only review is in
+`WRITER_LEGACY_SPARK_USER_GESTURE_CAPTURE_REVIEW.md`: c2b1 owns pure synthetic
+session logic and c2b2 owns later UI wiring. The first real Writer-data read
+remains the explicitly approved c2b2 click.

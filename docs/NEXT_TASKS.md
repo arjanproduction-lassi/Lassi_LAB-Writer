@@ -73,10 +73,12 @@ Pure injected c1 is published at `9d8168e1237d16eea0cbd06de0d923142f7de8cf`
 with 44 synthetic checks, exactly three ordered reads, fail-fast text-free
 errors, and no real storage access. The docs-only c2 review now defines c2a as
 an import-safe unwired wrapper and c2b as the separately approved user gesture.
-Import-safe c2a is prepared locally with 39 synthetic checks and no App/UI
-wiring or real storage read. The smallest next step is a docs-only c2b
-user-gesture wiring review; c2b remains the first authorized real localStorage
-data read.
+Import-safe c2a is published at
+`58b99036878b9975c527373f66b82e248bee9408` with 39 synthetic checks and no
+App/UI wiring or real storage read. The c2b review splits c2b1 (pure injected
+one-shot session) from c2b2 (later UI wiring). The smallest next implementation
+is c2b1 only; the first real localStorage read remains c2b2 after an explicit
+click and separate approval.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
