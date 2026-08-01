@@ -94,10 +94,11 @@ import-safe, unwired c2a wrapper from c2b. Only a clear c2b user action such as
 text-free status/summary, and `START_OVER` must release snapshot references.
 The c2a wrapper is published but remains unwired; its existence and import do
 not create a user-visible action or storage read. c2b1 stays outside React as a
-pure one-shot session. A later c2b2 may add one isolated retirement subsection
-to the existing Writer **Dáta / Ručný prenos DB** area; the first real read
-happens only inside the actual **Pripraviť lokálnu zálohu** click handler. The
-read-only product shell is not the owner of this sensitive operation.
+pure one-shot session and is prepared locally with synthetic dependencies only.
+A later c2b2 may add one isolated retirement subsection to the existing Writer
+**Dáta / Ručný prenos DB** area; the first real read happens only inside the
+actual **Pripraviť lokálnu zálohu** click handler. The read-only product shell
+is not the owner of this sensitive operation.
 
 ## Four Notebook Comfort
 

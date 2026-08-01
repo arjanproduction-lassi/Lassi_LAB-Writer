@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-30 - R2.6.3c2b1 pure local capture session (local only)
+
+- Added `legacySparkRetirementLocalCaptureSession.ts` as a pure one-shot
+  session coordinator over injected synthetic timestamp and capture dependencies.
+- Reused only the published backup guide state machine:
+  `START_PREREQUISITE_CHECK`, `PREREQUISITES_CONFIRMED`,
+  `SNAPSHOT_CAPTURED`, `SNAPSHOT_INCOMPLETE`, and `SNAPSHOT_FAILED`.
+- Kept the captured snapshot inside the session closure; public state exposes
+  only guide state, safe createdAt, typed command reasons, counts, storage
+  statuses, lifecycle flags, and next-step hints.
+- Added 45 synthetic c2b1 checks for creation/getPublicState side effects,
+  one-shot and reentrant prepare, timestamp failure, incomplete/invalid capture,
+  release, frozen public state, and source boundaries.
+- No App/UI wiring, c2a browser wrapper import, real localStorage read, real
+  Writer data, storage write, Drive/network call, Writer DB bytes, Blob,
+  download, backup verification, or R3 behavior was added. The next smallest
+  step remains a docs-only c2b2 minimal UI-wiring review.
+
 ## 2026-07-30 - R2.6.3c2b user-gesture capture review (docs only)
 
 - Added `WRITER_LEGACY_SPARK_USER_GESTURE_CAPTURE_REVIEW.md` without runtime,

@@ -154,5 +154,7 @@ a lazy public wrapper. It acquires one object, delegates to this published c1,
 and returns text-free `LOCAL_STORAGE_UNAVAILABLE` before c1 when unavailable.
 It is not wired into App/UI and has not read real localStorage or Writer data.
 `WRITER_LEGACY_SPARK_USER_GESTURE_CAPTURE_REVIEW.md` splits c2b into pure
-c2b1 one-shot session ownership and later c2b2 UI wiring. Only c2b2 may invoke
-c2a against real Writer storage after an explicit click.
+c2b1 one-shot session ownership and later c2b2 UI wiring. c2b1 is prepared
+locally with 45 synthetic checks and an injected capture dependency, not this
+production browser wrapper. Only c2b2 may invoke c2a against real Writer storage
+after an explicit click.

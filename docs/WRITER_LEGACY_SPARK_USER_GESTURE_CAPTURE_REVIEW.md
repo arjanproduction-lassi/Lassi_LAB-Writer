@@ -1,7 +1,8 @@
 # Writer Legacy Spark User-Gesture Capture Review
 
-R2.6.3c2b is a docs-only review of the first explicitly user-invoked local
-snapshot boundary. It implements no coordinator or UI, does not wire published
+R2.6.3c2b began as a docs-only review of the first explicitly user-invoked
+local snapshot boundary. The current local addendum implements only c2b1, the
+pure session coordinator. It still implements no UI, does not wire published
 c2a into App, reads no browser storage or real Writer data, and creates no
 backup, hash, manifest, Blob, download, commit, push, or deployment.
 
@@ -74,9 +75,7 @@ This review neither creates nor invokes that handler.
 
 ```ts
 type LegacySparkRetirementLocalCaptureSessionDependencies = Readonly<{
-  createCanonicalTimestamp():
-    | Readonly<{ ok: true; createdAt: string }>
-    | Readonly<{ ok: false; reason: "CREATED_AT_FACTORY_FAILED" }>;
+  createCanonicalTimestamp(): string;
   captureLocalSnapshot(input: Readonly<{ createdAt: string }> ):
     LegacySparkRetirementLocalSnapshotResult;
 }>;
@@ -84,21 +83,36 @@ type LegacySparkRetirementLocalCaptureSessionDependencies = Readonly<{
 createLegacySparkRetirementLocalCaptureSession(dependencies): Readonly<{
   prepareLocalSnapshot(): LegacySparkRetirementLocalCaptureCommandResult;
   getPublicState(): LegacySparkRetirementLocalCapturePublicState;
-  withCapturedSnapshot<T>(consumer: (snapshot) => T): T | undefined;
+  withCapturedSnapshotForInternalUse<T>(consumer: (snapshot) => T): T | undefined;
   release(): void;
 }>;
 ```
 
-`withCapturedSnapshot` is an internal service-layer capability, never passed to
-React. It lets a later trusted pipeline consume the closure-held snapshot for
-R2.6.3b/assembly without returning raw data through `getPublicState()`. A future
-implementation may choose an equivalent narrower capability, but public UI and
-serializable state must never expose the snapshot.
+`withCapturedSnapshotForInternalUse` is an internal service-layer capability,
+never passed to React. It lets a later trusted pipeline consume the closure-held
+snapshot for R2.6.3b/assembly without returning raw data through
+`getPublicState()`. Public UI and serializable state must never expose the
+snapshot.
 
 The session is deterministic and testable despite holding short-lived in-memory
 references. Its only effects are calls to explicitly injected pure/synthetic
 dependencies. c2b1 does not import the production browser wrapper directly;
 c2b2 or a later runtime composition layer supplies it only after approval.
+
+## Current Local c2b1 Status
+
+R2.6.3c2b1 is prepared locally in
+`src/legacySparkRetirementLocalCaptureSession.ts` with 45 synthetic checks in
+`src/legacySparkRetirementLocalCaptureSessionChecks.ts`. It creates no
+timestamp and calls no capture dependency during session creation or
+`getPublicState()`. The only command is `prepareLocalSnapshot()`.
+
+The module uses the published backup guide state machine directly, accepts only
+injected timestamp and capture dependencies, keeps a successful snapshot in its
+closure, and exposes only frozen text-free public state. The public snapshot
+summary omits raw values and Spark/Package IDs. It imports no production c2a
+browser wrapper, React, Drive, storage runtime, Writer DB bytes builder, crypto,
+Blob, or download code.
 
 ## One-Shot And Concurrency Rules
 
@@ -118,22 +132,23 @@ The session keeps a private phase such as `ready`, `capturing`, `captured`, or
 
 Rejected commands return only typed text-free reasons such as
 `INVALID_TRANSITION`, `CAPTURE_ALREADY_IN_PROGRESS`, or
-`SNAPSHOT_ALREADY_CAPTURED`. Add new execution reasons only with the future
-c2b1 implementation and keep them out of the published guide model unless the
-guide itself needs them.
+`CAPTURE_ALREADY_ATTEMPTED`. The local c2b1 command reasons stay separate from
+the published guide model unless the guide itself already has a matching typed
+reason.
 
 ## Canonical createdAt Factory
 
 c2b1 may be the first layer to receive a timestamp factory. Its injected
-factory returns a discriminated text-free result, not an exception:
+factory returns one timestamp string and any thrown failure is mapped to a
+typed text-free result:
 
 - call exactly once per accepted attempt;
 - success must be canonical `YYYY-MM-DDTHH:mm:ss.000Z`;
 - forward the exact value unchanged to capture;
 - retain the same `createdAt` for later Writer DB bytes, backup plan, and
   manifest composition;
-- factory throw/rejection or explicit failure maps to
-  `CREATED_AT_FACTORY_FAILED` without exception text;
+- factory throw/rejection maps to `CREATED_AT_CREATION_FAILED` without
+  exception text;
 - malformed success is ultimately `INVALID_CREATED_AT` under the published
   snapshot contract and must not be treated as captured.
 
@@ -181,10 +196,11 @@ It must exclude raw Spark/Package/draft strings, Spark text, Package titles and
 layers, note text, IDs unless separately approved, bytes, Storage objects,
 callbacks, exception text, and mutable references.
 
-The trusted service-layer `withCapturedSnapshot` callback may feed the snapshot
-to the already published Writer DB bytes builder or a later assembly coordinator.
-Its return value must remain internal or text-free; it is not a React prop,
-context value, reducer action, browser event detail, or serializable UI state.
+The trusted service-layer `withCapturedSnapshotForInternalUse` callback may feed
+the snapshot to the already published Writer DB bytes builder or a later
+assembly coordinator. Its return value must remain internal or text-free; it is
+not a React prop, context value, reducer action, browser event detail, or
+serializable UI state.
 
 ## release And START_OVER
 
@@ -242,8 +258,9 @@ This checklist is not authorization to implement or perform the click.
 ## Errors And Retry
 
 Text-free handling applies to `LOCAL_STORAGE_UNAVAILABLE`, the three per-key
-read failures, `CREATED_AT_FACTORY_FAILED`, `INVALID_CREATED_AT`,
-`DRAFT_PRESENT`, parse/shape failures, and duplicate Spark/Package IDs.
+read failures, `CREATED_AT_CREATION_FAILED`, `INVALID_CREATED_AT`,
+`CAPTURE_DEPENDENCY_FAILED`, `DRAFT_PRESENT`, parse/shape failures, and
+duplicate Spark/Package IDs.
 
 - Never expose raw data, exception text, stack, or partial snapshot.
 - Never retry automatically.
@@ -295,14 +312,14 @@ automatically create `writer-db-bytes-built`, `assembly-verified`,
 `backup-presented`, `backup-verified`, `ready-to-create-tombstones`, or
 `completed`.
 
-This review does not implement c2b1, App/UI wiring, a real storage read, Drive
-GET, post-Drive consistency, hashing, assembly, manifest, Blob/download, R3,
-tombstones, data reset, or purge.
+The local c2b1 implementation does not implement App/UI wiring, a real storage
+read, Drive GET, post-Drive consistency, hashing, assembly, manifest,
+Blob/download, R3, tombstones, data reset, or purge.
 
 ## Smallest Safe Implementation Step
 
-Implement only R2.6.3c2b1 as a pure one-shot session over synthetic injected
-timestamp, capture, and published guide-transition dependencies. Keep the raw
-snapshot in a closure and expose only text-free public state. Do not import c2a
-directly, wire App, add a button, or perform a real read. c2b2 remains a later
-separately reviewed and approved change.
+The smallest safe next step is a docs-only R2.6.3c2b2 minimal UI-wiring review.
+It should describe one explicit **Pripraviť lokálnu zálohu** click handler that
+may supply the production c2a browser wrapper to c2b1 only after separate
+approval. Do not wire App, add a button, or perform a real read as part of
+c2b1.

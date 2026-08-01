@@ -215,5 +215,6 @@ in a nonbrowser Node fallback, never against real localStorage or Writer data.
 
 Do not combine c2a with c2b. The completed docs-only review is in
 `WRITER_LEGACY_SPARK_USER_GESTURE_CAPTURE_REVIEW.md`: c2b1 owns pure synthetic
-session logic and c2b2 owns later UI wiring. The first real Writer-data read
-remains the explicitly approved c2b2 click.
+session logic and c2b2 owns later UI wiring. c2b1 is prepared locally with 45
+synthetic checks and still does not import this production browser wrapper. The
+first real Writer-data read remains the explicitly approved c2b2 click.
