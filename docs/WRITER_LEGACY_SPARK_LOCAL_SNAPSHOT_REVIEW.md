@@ -333,6 +333,9 @@ captures Spark -> Package -> Draft once each, fails without partial snapshot,
 and delegates to this parser. Import-safe c2a is published at
 `58b99036878b9975c527373f66b82e248bee9408`, remains unwired, and delegates its
 one acquired Storage object through c1 to this parser. The user-gesture review
-splits pure c2b1 session logic from c2b2. c2b1 is prepared locally with
-synthetic injected dependencies only and holds successful snapshots internally;
-c2b2 remains the first authorized real-data invocation after an explicit click.
+splits pure c2b1 session logic from c2b2. c2b1 is published at
+`315b24b695113ff1dcc8c6f633428e483b100c02` with synthetic injected dependencies
+only and holds successful snapshots internally. The docs-only c2b2 minimal UI
+capture review is prepared locally in
+`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`; c2b2 remains the first
+authorized real-data invocation after an explicit click.

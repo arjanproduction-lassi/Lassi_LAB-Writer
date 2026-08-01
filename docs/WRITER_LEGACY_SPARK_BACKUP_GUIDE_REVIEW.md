@@ -413,10 +413,13 @@ fail-fast read errors. Import-safe c2a is published at
 `58b99036878b9975c527373f66b82e248bee9408` with one lazy Storage acquisition,
 synthetic doubles, and no App/UI wiring or real-data read. The c2b review reuses
 the existing `checking-prerequisites -> snapshot-capturing -> drive-reading`
-transitions. c2b1 is prepared locally as pure one-shot session logic with 45
-synthetic checks, injected timestamp/capture dependencies, closure-held
-snapshot state, and no production c2a wrapper import. c2b2 remains later UI
-wiring and the only phase allowed to trigger the first real read after a click.
+transitions. c2b1 is published at
+`315b24b695113ff1dcc8c6f633428e483b100c02` as pure one-shot session logic with
+45 synthetic checks, injected timestamp/capture dependencies, closure-held
+snapshot state, and no production c2a wrapper import. The docs-only c2b2
+minimal UI capture review is prepared locally in
+`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`; c2b2 remains the only phase
+allowed to trigger the first real read after a click.
 
 ## Test Plan
 

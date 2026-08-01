@@ -1,6 +1,23 @@
 # Worklog
 
-## 2026-07-30 - R2.6.3c2b1 pure local capture session (local only)
+## 2026-07-30 - R2.6.3c2b2 minimal UI capture review (docs only)
+
+- Added `WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md` without React/UI
+  runtime, App wiring, c2a invocation, localStorage read, Writer data access,
+  Drive/network, hash, manifest, Blob/download, commit, push, or deploy.
+- Inventoried the existing `App.tsx` Data area and CSS patterns. A future
+  implementation belongs as one isolated retirement subsection after manual
+  import/export controls and before Google Drive sync.
+- Defined the future service/ref session boundary, text-free view model,
+  explicit **Pripraviť lokálnu zálohu** gesture, first-real-read manual gate,
+  session release rules, UI states, safe error mapping, synthetic tests, and
+  c2b2/R2.6.3d boundary.
+- The smallest next implementation step is a synthetic c2b2 UI/controller slice
+  with fake capture only. The first real c2a/localStorage read still requires a
+  later explicit visible-chat approval after review, commit, push, and a clean
+  worktree.
+
+## 2026-07-30 - R2.6.3c2b1 pure local capture session (published)
 
 - Added `legacySparkRetirementLocalCaptureSession.ts` as a pure one-shot
   session coordinator over injected synthetic timestamp and capture dependencies.
@@ -15,8 +32,9 @@
   release, frozen public state, and source boundaries.
 - No App/UI wiring, c2a browser wrapper import, real localStorage read, real
   Writer data, storage write, Drive/network call, Writer DB bytes, Blob,
-  download, backup verification, or R3 behavior was added. The next smallest
-  step remains a docs-only c2b2 minimal UI-wiring review.
+  download, backup verification, or R3 behavior was added.
+- Published at `315b24b695113ff1dcc8c6f633428e483b100c02`. The next smallest
+  step is the docs-only c2b2 minimal UI capture review.
 
 ## 2026-07-30 - R2.6.3c2b user-gesture capture review (docs only)
 

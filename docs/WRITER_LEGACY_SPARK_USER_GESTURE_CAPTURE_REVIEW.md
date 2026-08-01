@@ -1,10 +1,12 @@
 # Writer Legacy Spark User-Gesture Capture Review
 
 R2.6.3c2b began as a docs-only review of the first explicitly user-invoked
-local snapshot boundary. The current local addendum implements only c2b1, the
-pure session coordinator. It still implements no UI, does not wire published
-c2a into App, reads no browser storage or real Writer data, and creates no
-backup, hash, manifest, Blob, download, commit, push, or deployment.
+local snapshot boundary. R2.6.3c2b1 is published as the pure session
+coordinator. The follow-up c2b2 minimal UI capture review is prepared locally in
+`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. This review still
+implements no UI, does not wire published c2a into App, reads no browser storage
+or real Writer data, and creates no backup, hash, manifest, Blob, download,
+commit, push, or deployment.
 
 ## Existing Guide And UI Inventory
 
@@ -99,9 +101,10 @@ references. Its only effects are calls to explicitly injected pure/synthetic
 dependencies. c2b1 does not import the production browser wrapper directly;
 c2b2 or a later runtime composition layer supplies it only after approval.
 
-## Current Local c2b1 Status
+## Published c2b1 Status
 
-R2.6.3c2b1 is prepared locally in
+R2.6.3c2b1 is published at
+`315b24b695113ff1dcc8c6f633428e483b100c02`. It lives in
 `src/legacySparkRetirementLocalCaptureSession.ts` with 45 synthetic checks in
 `src/legacySparkRetirementLocalCaptureSessionChecks.ts`. It creates no
 timestamp and calls no capture dependency during session creation or
@@ -221,8 +224,10 @@ to return to `idle`; a fresh attempt still requires another explicit gesture.
 
 ## Future c2b2 Minimal UI Wiring
 
-A separate c2b2 change may add one isolated retirement-backup subsection under
-Writer **Dáta**, with:
+The docs-only c2b2 minimal UI capture review is prepared locally in
+`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. A separate implementation
+change may add one isolated retirement-backup subsection under Writer **Dáta**,
+with:
 
 - **Pripraviť lokálnu zálohu** button;
 - short local/read-only explanation;
@@ -240,7 +245,8 @@ remain unchanged.
 ## Manual Gate Before The First Real Click
 
 The first real-data click requires a new explicit chat approval after c2b1 and
-c2b2 are separately reviewed and published. Before that click confirm:
+c2b2 are separately reviewed and published and the worktree is clean. Before
+that click confirm:
 
 - expected commits are published and the worktree is clean;
 - intended production domain and browser profile are correct;
@@ -312,14 +318,14 @@ automatically create `writer-db-bytes-built`, `assembly-verified`,
 `backup-presented`, `backup-verified`, `ready-to-create-tombstones`, or
 `completed`.
 
-The local c2b1 implementation does not implement App/UI wiring, a real storage
-read, Drive GET, post-Drive consistency, hashing, assembly, manifest,
+The published c2b1 implementation does not implement App/UI wiring, a real
+storage read, Drive GET, post-Drive consistency, hashing, assembly, manifest,
 Blob/download, R3, tombstones, data reset, or purge.
 
 ## Smallest Safe Implementation Step
 
-The smallest safe next step is a docs-only R2.6.3c2b2 minimal UI-wiring review.
-It should describe one explicit **Pripraviť lokálnu zálohu** click handler that
-may supply the production c2a browser wrapper to c2b1 only after separate
-approval. Do not wire App, add a button, or perform a real read as part of
-c2b1.
+The smallest safe next implementation step is a synthetic R2.6.3c2b2
+UI/controller slice with fake capture only. It should prove render, mount, and
+effects read nothing; prove one explicit **Pripraviť lokálnu zálohu** click maps
+to one c2b1 command; and keep all public output text-free. Do not perform the
+first real c2a/localStorage read until a later explicit manual approval gate.

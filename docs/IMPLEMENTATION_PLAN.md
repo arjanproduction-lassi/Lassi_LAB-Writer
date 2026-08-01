@@ -104,11 +104,13 @@ Draft reads and transparent R2.6.3a delegation. The docs-only c2 review splits
 an import-safe, unwired c2a wrapper from c2b. c2a is published at
 `58b99036878b9975c527373f66b82e248bee9408` with 39 synthetic checks, one lazy
 Storage acquisition, and no real data access. The docs-only c2b review splits
-c2b1 pure session logic from later c2b2 UI wiring. c2b1 is prepared locally
-with 45 synthetic checks over injected timestamp/capture dependencies, closure-
-held snapshot state, and the published guide state machine. It imports no
-production c2a browser wrapper and reads no real storage. Only approved c2b2 may
-first read real localStorage data after **Pripraviť lokálnu zálohu**.
+c2b1 pure session logic from later c2b2 UI wiring. c2b1 is published at
+`315b24b695113ff1dcc8c6f633428e483b100c02` with 45 synthetic checks over
+injected timestamp/capture dependencies, closure-held snapshot state, and the
+published guide state machine. It imports no production c2a browser wrapper and
+reads no real storage. The docs-only c2b2 minimal UI capture review is prepared
+locally in `WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. Only approved
+c2b2 may first read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice
 

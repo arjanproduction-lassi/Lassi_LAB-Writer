@@ -642,10 +642,13 @@ published at `9d8168e1237d16eea0cbd06de0d923142f7de8cf` and delegates only
 to R2.6.3a after three successful reads. Import-safe c2a is published at
 `58b99036878b9975c527373f66b82e248bee9408` with one lazy Storage acquisition
 and no UI wiring. The c2b review splits pure c2b1 session ownership from later
-c2b2 UI wiring. c2b1 is prepared locally with 45 synthetic checks, no direct c2a
-browser wrapper import, no App/UI wiring, and no real storage read. Only c2b2
-may first invoke real Writer storage after a click; this does not authorize
-Drive, assembly, download, deletion, reset, or R3.
+c2b2 UI wiring. c2b1 is published at
+`315b24b695113ff1dcc8c6f633428e483b100c02` with 45 synthetic checks, no direct
+c2a browser wrapper import, no App/UI wiring, and no real storage read. The
+docs-only c2b2 minimal UI capture review is prepared locally in
+`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. Only c2b2 may first invoke
+real Writer storage after a click; this does not authorize Drive, assembly,
+download, deletion, reset, or R3.
 
 ### R2.7 - Synthetic integration and manual backup
 

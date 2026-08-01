@@ -76,11 +76,12 @@ an import-safe unwired wrapper and c2b as the separately approved user gesture.
 Import-safe c2a is published at
 `58b99036878b9975c527373f66b82e248bee9408` with 39 synthetic checks and no
 App/UI wiring or real storage read. The c2b review splits c2b1 (pure injected
-one-shot session) from c2b2 (later UI wiring). c2b1 is prepared locally with
-45 synthetic checks, no production c2a wrapper import, no App/UI wiring, and no
-real storage read. The smallest next step is a docs-only c2b2 minimal UI-wiring
-review; the first real localStorage read remains c2b2 after an explicit click
-and separate approval.
+one-shot session) from c2b2 (later UI wiring). c2b1 is published at
+`315b24b695113ff1dcc8c6f633428e483b100c02` with 45 synthetic checks, no
+production c2a wrapper import, no App/UI wiring, and no real storage read. The
+docs-only c2b2 minimal UI capture review is prepared locally in
+`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`; the first real localStorage
+read remains c2b2 after an explicit click and separate approval.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

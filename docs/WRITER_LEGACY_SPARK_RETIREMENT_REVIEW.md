@@ -372,10 +372,12 @@ partial snapshot after read failure. Import-safe c2a is published at
 `58b99036878b9975c527373f66b82e248bee9408` with 39 synthetic checks, one lazy
 Storage acquisition, and no App/UI wiring or real data read. The user-gesture
 review separates pure c2b1 one-shot session logic from later c2b2 UI wiring.
-c2b1 is prepared locally with 45 synthetic checks, injected dependencies only,
-closure-held snapshot state, and no production c2a wrapper import. Only approved
-c2b2 may first read real localStorage data after a click; it does not authorize
-retirement or deletion.
+c2b1 is published at `315b24b695113ff1dcc8c6f633428e483b100c02` with 45
+synthetic checks, injected dependencies only, closure-held snapshot state, and
+no production c2a wrapper import. The docs-only c2b2 minimal UI capture review
+is prepared locally in `WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. Only
+approved c2b2 may first read real localStorage data after a click; it does not
+authorize retirement or deletion.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use
