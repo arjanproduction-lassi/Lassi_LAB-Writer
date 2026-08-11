@@ -6,6 +6,8 @@ does not import c2b1 into App, does not call c2a, reads no real localStorage or
 Writer data, and creates no Writer DB bytes, Drive request, hash, manifest,
 Blob, download, commit, push, or deployment.
 
+Published at `b392600914a7a8e4eebe32644a97f99678e1bb41`.
+
 Published prerequisite: R2.6.3c2b1 is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02`. It provides the pure
 `createLegacySparkRetirementLocalCaptureSession(...)` one-shot session with 45
@@ -305,6 +307,33 @@ R2.6.3d remains separate:
 - `LOCAL_SNAPSHOT_CHANGED`;
 - no merge, repair, normalization, or write.
 
+## Local c2b2a Headless Controller
+
+R2.6.3c2b2a is prepared locally as a headless synthetic UI/controller slice over
+an injected c2b1 session factory. It creates no React component, imports nothing
+into `App.tsx`, does not import the production c2a browser wrapper, reads no
+real localStorage, and uses no real Writer data.
+
+The controller owns only:
+
+- `getViewModel()`;
+- `prepareLocalBackup()`;
+- `startOver()`;
+- `dispose()`.
+
+Its view model is frozen and text-free. It may expose the approved label,
+controller status, safe createdAt, counts, Spark/Package storage statuses, typed
+reason codes, message keys, and `nextAllowedStep`. It must not expose raw
+snapshot data, raw JSON, author text, IDs, bytes, Storage objects, session
+objects, dependency callbacks, exception text, or stack traces.
+
+`prepareLocalBackup()` is the only capture trigger. `startOver()` releases the
+old session and creates a new side-effect-free session without capture.
+`dispose()` releases the active session and leaves the controller released.
+The next smallest step after c2b2a is a docs-only c2b2b production React wiring
+review. The first real c2a/localStorage read still requires a later explicit
+manual approval gate.
+
 ## Out Of Scope
 
 This review does not implement:
@@ -326,8 +355,7 @@ This review does not implement:
 
 ## Smallest Safe Implementation Step
 
-The smallest next implementation should be a synthetic c2b2 UI/controller slice:
-add a tiny feature controller or component boundary with injected fake capture,
-prove render/mount/effects read nothing, prove one click maps to one c2b1
-command, and keep all public output text-free. Do not perform the first real
-c2a/localStorage read until a later explicit manual approval gate.
+The smallest next step is a docs-only c2b2b production React wiring review. It
+should keep the c2b2a controller headless, preserve a single explicit
+**Pripraviť lokálnu zálohu** trigger, and keep the first real c2a/localStorage
+read behind a later explicit manual approval gate.

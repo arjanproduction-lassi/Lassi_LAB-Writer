@@ -157,6 +157,8 @@ It is not wired into App/UI and has not read real localStorage or Writer data.
 c2b1 one-shot session ownership and later c2b2 UI wiring. c2b1 is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02` with 45 synthetic checks and an
 injected capture dependency, not this production browser wrapper. The docs-only
-c2b2 minimal UI capture review is prepared locally in
-`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. Only c2b2 may invoke c2a
-against real Writer storage after an explicit click.
+c2b2 minimal UI capture review is published at
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
+a headless synthetic controller and still does not import this production
+browser wrapper. Only later approved c2b2b may invoke c2a against real Writer
+storage after an explicit click.

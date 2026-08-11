@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-07-30 - R2.6.3c2b2a headless minimal UI controller (local only)
+
+- Added a headless synthetic UI/controller slice over an injected c2b1 session
+  factory. It has no React component, App import, production c2a wrapper import,
+  real localStorage read, real Writer data, Drive/network call, Writer DB bytes,
+  hash, manifest, Blob/download, backup verification, or R3 behavior.
+- The controller exposes frozen text-free view models plus explicit
+  `prepareLocalBackup()`, `startOver()`, and `dispose()` commands.
+  `prepareLocalBackup()` is the only capture trigger; `startOver()` releases
+  the old session and creates a new side-effect-free session without capture;
+  `dispose()` releases the active session and leaves the controller released.
+- Added synthetic c2b2a checks for creation/getViewModel side effects, one
+  click, reentrancy/double-click safety, status and reason mapping, frozen
+  public output, release lifecycle, and source boundaries.
+- The next smallest step is a docs-only c2b2b production React wiring review.
+  The first real c2a/localStorage read still requires separate visible-chat
+  approval after reviewed implementation, commit, push, and a clean worktree.
+
 ## 2026-07-30 - R2.6.3c2b2 minimal UI capture review (docs only)
 
 - Added `WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md` without React/UI
@@ -12,10 +30,11 @@
   explicit **Pripraviť lokálnu zálohu** gesture, first-real-read manual gate,
   session release rules, UI states, safe error mapping, synthetic tests, and
   c2b2/R2.6.3d boundary.
-- The smallest next implementation step is a synthetic c2b2 UI/controller slice
+- This review opened the now-local R2.6.3c2b2a synthetic UI/controller slice
   with fake capture only. The first real c2a/localStorage read still requires a
   later explicit visible-chat approval after review, commit, push, and a clean
   worktree.
+- Published at `b392600914a7a8e4eebe32644a97f99678e1bb41`.
 
 ## 2026-07-30 - R2.6.3c2b1 pure local capture session (published)
 
@@ -33,8 +52,9 @@
 - No App/UI wiring, c2a browser wrapper import, real localStorage read, real
   Writer data, storage write, Drive/network call, Writer DB bytes, Blob,
   download, backup verification, or R3 behavior was added.
-- Published at `315b24b695113ff1dcc8c6f633428e483b100c02`. The next smallest
-  step is the docs-only c2b2 minimal UI capture review.
+- Published at `315b24b695113ff1dcc8c6f633428e483b100c02`. The docs-only c2b2
+  minimal UI capture review is published at
+  `b392600914a7a8e4eebe32644a97f99678e1bb41`.
 
 ## 2026-07-30 - R2.6.3c2b user-gesture capture review (docs only)
 

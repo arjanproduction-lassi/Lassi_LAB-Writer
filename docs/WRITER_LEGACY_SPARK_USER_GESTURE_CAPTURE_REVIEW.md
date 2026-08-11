@@ -2,11 +2,11 @@
 
 R2.6.3c2b began as a docs-only review of the first explicitly user-invoked
 local snapshot boundary. R2.6.3c2b1 is published as the pure session
-coordinator. The follow-up c2b2 minimal UI capture review is prepared locally in
-`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. This review still
-implements no UI, does not wire published c2a into App, reads no browser storage
-or real Writer data, and creates no backup, hash, manifest, Blob, download,
-commit, push, or deployment.
+coordinator. The follow-up c2b2 minimal UI capture review is published at
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
+a headless synthetic UI controller. This review still does not wire published
+c2a into App, reads no browser storage or real Writer data, and creates no
+backup, hash, manifest, Blob, download, commit, push, or deployment.
 
 ## Existing Guide And UI Inventory
 
@@ -224,10 +224,10 @@ to return to `idle`; a fresh attempt still requires another explicit gesture.
 
 ## Future c2b2 Minimal UI Wiring
 
-The docs-only c2b2 minimal UI capture review is prepared locally in
-`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. A separate implementation
-change may add one isolated retirement-backup subsection under Writer **Dáta**,
-with:
+The docs-only c2b2 minimal UI capture review is published at
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
+a headless synthetic controller. A later c2b2b implementation change may add
+one isolated retirement-backup subsection under Writer **Dáta**, with:
 
 - **Pripraviť lokálnu zálohu** button;
 - short local/read-only explanation;
@@ -324,8 +324,7 @@ Blob/download, R3, tombstones, data reset, or purge.
 
 ## Smallest Safe Implementation Step
 
-The smallest safe next implementation step is a synthetic R2.6.3c2b2
-UI/controller slice with fake capture only. It should prove render, mount, and
-effects read nothing; prove one explicit **Pripraviť lokálnu zálohu** click maps
-to one c2b1 command; and keep all public output text-free. Do not perform the
-first real c2a/localStorage read until a later explicit manual approval gate.
+The smallest safe next step is a docs-only c2b2b production React wiring review.
+It should keep the c2b2a controller headless, describe one explicit
+**Pripraviť lokálnu zálohu** click handler, and preserve the manual gate before
+the first real c2a/localStorage read.

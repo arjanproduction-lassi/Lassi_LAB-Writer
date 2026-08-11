@@ -96,12 +96,14 @@ The c2a wrapper is published but remains unwired; its existence and import do
 not create a user-visible action or storage read. c2b1 stays outside React as a
 pure one-shot session and is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02` with synthetic dependencies only.
-The docs-only c2b2 minimal UI capture review is prepared locally in
-`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`: a future c2b2 may add one
-isolated retirement subsection to the existing Writer **Dáta / Ručný prenos DB**
-area; the first real read happens only inside the actual **Pripraviť lokálnu
-zálohu** click handler after separate approval. The read-only product shell is
-not the owner of this sensitive operation.
+The docs-only c2b2 minimal UI capture review is published at
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
+a headless synthetic controller that exposes only frozen text-free state and no
+React component. A future c2b2b may add one isolated retirement subsection to
+the existing Writer **Dáta / Ručný prenos DB** area; the first real read happens
+only inside the actual **Pripraviť lokálnu zálohu** click handler after separate
+approval. The read-only product shell is not the owner of this sensitive
+operation.
 
 ## Four Notebook Comfort
 

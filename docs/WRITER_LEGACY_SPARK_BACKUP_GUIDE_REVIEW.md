@@ -417,9 +417,11 @@ transitions. c2b1 is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02` as pure one-shot session logic with
 45 synthetic checks, injected timestamp/capture dependencies, closure-held
 snapshot state, and no production c2a wrapper import. The docs-only c2b2
-minimal UI capture review is prepared locally in
-`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`; c2b2 remains the only phase
-allowed to trigger the first real read after a click.
+minimal UI capture review is published at
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
+a headless synthetic controller that maps c2b1 public state into frozen
+text-free UI state. Later approved c2b2b remains the only phase allowed to
+trigger the first real read after a click.
 
 ## Test Plan
 

@@ -375,9 +375,10 @@ review separates pure c2b1 one-shot session logic from later c2b2 UI wiring.
 c2b1 is published at `315b24b695113ff1dcc8c6f633428e483b100c02` with 45
 synthetic checks, injected dependencies only, closure-held snapshot state, and
 no production c2a wrapper import. The docs-only c2b2 minimal UI capture review
-is prepared locally in `WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. Only
-approved c2b2 may first read real localStorage data after a click; it does not
-authorize retirement or deletion.
+is published at `b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is
+prepared locally as a headless synthetic controller over an injected c2b1
+session factory. Only later approved c2b2b may first read real localStorage data
+after a click; it does not authorize retirement or deletion.
 
 The existing Drive sync request is not a raw-backup reader: it parses JSON and
 then participates in merge/upload behavior. A future R2 implementation must use

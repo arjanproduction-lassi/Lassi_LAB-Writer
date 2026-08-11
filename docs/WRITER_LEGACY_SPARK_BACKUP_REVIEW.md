@@ -645,8 +645,10 @@ and no UI wiring. The c2b review splits pure c2b1 session ownership from later
 c2b2 UI wiring. c2b1 is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02` with 45 synthetic checks, no direct
 c2a browser wrapper import, no App/UI wiring, and no real storage read. The
-docs-only c2b2 minimal UI capture review is prepared locally in
-`WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. Only c2b2 may first invoke
+docs-only c2b2 minimal UI capture review is published at
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
+a headless synthetic controller with no React component, App import, production
+c2a wrapper, or real storage read. Only later approved c2b2b may first invoke
 real Writer storage after a click; this does not authorize Drive, assembly,
 download, deletion, reset, or R3.
 

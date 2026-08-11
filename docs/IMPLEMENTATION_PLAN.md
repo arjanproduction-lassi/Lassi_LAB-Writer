@@ -108,9 +108,12 @@ c2b1 pure session logic from later c2b2 UI wiring. c2b1 is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02` with 45 synthetic checks over
 injected timestamp/capture dependencies, closure-held snapshot state, and the
 published guide state machine. It imports no production c2a browser wrapper and
-reads no real storage. The docs-only c2b2 minimal UI capture review is prepared
-locally in `WRITER_LEGACY_SPARK_MINIMAL_UI_CAPTURE_REVIEW.md`. Only approved
-c2b2 may first read real localStorage data after **Pripraviť lokálnu zálohu**.
+reads no real storage. The docs-only c2b2 minimal UI capture review is
+published at `b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is
+prepared locally as a headless synthetic UI controller over an injected c2b1
+session factory. It creates no React component, imports nothing into App, uses
+no production c2a wrapper, and reads no real storage. Only later approved c2b2b
+may first read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice
 
