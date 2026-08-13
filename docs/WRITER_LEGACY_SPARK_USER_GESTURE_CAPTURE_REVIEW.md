@@ -3,10 +3,12 @@
 R2.6.3c2b began as a docs-only review of the first explicitly user-invoked
 local snapshot boundary. R2.6.3c2b1 is published as the pure session
 coordinator. The follow-up c2b2 minimal UI capture review is published at
-`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
-a headless synthetic UI controller. This review still does not wire published
-c2a into App, reads no browser storage or real Writer data, and creates no
-backup, hash, manifest, Blob, download, commit, push, or deployment.
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is published at
+`ae998764637075bf8bc341255903af23ce762232` as a headless synthetic UI
+controller. The docs-only c2b2b React wiring review is defined in
+`WRITER_LEGACY_SPARK_REACT_WIRING_REVIEW.md`. This review still does not wire
+published c2a into App, reads no browser storage or real Writer data, and
+creates no backup, hash, manifest, Blob, download, commit, push, or deployment.
 
 ## Existing Guide And UI Inventory
 
@@ -225,9 +227,12 @@ to return to `idle`; a fresh attempt still requires another explicit gesture.
 ## Future c2b2 Minimal UI Wiring
 
 The docs-only c2b2 minimal UI capture review is published at
-`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
-a headless synthetic controller. A later c2b2b implementation change may add
-one isolated retirement-backup subsection under Writer **Dáta**, with:
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is published at
+`ae998764637075bf8bc341255903af23ce762232` as a headless synthetic controller.
+The c2b2b design is documented in
+`WRITER_LEGACY_SPARK_REACT_WIRING_REVIEW.md`. A later separately reviewed App
+change may add one isolated retirement-backup subsection under Writer **Dáta**,
+with:
 
 - **Pripraviť lokálnu zálohu** button;
 - short local/read-only explanation;
@@ -324,7 +329,9 @@ Blob/download, R3, tombstones, data reset, or purge.
 
 ## Smallest Safe Implementation Step
 
-The smallest safe next step is a docs-only c2b2b production React wiring review.
-It should keep the c2b2a controller headless, describe one explicit
-**Pripraviť lokálnu zálohu** click handler, and preserve the manual gate before
-the first real c2a/localStorage read.
+The c2b2b1 isolated React panel is now prepared locally with an injected
+synthetic controller factory and 45 focused checks. It remains outside
+`App.tsx`, does not import production c2a, and preserves one explicit
+**Pripraviť lokálnu zálohu** click handler plus the manual gate before
+the first real c2a/localStorage read. The smallest next step is a docs-only
+c2b2b2 production composition review; App placement remains a separate gate.

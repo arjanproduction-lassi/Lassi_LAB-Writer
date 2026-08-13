@@ -6,6 +6,7 @@ import { legacySparkRetirementBrowserAdaptersCheckCount } from "./legacySparkRet
 import { legacySparkRetirementDriveV1BackupVerifierCheckCount } from "./legacySparkRetirementDriveV1BackupVerifierChecks";
 import { legacySparkRetirementInventoryCheckCount } from "./legacySparkRetirementInventoryChecks";
 import { legacySparkRetirementLocalCaptureSessionCheckCount } from "./legacySparkRetirementLocalCaptureSessionChecks";
+import { legacySparkRetirementLocalBackupPanelCheckCount } from "./legacySparkRetirementLocalBackupPanelChecks";
 import { legacySparkRetirementMinimalUiCaptureControllerCheckCount } from "./legacySparkRetirementMinimalUiCaptureControllerChecks";
 import { legacySparkRetirementLocalSnapshotCheckCount } from "./legacySparkRetirementLocalSnapshotChecks";
 import { legacySparkRetirementLocalStorageCaptureCheckCount } from "./legacySparkRetirementLocalStorageCaptureChecks";
@@ -17,6 +18,7 @@ async function runLegacySparkRetirementChecks() {
   const total = legacySparkRetirementInventoryCheckCount +
     legacySparkRetirementBrowserLocalStorageCaptureCheckCount +
     legacySparkRetirementLocalCaptureSessionCheckCount +
+    legacySparkRetirementLocalBackupPanelCheckCount +
     legacySparkRetirementMinimalUiCaptureControllerCheckCount +
     legacySparkRetirementLocalSnapshotCheckCount +
     legacySparkRetirementLocalStorageCaptureCheckCount +

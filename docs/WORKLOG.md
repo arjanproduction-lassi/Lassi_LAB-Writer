@@ -1,6 +1,41 @@
 # Worklog
 
-## 2026-07-30 - R2.6.3c2b2a headless minimal UI controller (local only)
+## 2026-08-11 - R2.6.3c2b2b1 injected React panel (local only)
+
+- Added `LegacySparkRetirementLocalBackupPanel.tsx` as an isolated component
+  over an injected c2b2a controller factory. It is not imported into `App.tsx`,
+  `main.tsx`, or the product shell and has no CSS change.
+- Controller creation remains lazy inside the accepted explicit command.
+  Render, server render, mount, blocked commands, and release-only cleanup do
+  not create the controller, call c2a, or read storage.
+- Added text-free fail-closed blocking reasons, synchronous re-entry/repeat
+  protection, safe static status copy, aggregate counts, start-over/cancel, and
+  Strict Mode-safe idempotent release behavior.
+- Added 45/45 synthetic panel checks; the combined Legacy Spark retirement
+  harness now passes 693/693. No production c2a, App, storage, Drive, time,
+  randomness, network, crypto, file, download, backup verification, or R3 path
+  was added.
+- The smallest next step is a docs-only c2b2b2 production composition review.
+  c2b2b1 remains uncommitted and unpublished; no real data was read.
+
+## 2026-08-11 - R2.6.3c2b2b production React wiring review (docs only)
+
+- Added `WRITER_LEGACY_SPARK_REACT_WIRING_REVIEW.md` without React/UI runtime,
+  App/CSS changes, c2a invocation, localStorage read, Writer data access,
+  Drive/network, hash, manifest, Blob/download, commit, push, or deployment.
+- Split later work into c2b2b1 injected synthetic React panel, c2b2b2
+  import-safe production composition, c2b2b3 separately reviewed App placement,
+  and c2b2b4 separately approved first-real-click gate.
+- Defined lazy controller ownership, a single explicit click sequence,
+  fail-closed import/recovery/sync/editor guards, text-free React state,
+  release-only unmount cleanup, synthetic checks, and the manual production
+  gate. Render, mount, effects, imports, retries, and unrelated App actions
+  remain read-free.
+- At review time the smallest later implementation was c2b2b1 only. The newer
+  local entry above records that isolated implementation; neither phase
+  authorizes the first real c2a/localStorage read.
+
+## 2026-07-30 - R2.6.3c2b2a headless minimal UI controller (published)
 
 - Added a headless synthetic UI/controller slice over an injected c2b1 session
   factory. It has no React component, App import, production c2a wrapper import,
@@ -14,9 +49,10 @@
 - Added synthetic c2b2a checks for creation/getViewModel side effects, one
   click, reentrancy/double-click safety, status and reason mapping, frozen
   public output, release lifecycle, and source boundaries.
-- The next smallest step is a docs-only c2b2b production React wiring review.
-  The first real c2a/localStorage read still requires separate visible-chat
-  approval after reviewed implementation, commit, push, and a clean worktree.
+- Published at `ae998764637075bf8bc341255903af23ce762232` with 44 focused checks
+  and 648/648 combined retirement checks. The first real c2a/localStorage read
+  still requires separate visible-chat approval after reviewed implementation,
+  commit, push, deployment, and a clean worktree.
 
 ## 2026-07-30 - R2.6.3c2b2 minimal UI capture review (docs only)
 

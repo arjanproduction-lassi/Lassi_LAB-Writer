@@ -97,9 +97,13 @@ not create a user-visible action or storage read. c2b1 stays outside React as a
 pure one-shot session and is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02` with synthetic dependencies only.
 The docs-only c2b2 minimal UI capture review is published at
-`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
-a headless synthetic controller that exposes only frozen text-free state and no
-React component. A future c2b2b may add one isolated retirement subsection to
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is published at
+`ae998764637075bf8bc341255903af23ce762232` as a headless synthetic controller
+that exposes only frozen text-free state and no React component. The docs-only
+c2b2b review keeps the panel lazy and injected: render, mount, effects, and
+entering Data create no controller and read nothing. c2b2b1 is now prepared
+locally as that isolated panel with synthetic dependencies only and remains
+outside App. A later separately reviewed App step may add one retirement subsection to
 the existing Writer **Dáta / Ručný prenos DB** area; the first real read happens
 only inside the actual **Pripraviť lokálnu zálohu** click handler after separate
 approval. The read-only product shell is not the owner of this sensitive

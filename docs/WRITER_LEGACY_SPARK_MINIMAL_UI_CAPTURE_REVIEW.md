@@ -94,7 +94,8 @@ data, or download artifacts.
 
 ### C. Minimal React UI
 
-The future React UI should be a small isolated subsection under Data:
+The local c2b2b1 React panel follows this small isolated Data-subsection design,
+but it is not mounted in App:
 
 - one explicit **Pripraviť lokálnu zálohu** button;
 - short local/read-only copy;
@@ -307,12 +308,14 @@ R2.6.3d remains separate:
 - `LOCAL_SNAPSHOT_CHANGED`;
 - no merge, repair, normalization, or write.
 
-## Local c2b2a Headless Controller
+## Published c2b2a Headless Controller
 
-R2.6.3c2b2a is prepared locally as a headless synthetic UI/controller slice over
-an injected c2b1 session factory. It creates no React component, imports nothing
-into `App.tsx`, does not import the production c2a browser wrapper, reads no
-real localStorage, and uses no real Writer data.
+R2.6.3c2b2a is published at
+`ae998764637075bf8bc341255903af23ce762232` as a headless synthetic
+UI/controller slice over an injected c2b1 session factory. It has 44 focused
+checks and preserves 648/648 combined retirement checks. It creates no React
+component, imports nothing into `App.tsx`, does not import the production c2a
+browser wrapper, reads no real localStorage, and uses no real Writer data.
 
 The controller owns only:
 
@@ -330,15 +333,17 @@ objects, dependency callbacks, exception text, or stack traces.
 `prepareLocalBackup()` is the only capture trigger. `startOver()` releases the
 old session and creates a new side-effect-free session without capture.
 `dispose()` releases the active session and leaves the controller released.
-The next smallest step after c2b2a is a docs-only c2b2b production React wiring
-review. The first real c2a/localStorage read still requires a later explicit
-manual approval gate.
+The docs-only c2b2b production React wiring review is now defined in
+`WRITER_LEGACY_SPARK_REACT_WIRING_REVIEW.md`. It splits the later runtime work
+into an injected synthetic panel, import-safe production composition, separate
+App placement, and a separately approved first-real-click gate. No part is
+implemented by that review.
 
 ## Out Of Scope
 
-This review does not implement:
+This review and local c2b2b1 do not implement:
 
-- React/UI runtime;
+- App/UI runtime activation;
 - App wiring;
 - production click handler;
 - real localStorage read;
@@ -355,7 +360,9 @@ This review does not implement:
 
 ## Smallest Safe Implementation Step
 
-The smallest next step is a docs-only c2b2b production React wiring review. It
-should keep the c2b2a controller headless, preserve a single explicit
-**Pripraviť lokálnu zálohu** trigger, and keep the first real c2a/localStorage
-read behind a later explicit manual approval gate.
+The c2b2b1 isolated injected React panel is now prepared locally with 45
+synthetic checks. It is not imported into `App.tsx`, has no production c2a
+composition, and performs no real storage read. The smallest next step is a
+docs-only c2b2b2 production composition review. The panel preserves a single explicit
+**Pripraviť lokálnu zálohu** trigger and keeps the first real c2a/localStorage
+read behind later App wiring and an explicit manual approval gate.

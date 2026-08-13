@@ -110,9 +110,16 @@ injected timestamp/capture dependencies, closure-held snapshot state, and the
 published guide state machine. It imports no production c2a browser wrapper and
 reads no real storage. The docs-only c2b2 minimal UI capture review is
 published at `b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is
-prepared locally as a headless synthetic UI controller over an injected c2b1
-session factory. It creates no React component, imports nothing into App, uses
-no production c2a wrapper, and reads no real storage. Only later approved c2b2b
+published at `ae998764637075bf8bc341255903af23ce762232` as a headless synthetic
+UI controller over an injected c2b1 session factory, with 44 focused checks and
+648/648 combined retirement checks. It creates no React component, imports
+nothing into App, uses no production c2a wrapper, and reads no real storage.
+The docs-only c2b2b review now splits later work into an injected synthetic
+panel, import-safe production composition, separate App placement, and a
+separately approved first-real-click gate. c2b2b1 is now prepared locally as an
+isolated injected React panel with 45 synthetic checks and no `App.tsx`, c2a,
+real storage, time, network, or file access. Only the separately approved
+c2b2b4 explicit click
 may first read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice

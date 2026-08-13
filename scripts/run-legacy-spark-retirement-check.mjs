@@ -22,6 +22,8 @@ try {
       "--strict",
       "--skipLibCheck",
       "--esModuleInterop",
+      "--jsx",
+      "react-jsx",
       "--outDir",
       outputDir,
       "src/legacySparkRetirementChecks.ts"
@@ -36,7 +38,11 @@ try {
   const run = spawnSync(
     process.execPath,
     [join(outputDir, "legacySparkRetirementChecks.js")],
-    { cwd: repoRoot, stdio: "inherit" }
+    {
+      cwd: repoRoot,
+      stdio: "inherit",
+      env: { ...process.env, NODE_PATH: resolve(repoRoot, "node_modules") }
+    }
   );
 
   if (run.status !== 0) {

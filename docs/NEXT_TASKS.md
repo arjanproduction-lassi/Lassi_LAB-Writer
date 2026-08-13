@@ -80,12 +80,17 @@ one-shot session) from c2b2 (later UI wiring). c2b1 is published at
 `315b24b695113ff1dcc8c6f633428e483b100c02` with 45 synthetic checks, no
 production c2a wrapper import, no App/UI wiring, and no real storage read. The
 docs-only c2b2 minimal UI capture review is published at
-`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is prepared locally as
-a headless synthetic UI controller over an injected c2b1 session factory, with
-no React component, no App import, no production c2a wrapper, and no real
-storage read. The smallest next step is a docs-only c2b2b production React
-wiring review; the first real localStorage read remains c2b2b after an explicit
-click and separate approval.
+`b392600914a7a8e4eebe32644a97f99678e1bb41`. R2.6.3c2b2a is published at
+`ae998764637075bf8bc341255903af23ce762232` as a headless synthetic UI
+controller over an injected c2b1 session factory, with 44 focused checks and
+648/648 combined retirement checks. It has no React component, App import,
+production c2a wrapper, or real storage read. The docs-only c2b2b review now
+defines the later production React boundary. c2b2b1 is prepared locally as an
+isolated injected React panel with 45/45 synthetic checks. It is not imported
+into App, does not import production c2a, and reads no real storage. The
+smallest next step is a docs-only c2b2b2 production composition review; do not
+wire App or create the production composition yet. The first real localStorage
+read remains behind later App wiring, an explicit click, and separate approval.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
