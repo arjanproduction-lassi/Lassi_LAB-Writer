@@ -7,6 +7,7 @@ import { legacySparkRetirementDriveV1BackupVerifierCheckCount } from "./legacySp
 import { legacySparkRetirementInventoryCheckCount } from "./legacySparkRetirementInventoryChecks";
 import { legacySparkRetirementLocalCaptureSessionCheckCount } from "./legacySparkRetirementLocalCaptureSessionChecks";
 import { legacySparkRetirementLocalBackupPanelCheckCount } from "./legacySparkRetirementLocalBackupPanelChecks";
+import { legacySparkRetirementLocalBackupRuntimeCheckCount } from "./legacySparkRetirementLocalBackupRuntimeChecks";
 import { legacySparkRetirementMinimalUiCaptureControllerCheckCount } from "./legacySparkRetirementMinimalUiCaptureControllerChecks";
 import { legacySparkRetirementLocalSnapshotCheckCount } from "./legacySparkRetirementLocalSnapshotChecks";
 import { legacySparkRetirementLocalStorageCaptureCheckCount } from "./legacySparkRetirementLocalStorageCaptureChecks";
@@ -19,6 +20,7 @@ async function runLegacySparkRetirementChecks() {
     legacySparkRetirementBrowserLocalStorageCaptureCheckCount +
     legacySparkRetirementLocalCaptureSessionCheckCount +
     legacySparkRetirementLocalBackupPanelCheckCount +
+    legacySparkRetirementLocalBackupRuntimeCheckCount +
     legacySparkRetirementMinimalUiCaptureControllerCheckCount +
     legacySparkRetirementLocalSnapshotCheckCount +
     legacySparkRetirementLocalStorageCaptureCheckCount +

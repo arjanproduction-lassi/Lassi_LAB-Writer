@@ -120,9 +120,13 @@ separately approved first-real-click gate. c2b2b1 is published as an
 isolated injected React panel with 45 synthetic checks and no `App.tsx`, c2a,
 real storage, time, network, or file access. It is published at
 `340f8335ba1d1a68f9b180a66c946728addb9a7c`; the combined retirement harness
-passes 693/693. The docs-only c2b2b2 review now defines one future import-safe
-timestamp/c2a/controller composition module without implementing it. Only the
-separately approved c2b2b4 explicit click
+passed 693/693. The c2b2b2 review is published at
+`959a4c756d6f901cd45501b6286dd1374091e2ce`. Its matching import-safe
+timestamp/c2a/controller composition module and 42 synthetic checks implement
+that contract; the combined retirement harness passes 735/735. The module
+remains outside App, and automated checks never invoke its production prepare
+path. The next gate is a separate docs-only c2b2b3 App placement review. Only
+the separately approved c2b2b4 explicit click
 may first read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice

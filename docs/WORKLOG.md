@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-08-19 - R2.6.3c2b2b2 production composition
+
+- Added one thin non-React runtime module that composes the existing c2b2a
+  controller, c2b1 session, canonical UTC-second timestamp adapter, and c2a
+  browser capture wrapper through injected and production factories.
+- Module import, both factory constructions, controller/session creation,
+  `getViewModel()`, start-over, and dispose remain free of time and capture.
+  Only an accepted prepare calls time once and capture once in that order.
+- Added 42/42 synthetic checks for canonical `.000Z` formatting, invalid time,
+  typed success/incomplete/invalid failures, repeat/start-over/dispose behavior,
+  raw-content privacy, and forbidden dependency boundaries. The combined
+  retirement harness passes 735/735.
+- The production prepare path was not invoked. No App/React/CSS wiring, real
+  localStorage read, Writer data access, storage write, Drive/network call,
+  backup/file creation, commit, push, deployment, or R3 behavior was added.
+- c2b2b3 App placement review and c2b2b4 first real click remain separate
+  approvals.
+
 ## 2026-08-13 - R2.6.3c2b2b2 production composition review (docs only)
 
 - Added `WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md` without runtime,

@@ -1,17 +1,17 @@
 # Writer Legacy Spark Production Composition Review
 
-Status: R2.6.3c2b2b2 docs-only review based on published `main` commit
-`340f8335ba1d1a68f9b180a66c946728addb9a7c`. c2b2b1 is published as an
+Status: R2.6.3c2b2b2 contract originally reviewed as docs-only and published at
+`959a4c756d6f901cd45501b6286dd1374091e2ce`. c2b2b1 is published as an
 isolated React panel with a synthetic controller factory and no App wiring.
-This document defines the smallest future import-safe production composition
-module. It adds no runtime code, changes no React or App file, calls no c2a
-wrapper, reads no localStorage or Writer data, and creates no commit, push,
-deployment, backup, hash, manifest, Blob, file, or download.
+The matching c2b2b2 runtime composition and synthetic checks implement this
+reviewed contract. They change no React or App file, do not execute c2a
+or read localStorage/Writer data during checks, and create no backup, hash,
+manifest, Blob, file, download, or deployment.
 
 ## Decision
 
-The future c2b2b2 implementation should add exactly one thin production
-composition module. It will connect four already published layers without
+The c2b2b2 implementation adds exactly one thin production composition
+module. It connects four already published layers without
 changing their contracts:
 
 1. c2b2a `createLegacySparkRetirementMinimalUiCaptureController()`;
@@ -45,12 +45,13 @@ The composition must reuse, not redesign, these APIs:
   render, and first calls the controller factory from an accepted explicit
   command.
 
-No production module currently connects these APIs. Therefore no real
-retirement localStorage read is currently reachable from the UI.
+The production composition module connects these APIs, but it is not imported by
+the panel or App. Therefore no real retirement localStorage read is currently
+reachable from the UI.
 
-## Future Module Boundary
+## Module Boundary
 
-Recommended future file:
+Implemented file:
 
 `src/legacySparkRetirementLocalBackupRuntime.ts`
 
@@ -67,7 +68,7 @@ Drive calls, backup assembly, hashing, file creation, download, R3, or logging.
 
 ## Proposed Public API
 
-The implementation should keep production effects replaceable in tests:
+The implementation keeps production effects replaceable in tests:
 
 ```ts
 type LegacySparkRetirementLocalBackupRuntimeDependencies = Readonly<{
@@ -218,8 +219,8 @@ or author text may enter public results.
 
 ## Synthetic Verification Plan
 
-Future c2b2b2 checks should use only injected dependencies and synthetic data.
-They must prove:
+The c2b2b2 checks use only injected dependencies and synthetic data. They
+prove:
 
 - module import has no time, window, storage, capture, or network side effect;
 - injected factory creation creates one controller/session but calls neither
@@ -280,11 +281,25 @@ happen only after:
 No docs review, module import, commit, push, build, deployment, render, or mount
 counts as that approval.
 
+## Implementation Result
+
+The implementation adds only
+`src/legacySparkRetirementLocalBackupRuntime.ts`, its synthetic checks, and the
+existing retirement-harness import/count wiring. It exposes the injected and
+zero-argument production controller factories defined above. Its 42/42 checks
+prove that imports, factory/controller/session creation, `getViewModel()`,
+start-over, and dispose are read-free; one injected accepted prepare performs
+one canonical timestamp call followed by one synthetic capture call. The
+combined retirement harness passes 735/735.
+
+The production prepare path is not invoked by automated checks. The module is
+not imported into `App.tsx`, the panel remains invisible, and no real browser
+storage read has occurred.
+
 ## Out Of Scope
 
-This review does not implement or authorize:
+This c2b2b2 slice does not implement or authorize:
 
-- `legacySparkRetirementLocalBackupRuntime.ts` or its checks;
 - React, App, CSS, navigation, route, or production button changes;
 - any real localStorage or Writer data read;
 - Writer DB bytes, Drive raw GET, sync changes, hashing, assembly,
@@ -292,11 +307,11 @@ This review does not implement or authorize:
 - raw snapshot orchestration beyond c2b1;
 - R2.6.3d post-Drive consistency reread;
 - tombstones, reset, purge, migration, merge, R3, or package-only cutover;
-- commit, push, deployment, or user-data deletion.
+- deployment or user-data deletion.
 
-## Go / No-Go For Future c2b2b2 Implementation
+## Go / No-Go For c2b2b3 Review
 
-Proceed only if the implementation can remain one small non-React module plus
+Proceed to c2b2b3 review only if the implementation remains one small non-React module plus
 synthetic checks and harness wiring. Stop if it requires changing c2a, c2b1,
 c2b2a, c2b2b1, App, CSS, storage keys, import/export, recovery, persistence, or
 Google sync.
@@ -305,9 +320,8 @@ The implementation is complete only when import/factory/controller creation is
 proven effect-free and exactly one explicit prepare maps to one timestamp and
 one c2a call under synthetic dependencies.
 
-## Smallest Safe Next Implementation
+## Smallest Safe Next Step
 
-The smallest later implementation is c2b2b2 only: add the import-safe injected
-and production controller factories plus synthetic checks, without importing
-the module into `App.tsx` and without invoking the production prepare path.
-c2b2b3 App placement and c2b2b4 first real click remain separate approvals.
+The next separately gated step is a docs-only c2b2b3 App placement review.
+Do not begin App implementation without explicit approval. c2b2b4 first real
+click remains a later separate approval.

@@ -375,9 +375,9 @@ controller or c2b1 session. No real localStorage or Writer data was read.
 
 ## Out Of Scope
 
-This review and local c2b2b1 do not implement or authorize:
+This review and the c2b2b2 composition do not implement or authorize:
 
-- production c2b2b2 composition, App wiring, CSS, route, or activation;
+- App wiring, CSS, route, or activation;
 - a real localStorage read or first click;
 - Drive raw GET, sync changes, or multi-device propagation;
 - Writer DB v2 byte creation, raw Drive bytes, hashing, assembly, verification,
@@ -387,11 +387,11 @@ This review and local c2b2b1 do not implement or authorize:
   export-format changes, or R3;
 - commit, push, deploy, or deletion of any data.
 
-## Smallest Safe Next Implementation
+## Smallest Safe Next Step
 
-The docs-only c2b2b2 production composition review is now defined in
-`WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md`. The smallest later
-implementation is one import-safe injected/production controller factory
-module plus synthetic checks, without importing it into `App.tsx` or invoking
-the production prepare path. c2b2b3 App placement remains separate. The first
-real click remains c2b2b4 and requires another explicit approval.
+The c2b2b2 import-safe injected/production controller factory module passes
+42/42 synthetic checks and 735/735 combined checks. It is
+not imported into `App.tsx`, and automated checks do not invoke its production
+prepare path. The next step is a separate docs-only c2b2b3 App placement
+review; the first real click remains c2b2b4 and requires another explicit
+approval.

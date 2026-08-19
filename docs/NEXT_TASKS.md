@@ -89,10 +89,12 @@ defines the later production React boundary. c2b2b1 is published at
 `340f8335ba1d1a68f9b180a66c946728addb9a7c` as an isolated injected React
 panel with 45/45 synthetic checks and 693/693 combined retirement checks. It is
 not imported into App, does not import production c2a, and reads no real
-storage. The docs-only c2b2b2 production composition review is now prepared in
-`WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md`. The smallest later
-implementation is c2b2b2 only: one import-safe injected/production factory
-module plus synthetic checks, still without App wiring or a real read.
+storage. The c2b2b2 production composition review is published at
+`959a4c756d6f901cd45501b6286dd1374091e2ce`. Its one import-safe
+injected/production factory module plus 42 synthetic checks implements the
+reviewed contract with 735/735 combined retirement checks. It remains outside
+App and has performed no real read. The next step is a separate docs-only
+c2b2b3 App placement review; c2b2b4 first real click remains a later gate.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

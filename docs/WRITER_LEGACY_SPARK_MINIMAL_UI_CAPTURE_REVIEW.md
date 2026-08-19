@@ -363,10 +363,11 @@ This review and local c2b2b1 do not implement:
 The c2b2b1 isolated injected React panel is published at
 `340f8335ba1d1a68f9b180a66c946728addb9a7c` with 45 synthetic checks and
 693/693 combined retirement checks. It is not imported into `App.tsx`, has no
-production c2a composition, and performs no real storage read. The docs-only
-c2b2b2 composition review is now defined in
-`WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md`. The smallest later
-implementation is that one import-safe factory module plus synthetic checks.
-The panel preserves a single explicit
+production c2a composition, and performs no real storage read. The c2b2b2
+composition contract is defined in
+`WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md`; its import-safe
+factory module now passes 42/42 synthetic checks and 735/735 combined checks.
+It remains outside App, and production prepare is not invoked. The panel
+preserves a single explicit
 **Pripraviť lokálnu zálohu** trigger and keeps the first real c2a/localStorage
 read behind later App wiring and an explicit manual approval gate.

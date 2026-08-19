@@ -335,5 +335,7 @@ controller factory, 45 focused checks, and 693/693 combined retirement checks.
 It remains outside `App.tsx`, does not import production c2a, and preserves one
 explicit
 **Pripraviť lokálnu zálohu** click handler plus the manual gate before
-the first real c2a/localStorage read. The docs-only c2b2b2 composition review
-is now prepared; its implementation and App placement remain separate gates.
+the first real c2a/localStorage read. The c2b2b2 composition passes 42/42
+synthetic checks and 735/735 combined checks; it remains
+outside App, and its production prepare path is not invoked. App placement and
+the first real click remain separate gates.

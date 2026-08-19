@@ -103,8 +103,9 @@ that exposes only frozen text-free state and no React component. The docs-only
 c2b2b review keeps the panel lazy and injected: render, mount, effects, and
 entering Data create no controller and read nothing. c2b2b1 is published at
 `340f8335ba1d1a68f9b180a66c946728addb9a7c` as that isolated panel with
-synthetic dependencies only and remains outside App. The docs-only c2b2b2
-review keeps time creation and c2a deferred inside a later accepted command;
+synthetic dependencies only and remains outside App. The c2b2b2
+composition keeps time creation and c2a deferred inside an accepted command;
+its 42 synthetic checks invoke only injected capture dependencies, while
 import and factory/controller creation remain read-free. A later separately
 reviewed App step may add one retirement subsection to
 the existing Writer **Dáta / Ručný prenos DB** area; the first real read happens
