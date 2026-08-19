@@ -117,6 +117,14 @@ only inside the actual **Pripraviť lokálnu zálohu** click handler after separ
 approval. The read-only product shell is not the owner of this sensitive
 operation.
 
+The separately approved c2b2b4 production click reached the truthful
+`snapshot-ready` state. The UI exposed only safe counts: 0 Sparks, 0
+WriterPackages, and 0 notes. It explicitly said that the snapshot existed only
+in memory and that no file had been created or downloaded. No author text, raw
+JSON, storage value, filename, account detail, or token appeared in the UI.
+`snapshot-ready` is not `assembly-verified`, downloaded, `backup-verified`, or
+permission to retire data.
+
 ## Four Notebook Comfort
 
 Writer should recreate the comfort of the author's old 3-4 physical notebook

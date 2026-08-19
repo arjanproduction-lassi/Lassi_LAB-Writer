@@ -131,8 +131,13 @@ placement contract is defined in
 guard, 41 synthetic/isolation checks, and one App placement now implement the
 contract with 776/776 combined retirement checks. App adds no retirement
 state/effect/ref/handler and passes the production factory only as a reference.
-Only the separately approved c2b2b4 explicit click
-may first read real localStorage data after **Pripraviť lokálnu zálohu**.
+c2b2b3 is published at `ead4025bedd1af5ed1801c484b8f32e84af22a6a`.
+After separate visible-chat approval, c2b2b4 completed one production click in
+the intended browser profile: the UI reached `snapshot-ready` and showed only
+safe counts of 0 Sparks, 0 WriterPackages, and 0 notes. The snapshot stayed in
+memory; no file, download, Drive call, write, deletion, migration, or R3 action
+was initiated. The next step is only a separate docs review for R2.6.3d local
+consistency reread; do not start that runtime yet.
 
 ## Completed v0.1 Slice
 

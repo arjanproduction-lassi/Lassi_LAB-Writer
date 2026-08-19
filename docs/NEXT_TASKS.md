@@ -98,8 +98,13 @@ no real read. Its App placement contract is defined in
 `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. The implementation is present as
 one pure four-boolean guard helper, 41
 synthetic/isolation checks, and exactly one App placement. The combined
-retirement harness passes 776/776. Final review and publication remain before
-the separate c2b2b4 first-real-click gate.
+retirement harness passes 776/776. c2b2b3 is published at
+`ead4025bedd1af5ed1801c484b8f32e84af22a6a`. The separately approved c2b2b4
+production click reached `snapshot-ready` with safe counts 0 Sparks, 0
+WriterPackages, and 0 notes. It created no file and authorized no retirement
+action. The next smallest development step is a docs-only R2.6.3d consistency
+reread review. Do not implement the reread, Drive access, artifacts, downloads,
+tombstones, reset, purge, or R3 in this closeout.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

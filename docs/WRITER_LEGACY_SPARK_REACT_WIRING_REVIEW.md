@@ -397,5 +397,9 @@ The c2b2b2 import-safe injected/production controller factory module passes
 `App.tsx` only as a function reference, and automated checks do not invoke its
 production prepare path. The c2b2b3 contract in
 `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` is now implemented as one pure
-guard helper, 41 synthetic/isolation checks, and one narrow App placement. The
-first real click remains c2b2b4 and requires another explicit approval.
+guard helper, 41 synthetic/isolation checks, and one narrow App placement,
+published at `ead4025bedd1af5ed1801c484b8f32e84af22a6a`. The separately
+approved c2b2b4 production click reached `snapshot-ready` with safe counts 0
+Sparks, 0 WriterPackages, and 0 notes. It created no file and grants no
+`assembly-verified`, `backup-verified`, or retirement permission. R2.6.3d
+remains a separate future review and implementation gate.

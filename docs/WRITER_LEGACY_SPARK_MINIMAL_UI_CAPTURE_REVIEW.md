@@ -372,4 +372,10 @@ production prepare is not invoked. The c2b2b3 placement contract is defined in
 `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` and implemented with one pure
 guard, 41 checks, and one App panel placement. The panel preserves a single explicit
 **Pripraviť lokálnu zálohu** trigger and keeps the first real c2a/localStorage
-read behind the separate c2b2b4 explicit manual approval gate.
+read behind the separate c2b2b4 explicit manual approval gate. That gate
+completed on 2026-08-19 against published commit
+`ead4025bedd1af5ed1801c484b8f32e84af22a6a`: one production click reached
+`snapshot-ready` and displayed safe counts 0 Sparks, 0 WriterPackages, and 0
+notes. The snapshot stayed in memory and no file was created or downloaded.
+This result does not grant `assembly-verified`, `backup-verified`, or any R3
+permission. The next step is a separate docs-only R2.6.3d review.

@@ -1,11 +1,11 @@
 # Writer Legacy Spark App Placement Review
 
-Status: R2.6.3c2b2b3 contract based on published `main` commit
-`80692052b213ac2152faac3a74dbef4dee8d8b6c`. The isolated panel and the
-import-safe production controller factory are published. The matching App
-placement implementation and synthetic checks now implement this contract.
-No automated check invokes the production factory or prepare command, and no
-real retirement localStorage read has occurred.
+Status: R2.6.3c2b2b3 is published at
+`ead4025bedd1af5ed1801c484b8f32e84af22a6a`. The isolated panel, import-safe
+production controller factory, App placement, and synthetic checks implement
+this contract. No automated check invokes the production factory or prepare
+command. After separate visible-chat approval, c2b2b4 performed one production
+prepare click and reached `snapshot-ready` with safe counts 0/0/0.
 
 ## Decision
 
@@ -306,6 +306,29 @@ The panel is now present in the implementation, but c2b2b4 remains a separate
 operational gate. Build, publication, deployment, render, or an enabled button
 does not authorize the first real click.
 
+## c2b2b4 Operational Result
+
+The c2b2b4 gate completed on 2026-08-19 against the ready production deployment
+of `ead4025bedd1af5ed1801c484b8f32e84af22a6a` in the intended browser profile.
+The repository was clean and local `HEAD`, local `origin/main`, and remote
+`origin/main` matched before the click. Explicit visible-chat approval was
+received immediately before the user clicked **Pripraviť lokálnu zálohu** once.
+
+The UI reached `snapshot-ready` and displayed only:
+
+- Sparks: 0;
+- WriterPackages: 0;
+- notes: 0;
+- the truthful message that the snapshot existed only in memory and no file had
+  been created or downloaded.
+
+The result does not distinguish missing keys from stored empty arrays in the UI;
+that private distinction remains inside the reviewed snapshot boundary. No raw
+storage value, author text, filename, account detail, token, screenshot, or
+snapshot is committed by this closeout. `snapshot-ready` is not
+`assembly-verified`, downloaded, `backup-verified`, or permission for
+tombstones, reset, purge, migration, or R3.
+
 ## Out Of Scope
 
 This c2b2b3 slice does not implement or authorize:
@@ -326,8 +349,6 @@ Stop if it requires modifying the panel, runtime composition, c2a, c2b1,
 controller contracts, existing handlers, storage keys, CSS, product shell,
 import/export, recovery, persistence, or Google sync.
 
-The next step is final safety review of the exact implementation scope, 41/41
-placement checks, 776/776 retirement harness, Writer DB and product-shell
-regressions, both builds, and production isolation. Commit and push require
-explicit approval. c2b2b4 first real click remains a separate explicit
-approval.
+The next step is only a separate docs-only R2.6.3d consistency-reread review.
+Do not combine that review with runtime code, Drive access, artifact creation,
+downloads, or any retirement action.

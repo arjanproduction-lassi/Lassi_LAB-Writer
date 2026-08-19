@@ -341,4 +341,9 @@ only as a function reference, and its production prepare path is not invoked by
 the checks. The c2b2b3 contract in
 `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` is now implemented with one pure
 guard and one App placement. Its 41 checks do not invoke production prepare.
-App placement and the first real click remain separate gates.
+App placement and the first real click remained separate gates. After c2b2b3
+was published at `ead4025bedd1af5ed1801c484b8f32e84af22a6a`, the user gave
+separate visible-chat approval for c2b2b4. One production click reached
+`snapshot-ready` and displayed safe counts 0 Sparks, 0 WriterPackages, and 0
+notes. No file or download was created, no raw content was displayed, and no
+later backup or retirement state was authorized.

@@ -326,5 +326,10 @@ one c2a call under synthetic dependencies.
 The docs-only c2b2b3 contract is now defined in
 `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. Its smallest later
 implementation is now present with 41/41 focused checks and 776/776 combined
-retirement checks. App passes this module's factory only as a reference. Final
-review/publication and c2b2b4 first real click remain separate approvals.
+retirement checks. App passes this module's factory only as a reference. The
+implementation is published at `ead4025bedd1af5ed1801c484b8f32e84af22a6a`.
+After a separate explicit approval, c2b2b4 performed one production prepare
+click and reached `snapshot-ready` with safe counts 0/0/0. No file or download
+was created, and the result grants no later backup or retirement state. A
+future R2.6.3d consistency reread remains a separate docs and implementation
+gate.

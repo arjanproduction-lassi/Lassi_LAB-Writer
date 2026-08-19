@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-08-19 - R2.6.3c2b2b4 first production read
+
+- Confirmed a clean published `main` at
+  `ead4025bedd1af5ed1801c484b8f32e84af22a6a` and a ready production deployment
+  before the manual gate.
+- Received explicit visible-chat approval for c2b2b4 immediately before the
+  first production **Pripraviť lokálnu zálohu** click in the intended browser
+  profile.
+- The UI reached `snapshot-ready` and showed only text-free counts: 0 Sparks, 0
+  WriterPackages, and 0 notes. No raw author content was displayed or recorded.
+- The UI truthfully reported that the snapshot remained only in memory and no
+  file was created or downloaded. The reviewed path performs no storage write,
+  Drive/network call, deletion, migration, tombstone, reset, purge, or R3
+  action.
+- This docs-only closeout stores no screenshot, raw snapshot, storage value,
+  author text, secret, token, or production artifact. R2.6.3d remains a separate
+  future review and implementation gate.
+
 ## 2026-08-19 - R2.6.3c2b2b3 App placement
 
 - Added a pure four-boolean blocking-reason helper with stable import,
