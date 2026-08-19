@@ -30,13 +30,13 @@ B5.4 and its final isolation/integration review are published at
 static read-only detail from the already-loaded snapshot, switches the four
 layers, and returns without another load or any write.
 
-The docs-only Phase D contract is defined in
-`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. The smallest next implementation
-is D1 only: a pure deterministic `workshopText` edit planner over explicit
-WriterPackage arrays, expected `updatedAt`, and injected `now`. It must not use
-React, storage, browser globals, Google Drive, import/export, or real author
-data. Do not start D2 persistence, D3 autosave state, D4 development wiring,
-Package creation, a draft key, or Package sync in the same commit.
+The Phase D contract is defined in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. D1 is complete as a pure
+deterministic `workshopText` edit planner over explicit WriterPackage arrays,
+expected `updatedAt`, and injected `now`, with artificial checks only. Pause
+before D2. Do not start D2 persistence, D3 autosave state, D4 development
+wiring, Package creation, a draft key, or Package sync without a separate
+review and explicit approval.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

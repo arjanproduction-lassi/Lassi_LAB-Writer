@@ -50,7 +50,8 @@ try {
       "src/writerLibraryReadOnlySnapshotChecks.ts",
       "src/writerLibraryReadOnlySelectionChecks.ts",
       "src/writerLibraryReadOnlyProviderChecks.ts",
-      "src/productShellReadOnlyDetailChecks.ts"
+      "src/productShellReadOnlyDetailChecks.ts",
+      "src/writerPackageWorkshopEditChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -148,6 +149,93 @@ try {
   if (readOnlyDetailRun.status !== 0) {
     process.exit(readOnlyDetailRun.status ?? 1);
   }
+
+  const workshopEditRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerPackageWorkshopEditChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (workshopEditRun.status !== 0) {
+    process.exit(workshopEditRun.status ?? 1);
+  }
+
+  const workshopEditSource = readFileSync(
+    resolve(repoRoot, "src/writerPackageWorkshopEdit.ts"),
+    "utf8"
+  ).toLowerCase();
+  let workshopEditIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "loadwriterpackagecatalog",
+    "getwriterpackagebyid",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (workshopEditSource.includes(pattern)) {
+      throw new Error(`D1 workshop edit planner contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  workshopEditIsolationChecks += 1;
+
+  for (const pattern of [
+    "setitem",
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "deletewriter",
+    "persist",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "googledrive"
+  ]) {
+    if (workshopEditSource.includes(pattern)) {
+      throw new Error(`D1 workshop edit planner contains forbidden write or network dependency: ${pattern}`);
+    }
+  }
+  workshopEditIsolationChecks += 1;
+
+  for (const pattern of [
+    "date.now",
+    "math.random",
+    "crypto.",
+    "settimeout",
+    "setinterval",
+    "performance.",
+    "console."
+  ]) {
+    if (workshopEditSource.includes(pattern)) {
+      throw new Error(`D1 workshop edit planner contains forbidden nondeterminism or logging: ${pattern}`);
+    }
+  }
+  workshopEditIsolationChecks += 1;
+
+  const productionWorkshopEditEntries = ["index.html", "src/main.tsx", "src/App.tsx"]
+    .map((relativePath) => readFileSync(resolve(repoRoot, relativePath), "utf8"))
+    .join("\n")
+    .toLowerCase();
+  if (
+    productionWorkshopEditEntries.includes("writerpackageworkshopedit") ||
+    !workshopEditSource.includes("input.now") ||
+    !workshopEditSource.includes("expectedupdatedat")
+  ) {
+    throw new Error("D1 workshop edit planner must remain unwired and explicitly injected.");
+  }
+  workshopEditIsolationChecks += 1;
+
+  console.log(
+    `WriterPackage workshop edit isolation checks: ${workshopEditIsolationChecks}/${workshopEditIsolationChecks} passed.`
+  );
 
   let isolationChecks = 0;
   for (const relativePath of prototypeFiles) {

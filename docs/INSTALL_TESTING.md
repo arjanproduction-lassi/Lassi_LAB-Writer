@@ -40,12 +40,12 @@ Expected result:
 
 ## Phase D WriterPackage Editing Review
 
-The docs-only Phase D contract is in
-`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. No Phase D edit command or runtime
-mode exists yet.
+The Phase D contract is in `WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. D1 adds
+a pure planner and artificial checks only. No Phase D storage edit command or
+runtime mode exists yet.
 
-The first future D1 check group must use artificial WriterPackages only and
-prove that one pure `workshopText` edit:
+The D1 check group uses artificial WriterPackages only and proves that one pure
+`workshopText` edit:
 
 - changes only `workshopText` and top-level `updatedAt`;
 - requires an exact expected revision;
@@ -58,6 +58,11 @@ prove that one pure `workshopText` edit:
 Do not perform real WriterPackage editing, storage-failure simulation, or
 author-data testing until later D2-D5 gates are separately implemented and
 approved. Current `npm run check:product-shell` remains read-only.
+
+Expected D1 additions in that harness:
+
+- `WriterPackage workshop edit checks: 19/19 passed.`
+- `WriterPackage workshop edit isolation checks: 4/4 passed.`
 
 ## Run Writer DB Checks
 

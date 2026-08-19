@@ -55,9 +55,10 @@ The docs-only Phase D editing contract is defined in
 because that is one package-level string and leaves the protected original
 Spark, note identities/tombstones, title, and final text untouched. Only a
 freshly proven real stored WriterPackage may become editable; catalog-only
-adapted Sparks remain read-only. The first future implementation is pure and
-synthetic. Production editing remains blocked until autosave failure, crash
-recovery, and local-only versus Package-sync behavior have explicit decisions.
+adapted Sparks remain read-only. D1 is pure and synthetic and has no UI or
+storage wiring. Production editing remains blocked until autosave failure,
+crash recovery, and local-only versus Package-sync behavior have explicit
+decisions.
 
 ## Legacy Reset And Package-Only UX Direction
 

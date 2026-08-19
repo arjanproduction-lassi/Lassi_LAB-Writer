@@ -2,14 +2,15 @@
 
 ## Status And Scope
 
-This is the docs-only Phase D review for editing one layer of one real stored
-WriterPackage. It follows the closed read-only Library/detail work published
-through `f268d569a1c45214090dcac326633afab76c6968`.
+This Phase D contract for editing one layer of one real stored WriterPackage
+was published at `f780e27627ee82e3a35fac891c99d0e2f60dd911`. It follows the
+closed read-only Library/detail work published through
+`f268d569a1c45214090dcac326633afab76c6968`.
 
-This review changes no runtime, React, CSS, storage key, WriterPackage shape,
-Writer DB format, import/export behavior, recovery behavior, Google Drive
-payload, production route, or navigation. It does not stage, commit, push,
-deploy, read real author data, or write browser storage.
+D1 is implemented as a pure planner plus artificial checks. It changes no
+React, CSS, storage key, WriterPackage shape, Writer DB format, import/export
+behavior, recovery behavior, Google Drive payload, production route, or
+navigation. It does not read real author data or browser storage.
 
 Phase D must remain separate from:
 
@@ -37,8 +38,8 @@ string and does not require note identity, note tombstone, ordering, creation,
 or deletion rules. The original `sparkText` remains the protected birth record
 of the work. `finalText`, title editing, and notes need later separate reviews.
 
-The first implementation must remain pure and synthetic. Real storage and UI
-wiring are later gates.
+The D1 implementation remains pure and synthetic. Real storage and UI wiring
+are later gates.
 
 ## Write Ownership
 
@@ -108,8 +109,7 @@ separately tested injected persistence boundary is introduced later.
 
 ## D1 Pure Workshop Edit Plan
 
-The first implementation slice should be a pure deterministic helper, for
-example:
+The D1 implementation is a pure deterministic helper with this contract:
 
 ```ts
 type PlanWriterPackageWorkshopEditInput = Readonly<{
@@ -388,7 +388,8 @@ Use a disposable WriterPackage in a disposable browser profile:
 
 ## Implementation Slices
 
-- **D1:** pure `workshopText` edit planner and artificial checks only.
+- **D1:** pure `workshopText` edit planner and artificial checks only; completed
+  as an isolated phase with no storage or UI wiring.
 - **D2:** injected existing-key persistence coordinator and in-memory storage
   checks only.
 - **D3:** pure autosave state machine and artificial concurrency checks.
@@ -402,9 +403,9 @@ D1-D7 must not be collapsed into one production change.
 
 ## Out Of Scope
 
-This review does not implement or authorize:
+The D1 slice does not implement or authorize:
 
-- any source, runtime, React, CSS, entry, route, or build change;
+- any React, CSS, entry, route, production runtime, or build behavior change;
 - real storage reads or writes;
 - a new storage key or draft schema;
 - Package creation, ID generation, title editing, Spark editing, notes, or final
@@ -420,6 +421,6 @@ This review does not implement or authorize:
 
 ## Smallest Next Step
 
-Implement D1 only: one pure deterministic `workshopText` edit planner with
-artificial data and no React, storage, browser, time creation, Google, import,
-or production wiring. Do not start D2 in the same commit.
+D1 is complete as an isolated pure phase. Pause before D2. Any D2 persistence,
+D3 autosave state, React wiring, or new storage key requires a separate review
+and explicit approval.

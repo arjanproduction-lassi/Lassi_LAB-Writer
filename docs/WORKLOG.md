@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-08-19 - WriterPackage D1 pure workshop edit planner
+
+- Added `writerPackageWorkshopEdit.ts` as a pure deterministic planner over an
+  explicit WriterPackage collection, selected ID, expected `updatedAt`, desired
+  `workshopText`, and injected `now`.
+- The planner blocks invalid or duplicate collections, missing/deleted
+  Packages, stale revisions, and invalid injected time. A ready plan changes
+  only `workshopText` and top-level `updatedAt`; unchanged text advances no
+  timestamp.
+- Added 19 artificial checks for exact field preservation, collection/note
+  order, timestamps, blocking reasons, non-mutation, deep detachment, freezing,
+  and determinism, plus four source isolation checks in the existing product
+  shell harness.
+- Added no React, storage read/write, browser global, current clock, random ID,
+  network, Google Drive, import/export, recovery, persistence, new storage key,
+  or production wiring. D2 and later gates remain unstarted.
+- D1 was kept isolated from D2 persistence and all later runtime gates.
+
 ## 2026-08-19 - WriterPackage Phase D editing/autosave review (docs only)
 
 - Added `WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md` after closing the published

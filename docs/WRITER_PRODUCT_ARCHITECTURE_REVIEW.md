@@ -653,11 +653,11 @@ Acceptance: refresh, failure, and cross-device implications are understood for
 each editable field before enabling the next one.
 
 The docs-only Phase D contract is now defined in
-`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. Its first future slice is D1 only:
-a pure deterministic `workshopText` edit planner for one freshly proven real
-stored WriterPackage. Adapted Sparks, title, original Spark, notes, and final
-text remain read-only. Production editing remains blocked by separate draft
-recovery and Package-sync decisions.
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. D1 is complete as a pure
+deterministic `workshopText` edit planner over explicit WriterPackage input and
+artificial checks only; it has no storage or UI wiring. Adapted Sparks, title,
+original Spark, notes, and final text remain read-only. Production editing
+remains blocked by separate draft recovery and Package-sync decisions.
 
 ### Phase E — New Spark creates a WriterPackage directly
 
