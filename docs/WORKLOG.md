@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-08-19 - R2.6.3c2b2b3 App placement
+
+- Added a pure four-boolean blocking-reason helper with stable import,
+  non-clean recovery, active Google sync, then editor/draft precedence.
+- Added exactly one existing retirement panel to `App.tsx` after Writer DB
+  import UI and before Google sync. App passes only the production factory
+  reference and the text-free blocking reason.
+- Added no App state, effect, ref, timer, listener, handler, storage key, CSS,
+  route, navigation, product-shell, import/export, recovery, persistence, or
+  Google sync behavior.
+- Added 41/41 synthetic helper and App source/isolation checks; the combined
+  retirement harness passes 776/776. Tests do not import/render App or invoke
+  the production factory/prepare path.
+- No real retirement localStorage read, storage write, Drive/network call,
+  backup/file creation, deployment, or c2b2b4 first click occurred.
+
 ## 2026-08-19 - R2.6.3c2b2b3 App placement review (docs only)
 
 - Added `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` without App/React/CSS,

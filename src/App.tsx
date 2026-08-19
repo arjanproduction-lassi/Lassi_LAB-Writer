@@ -53,6 +53,9 @@ import {
   createManualWriterDbV2Export,
   getManualWriterDbV2ExportFileName
 } from "./writerDbExport";
+import { LegacySparkRetirementLocalBackupPanel } from "./LegacySparkRetirementLocalBackupPanel";
+import { deriveLegacySparkRetirementLocalBackupBlockingReason } from "./legacySparkRetirementAppPlacement";
+import { createLegacySparkRetirementLocalBackupController } from "./legacySparkRetirementLocalBackupRuntime";
 import { loadWriterPackages } from "./writerPackageStorage";
 import type {
   GoogleSyncPreferences,
@@ -320,6 +323,13 @@ export default function App() {
   const canSave = Boolean(editor?.text.trim());
   const isGoogleSyncBusy =
     googleSyncStatus === "authorizing" || googleSyncStatus === "syncing";
+  const legacySparkRetirementBlockingReason =
+    deriveLegacySparkRetirementLocalBackupBlockingReason({
+      writerDbImportActive: importPreviewState.status === "importing",
+      writerDbRecoveryClean: importRecoveryGate.status === "clean",
+      googleSyncActive: isGoogleSyncBusy,
+      editorOrDraftActive: editor !== null || newSparkDraft !== undefined
+    });
   const googleSyncTitle = googleSyncHeading(
     googleSyncAvailable,
     syncPreferences,
@@ -1416,6 +1426,11 @@ export default function App() {
             </div>
           </section>
         ) : null}
+
+        <LegacySparkRetirementLocalBackupPanel
+          createController={createLegacySparkRetirementLocalBackupController}
+          blockingReason={legacySparkRetirementBlockingReason}
+        />
 
         <div className="sync-panel" aria-labelledby="google-sync-title">
           <div>

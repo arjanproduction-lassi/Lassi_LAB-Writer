@@ -25,8 +25,9 @@ text-free view model. The captured snapshot and c2b1 session remain outside
 React state, props, context, reducers, logs, and rendered output.
 
 c2b2b1 implements the isolated injected component and synthetic interaction
-boundary. c2b2b2 implements the import-safe production composition. App
-placement and an activated runtime path remain unimplemented. The first real production click remains
+boundary. c2b2b2 implements the import-safe production composition. c2b2b3 now
+implements the pure guard and one App placement without invoking the factory.
+The first real production click remains
 behind a later explicit visible-chat approval after the implementation is
 reviewed, published, and the worktree is clean.
 
@@ -392,9 +393,9 @@ This review and the c2b2b2 composition do not implement or authorize:
 ## Smallest Safe Next Step
 
 The c2b2b2 import-safe injected/production controller factory module passes
-42/42 synthetic checks and 735/735 combined checks. It is
-not imported into `App.tsx`, and automated checks do not invoke its production
-prepare path. The c2b2b3 docs-only placement contract is now defined in
-`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`; its smallest later
-implementation is one pure guard helper and one narrow App placement. The first
-real click remains c2b2b4 and requires another explicit approval.
+42/42 synthetic checks and 735/735 combined checks. c2b2b3 imports it into
+`App.tsx` only as a function reference, and automated checks do not invoke its
+production prepare path. The c2b2b3 contract in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` is now implemented as one pure
+guard helper, 41 synthetic/isolation checks, and one narrow App placement. The
+first real click remains c2b2b4 and requires another explicit approval.

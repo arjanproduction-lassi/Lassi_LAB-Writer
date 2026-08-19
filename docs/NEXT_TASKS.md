@@ -92,13 +92,14 @@ not imported into App, does not import production c2a, and reads no real
 storage. The c2b2b2 production composition review is published at
 `959a4c756d6f901cd45501b6286dd1374091e2ce`. Its one import-safe
 injected/production factory module plus 42 synthetic checks implements the
-reviewed contract with 735/735 combined retirement checks. It remains outside
-App and has performed no real read. The next step is a separate docs-only
-c2b2b3 App placement review; that contract is now defined in
-`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. The smallest later
-implementation is one pure four-boolean guard helper plus exactly one App
-placement, still without an approved production click. c2b2b4 first real click
-remains a later gate.
+reviewed contract with 735/735 combined retirement checks. c2b2b3 now imports
+its production factory into App only as a function reference and has performed
+no real read. Its App placement contract is defined in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. The implementation is present as
+one pure four-boolean guard helper, 41
+synthetic/isolation checks, and exactly one App placement. The combined
+retirement harness passes 776/776. Final review and publication remain before
+the separate c2b2b4 first-real-click gate.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still

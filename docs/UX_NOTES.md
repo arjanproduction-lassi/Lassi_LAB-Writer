@@ -106,11 +106,13 @@ entering Data create no controller and read nothing. c2b2b1 is published at
 synthetic dependencies only and remains outside App. The c2b2b2
 composition keeps time creation and c2a deferred inside an accepted command;
 its 42 synthetic checks invoke only injected capture dependencies, while
-import and factory/controller creation remain read-free. The docs-only c2b2b3
-review places one future retirement subsection after Writer DB import UI and
-before Google sync in the existing Writer **Dáta / Ručný prenos DB** area. It
+import and factory/controller creation remain read-free. The c2b2b3 contract
+places one retirement subsection after Writer DB import UI and before Google
+sync in the existing Writer **Dáta / Ručný prenos DB** area. It
 uses only existing import, recovery, sync, editor, and draft state to disable
-the action; it adds no runtime in that review. The first real read happens
+the action. The matching implementation now places exactly one panel there and
+passes 41/41 synthetic/isolation checks without adding App lifecycle state or
+calling the production factory. The first real read happens
 only inside the actual **Pripraviť lokálnu zálohu** click handler after separate
 approval. The read-only product shell is not the owner of this sensitive
 operation.

@@ -292,9 +292,10 @@ start-over, and dispose are read-free; one injected accepted prepare performs
 one canonical timestamp call followed by one synthetic capture call. The
 combined retirement harness passes 735/735.
 
-The production prepare path is not invoked by automated checks. The module is
-not imported into `App.tsx`, the panel remains invisible, and no real browser
-storage read has occurred.
+The production prepare path is not invoked by automated checks. At the c2b2b2
+boundary the module was not imported into `App.tsx` and the panel remained
+invisible. c2b2b3 now passes its factory into App only as a function reference;
+no automated or real browser storage read has occurred.
 
 ## Out Of Scope
 
@@ -324,6 +325,6 @@ one c2a call under synthetic dependencies.
 
 The docs-only c2b2b3 contract is now defined in
 `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. Its smallest later
-implementation is one pure guard helper and one narrow App placement. Do not
-begin that implementation without explicit approval. c2b2b4 first real click
-remains a later separate approval.
+implementation is now present with 41/41 focused checks and 776/776 combined
+retirement checks. App passes this module's factory only as a reference. Final
+review/publication and c2b2b4 first real click remain separate approvals.

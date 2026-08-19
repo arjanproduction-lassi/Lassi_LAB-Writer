@@ -1,20 +1,15 @@
 # Writer Legacy Spark App Placement Review
 
-Status: R2.6.3c2b2b3 docs-only review based on published `main` commit
-`a2f246c4a9aad335b2dbd0b04a907043216d3b02`. The isolated panel and the
-import-safe production controller factory are published. Neither is imported
-or rendered by `App.tsx`. No retirement button is reachable in production, and
-no real retirement localStorage read has occurred.
-
-This review defines one future App placement change. It does not change
-runtime, React, CSS, storage, Google Drive, import/export, recovery,
-persistence, tests, or build configuration. It does not stage, commit, push,
-deploy, render the production panel, invoke the production factory, or approve
-the first real click.
+Status: R2.6.3c2b2b3 contract based on published `main` commit
+`80692052b213ac2152faac3a74dbef4dee8d8b6c`. The isolated panel and the
+import-safe production controller factory are published. The matching App
+placement implementation and synthetic checks now implement this contract.
+No automated check invokes the production factory or prepare command, and no
+real retirement localStorage read has occurred.
 
 ## Decision
 
-Future c2b2b3 should place exactly one
+c2b2b3 places exactly one
 `LegacySparkRetirementLocalBackupPanel` in the existing Writer **Dáta / Ručný
 prenos DB** section:
 
@@ -39,7 +34,7 @@ reload, and deployment remain retirement-read-free.
 
 ## Current Published Inputs
 
-The future placement must reuse these published APIs without changing them:
+The placement reuses these published APIs without changing them:
 
 - `LegacySparkRetirementLocalBackupPanel` owns rendering, its private
   interaction/controller reference, command lock, safe view model, start-over,
@@ -90,8 +85,8 @@ it is not a replacement for c2a validation.
 
 ## Pure Blocking-Reason Boundary
 
-To keep guard precedence testable without rendering App, the later
-implementation should add one tiny pure helper module, for example:
+To keep guard precedence testable without rendering App, the implementation
+adds one tiny pure helper module:
 
 `src/legacySparkRetirementAppPlacement.ts`
 
@@ -128,9 +123,9 @@ Use stable first-match precedence:
 The precedence affects only which safe message is shown when multiple guards
 are true. Every non-null result blocks controller creation and capture.
 
-## Future App Composition
+## App Composition
 
-The future App diff should contain only:
+The App diff contains only:
 
 1. imports for the panel, production controller factory, and pure guard helper;
 2. one derived blocking reason from existing state;
@@ -152,8 +147,8 @@ const retirementBlockingReason = derive...({
 />
 ```
 
-This is a contract sketch, not runtime code. The eventual implementation must
-pass the production factory as a reference. It must not write
+The implementation matches this composition and passes the production factory
+as a reference. It must not write
 `createController={createLegacySparkRetirementLocalBackupController()}` and
 must not wrap it in an effect, timer, memo that executes it, or startup call.
 
@@ -228,8 +223,8 @@ authorize clicking the button.
 
 ## Automated Verification Plan
 
-Future c2b2b3 checks should use only synthetic booleans and source/isolation
-inspection. They must not render App against a real browser profile and must
+The c2b2b3 checks use only synthetic booleans and source/isolation inspection.
+They do not render App against a real browser profile and must
 never invoke the production prepare command.
 
 Pure helper checks should prove:
@@ -290,22 +285,40 @@ That later click may read only the three existing c2a keys. It still may not
 write storage, call Drive/network, create bytes/hash/manifest/Blob/file/download,
 retry automatically, or continue to R3.
 
+## Implementation Result
+
+The implementation adds exactly:
+
+- pure `src/legacySparkRetirementAppPlacement.ts` with the reviewed four-boolean
+  precedence;
+- 41/41 synthetic helper and App source/isolation checks;
+- one App-derived blocking reason using only existing state;
+- one panel element after Writer DB import UI and before Google sync;
+- one retirement-harness import/count entry.
+
+`App.tsx` passes the production controller factory as a reference and never
+calls it. It adds no state, effect, ref, timer, listener, handler, storage key,
+or direct retirement localStorage access. Automated checks read App source but
+do not import, render, mount, or click App. The combined retirement harness
+passes 776/776.
+
+The panel is now present in the implementation, but c2b2b4 remains a separate
+operational gate. Build, publication, deployment, render, or an enabled button
+does not authorize the first real click.
+
 ## Out Of Scope
 
-This docs-only review does not implement or authorize:
+This c2b2b3 slice does not implement or authorize:
 
-- `App.tsx`, React, CSS, route, navigation, or runtime changes;
-- the pure guard helper or its checks;
-- mounting or rendering the production panel;
 - invoking the production controller factory or prepare command;
 - any real localStorage/Writer data read;
 - any storage write, new key, migration, tombstone, reset, purge, or R3 action;
 - Drive/network, backup assembly, hash, manifest, Blob, file, download, or
   verification;
 - import/export, recovery, persistence, package storage, or Google sync changes;
-- commit, push, deployment, or user-data deletion.
+- deployment, the first real click, or user-data deletion.
 
-## Go / No-Go For Future c2b2b3 Implementation
+## Go / No-Go For c2b2b3 Final Review
 
 Proceed only if the implementation remains one pure boolean-to-reason helper,
 its synthetic checks, one narrow App placement, and isolation/harness wiring.
@@ -313,5 +326,8 @@ Stop if it requires modifying the panel, runtime composition, c2a, c2b1,
 controller contracts, existing handlers, storage keys, CSS, product shell,
 import/export, recovery, persistence, or Google sync.
 
-The smallest later implementation is c2b2b3 only. c2b2b4 first real click
-remains a separate explicit approval.
+The next step is final safety review of the exact implementation scope, 41/41
+placement checks, 776/776 retirement harness, Writer DB and product-shell
+regressions, both builds, and production isolation. Commit and push require
+explicit approval. c2b2b4 first real click remains a separate explicit
+approval.

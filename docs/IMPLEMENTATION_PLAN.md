@@ -123,13 +123,15 @@ real storage, time, network, or file access. It is published at
 passed 693/693. The c2b2b2 review is published at
 `959a4c756d6f901cd45501b6286dd1374091e2ce`. Its matching import-safe
 timestamp/c2a/controller composition module and 42 synthetic checks implement
-that contract; the combined retirement harness passes 735/735. The module
-remains outside App, and automated checks never invoke its production prepare
-path. The docs-only c2b2b3 App placement contract is now defined in
-`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. It derives four fail-closed
-reasons from existing App state, places one panel after import UI and before
-Google sync, and adds no runtime in this review. The smallest later
-implementation is c2b2b3 only. Only the separately approved c2b2b4 explicit click
+that contract; the combined retirement harness passes 735/735. c2b2b3 now
+imports the production factory into App only as a function reference, and
+automated checks never invoke its production prepare path. The c2b2b3 App
+placement contract is defined in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. Its matching pure four-boolean
+guard, 41 synthetic/isolation checks, and one App placement now implement the
+contract with 776/776 combined retirement checks. App adds no retirement
+state/effect/ref/handler and passes the production factory only as a reference.
+Only the separately approved c2b2b4 explicit click
 may first read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice

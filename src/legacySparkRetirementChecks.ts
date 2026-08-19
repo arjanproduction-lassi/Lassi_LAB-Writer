@@ -1,4 +1,5 @@
 import { legacySparkRetirementBackupPlanCheckCount } from "./legacySparkRetirementBackupPlanChecks";
+import { legacySparkRetirementAppPlacementCheckCount } from "./legacySparkRetirementAppPlacementChecks";
 import { legacySparkRetirementBackupAssemblyCheckCount } from "./legacySparkRetirementBackupAssemblyChecks";
 import { legacySparkRetirementBackupGuideStateCheckCount } from "./legacySparkRetirementBackupGuideStateChecks";
 import { legacySparkRetirementBrowserLocalStorageCaptureCheckCount } from "./legacySparkRetirementBrowserLocalStorageCaptureChecks";
@@ -17,6 +18,7 @@ import { legacySparkRetirementWriterDbBytesBuilderCheckCount } from "./legacySpa
 
 async function runLegacySparkRetirementChecks() {
   const total = legacySparkRetirementInventoryCheckCount +
+    legacySparkRetirementAppPlacementCheckCount +
     legacySparkRetirementBrowserLocalStorageCaptureCheckCount +
     legacySparkRetirementLocalCaptureSessionCheckCount +
     legacySparkRetirementLocalBackupPanelCheckCount +

@@ -367,9 +367,9 @@ production c2a composition, and performs no real storage read. The c2b2b2
 composition contract is defined in
 `WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md`; its import-safe
 factory module now passes 42/42 synthetic checks and 735/735 combined checks.
-It remains outside App, and production prepare is not invoked. The docs-only
-c2b2b3 placement contract is defined in
-`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` without runtime changes. The
-panel preserves a single explicit
+Its production factory is now passed by App only as a function reference, and
+production prepare is not invoked. The c2b2b3 placement contract is defined in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` and implemented with one pure
+guard, 41 checks, and one App panel placement. The panel preserves a single explicit
 **Pripraviť lokálnu zálohu** trigger and keeps the first real c2a/localStorage
-read behind later App wiring and an explicit manual approval gate.
+read behind the separate c2b2b4 explicit manual approval gate.

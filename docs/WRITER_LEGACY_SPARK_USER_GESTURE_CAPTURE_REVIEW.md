@@ -336,7 +336,9 @@ It remains outside `App.tsx`, does not import production c2a, and preserves one
 explicit
 **Pripraviť lokálnu zálohu** click handler plus the manual gate before
 the first real c2a/localStorage read. The c2b2b2 composition passes 42/42
-synthetic checks and 735/735 combined checks; it remains outside App, and its
-production prepare path is not invoked. The docs-only c2b2b3 placement contract
-is now defined in `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. App placement
-and the first real click remain separate gates.
+synthetic checks and 735/735 combined checks; c2b2b3 passes its factory into App
+only as a function reference, and its production prepare path is not invoked by
+the checks. The c2b2b3 contract in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` is now implemented with one pure
+guard and one App placement. Its 41 checks do not invoke production prepare.
+App placement and the first real click remain separate gates.
