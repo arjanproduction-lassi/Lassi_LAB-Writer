@@ -1,6 +1,23 @@
 # Worklog
 
-## 2026-08-11 - R2.6.3c2b2b1 injected React panel (local only)
+## 2026-08-13 - R2.6.3c2b2b2 production composition review (docs only)
+
+- Added `WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md` without runtime,
+  React/App/CSS changes, c2a invocation, localStorage read, real Writer data,
+  storage writes, Drive/network, backup/file creation, commit, push, or deploy.
+- Defined one future import-safe module that composes published c2b2a, c2b1,
+  canonical timestamp creation, and c2a through injected and production
+  controller factories.
+- Time and c2a remain deferred until an accepted explicit prepare command.
+  Import, factory/controller/session creation, `getViewModel()`, start-over,
+  cancel, and dispose remain read-free.
+- Defined canonical UTC-second timestamp behavior, typed failure mapping,
+  three-key read ownership, raw-snapshot privacy, synthetic tests, and the
+  unchanged c2b2b3/c2b2b4 gates.
+- The smallest later implementation is c2b2b2 only. This docs phase does not
+  implement it and does not authorize App wiring or the first real read.
+
+## 2026-08-11 - R2.6.3c2b2b1 injected React panel (published)
 
 - Added `LegacySparkRetirementLocalBackupPanel.tsx` as an isolated component
   over an injected c2b2a controller factory. It is not imported into `App.tsx`,
@@ -15,8 +32,8 @@
   harness now passes 693/693. No production c2a, App, storage, Drive, time,
   randomness, network, crypto, file, download, backup verification, or R3 path
   was added.
-- The smallest next step is a docs-only c2b2b2 production composition review.
-  c2b2b1 remains uncommitted and unpublished; no real data was read.
+- Published at `340f8335ba1d1a68f9b180a66c946728addb9a7c`. The combined retirement
+  harness passed 693/693; no real data was read and no App wiring was added.
 
 ## 2026-08-11 - R2.6.3c2b2b production React wiring review (docs only)
 

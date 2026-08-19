@@ -329,9 +329,11 @@ Blob/download, R3, tombstones, data reset, or purge.
 
 ## Smallest Safe Implementation Step
 
-The c2b2b1 isolated React panel is now prepared locally with an injected
-synthetic controller factory and 45 focused checks. It remains outside
-`App.tsx`, does not import production c2a, and preserves one explicit
+The c2b2b1 isolated React panel is published at
+`340f8335ba1d1a68f9b180a66c946728addb9a7c` with an injected synthetic
+controller factory, 45 focused checks, and 693/693 combined retirement checks.
+It remains outside `App.tsx`, does not import production c2a, and preserves one
+explicit
 **Pripraviť lokálnu zálohu** click handler plus the manual gate before
-the first real c2a/localStorage read. The smallest next step is a docs-only
-c2b2b2 production composition review; App placement remains a separate gate.
+the first real c2a/localStorage read. The docs-only c2b2b2 composition review
+is now prepared; its implementation and App placement remain separate gates.

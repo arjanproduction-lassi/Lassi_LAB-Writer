@@ -116,10 +116,13 @@ UI controller over an injected c2b1 session factory, with 44 focused checks and
 nothing into App, uses no production c2a wrapper, and reads no real storage.
 The docs-only c2b2b review now splits later work into an injected synthetic
 panel, import-safe production composition, separate App placement, and a
-separately approved first-real-click gate. c2b2b1 is now prepared locally as an
+separately approved first-real-click gate. c2b2b1 is published as an
 isolated injected React panel with 45 synthetic checks and no `App.tsx`, c2a,
-real storage, time, network, or file access. Only the separately approved
-c2b2b4 explicit click
+real storage, time, network, or file access. It is published at
+`340f8335ba1d1a68f9b180a66c946728addb9a7c`; the combined retirement harness
+passes 693/693. The docs-only c2b2b2 review now defines one future import-safe
+timestamp/c2a/controller composition module without implementing it. Only the
+separately approved c2b2b4 explicit click
 may first read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice

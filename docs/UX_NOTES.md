@@ -101,9 +101,12 @@ The docs-only c2b2 minimal UI capture review is published at
 `ae998764637075bf8bc341255903af23ce762232` as a headless synthetic controller
 that exposes only frozen text-free state and no React component. The docs-only
 c2b2b review keeps the panel lazy and injected: render, mount, effects, and
-entering Data create no controller and read nothing. c2b2b1 is now prepared
-locally as that isolated panel with synthetic dependencies only and remains
-outside App. A later separately reviewed App step may add one retirement subsection to
+entering Data create no controller and read nothing. c2b2b1 is published at
+`340f8335ba1d1a68f9b180a66c946728addb9a7c` as that isolated panel with
+synthetic dependencies only and remains outside App. The docs-only c2b2b2
+review keeps time creation and c2a deferred inside a later accepted command;
+import and factory/controller creation remain read-free. A later separately
+reviewed App step may add one retirement subsection to
 the existing Writer **Dáta / Ručný prenos DB** area; the first real read happens
 only inside the actual **Pripraviť lokálnu zálohu** click handler after separate
 approval. The read-only product shell is not the owner of this sensitive

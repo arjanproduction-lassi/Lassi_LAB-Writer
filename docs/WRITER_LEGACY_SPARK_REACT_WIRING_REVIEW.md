@@ -1,9 +1,10 @@
 # Writer Legacy Spark React Wiring Review
 
-Status: R2.6.3c2b2b review with c2b2b1 prepared locally. The published c2b2a
+Status: R2.6.3c2b2b review with c2b2b1 published at
+`340f8335ba1d1a68f9b180a66c946728addb9a7c`. The published c2b2a
 headless controller exists at `ae998764637075bf8bc341255903af23ce762232`.
-This document defines the production React boundary around it. The local
-c2b2b1 slice adds only an injected, isolated React panel and synthetic checks;
+This document defines the production React boundary around it. The c2b2b1
+slice adds only an injected, isolated React panel and synthetic checks;
 it does not change `App.tsx` or CSS, call the production c2a wrapper, read real
 localStorage or Writer data, or create a backup, hash, manifest, Blob, download,
 commit, push, or deployment.
@@ -352,7 +353,7 @@ App action can reach c2a, time creation, or localStorage.
 
 ## Local c2b2b1 Status
 
-c2b2b1 is prepared locally as:
+c2b2b1 is published as:
 
 - `LegacySparkRetirementLocalBackupPanel.tsx`, an isolated component with an
   injected c2b2a controller factory;
@@ -388,8 +389,9 @@ This review and local c2b2b1 do not implement or authorize:
 
 ## Smallest Safe Next Implementation
 
-The smallest next step is a **docs-only c2b2b2 production composition review**.
-It should define the import-safe timestamp/c2a/controller factory boundary
-without implementing it, importing the panel into `App.tsx`, or reading real
-storage. c2b2b3 App placement remains separate. The first real click remains
-c2b2b4 and requires another explicit approval.
+The docs-only c2b2b2 production composition review is now defined in
+`WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md`. The smallest later
+implementation is one import-safe injected/production controller factory
+module plus synthetic checks, without importing it into `App.tsx` or invoking
+the production prepare path. c2b2b3 App placement remains separate. The first
+real click remains c2b2b4 and requires another explicit approval.

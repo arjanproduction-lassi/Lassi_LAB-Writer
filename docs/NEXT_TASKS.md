@@ -85,12 +85,14 @@ docs-only c2b2 minimal UI capture review is published at
 controller over an injected c2b1 session factory, with 44 focused checks and
 648/648 combined retirement checks. It has no React component, App import,
 production c2a wrapper, or real storage read. The docs-only c2b2b review now
-defines the later production React boundary. c2b2b1 is prepared locally as an
-isolated injected React panel with 45/45 synthetic checks. It is not imported
-into App, does not import production c2a, and reads no real storage. The
-smallest next step is a docs-only c2b2b2 production composition review; do not
-wire App or create the production composition yet. The first real localStorage
-read remains behind later App wiring, an explicit click, and separate approval.
+defines the later production React boundary. c2b2b1 is published at
+`340f8335ba1d1a68f9b180a66c946728addb9a7c` as an isolated injected React
+panel with 45/45 synthetic checks and 693/693 combined retirement checks. It is
+not imported into App, does not import production c2a, and reads no real
+storage. The docs-only c2b2b2 production composition review is now prepared in
+`WRITER_LEGACY_SPARK_PRODUCTION_COMPOSITION_REVIEW.md`. The smallest later
+implementation is c2b2b2 only: one import-safe injected/production factory
+module plus synthetic checks, still without App wiring or a real read.
 
 One remaining manual regression check is outside development scope: connect
 Google on production and confirm that the existing v1/Sparks-only sync still
