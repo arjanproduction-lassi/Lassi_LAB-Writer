@@ -266,6 +266,32 @@ sorted by `updatedAt`, newest first.
 
 No automatic migration runs in this step.
 
+### Phase D WriterPackage Write Boundary
+
+The docs-only Phase D contract is defined in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. Its first editable field is only
+`workshopText` on a WriterPackage freshly proven to exist in the real Package
+storage collection.
+
+The combined `loadWriterPackageCatalog()` output remains read-only and must not
+be used to establish write ownership because it also contains adapted Sparks.
+`legacy.source` is not physical storage provenance. Write ownership requires a
+fresh, strict, complete read of the existing Package collection and an exact
+selected ID plus `updatedAt` revision match.
+
+The current `loadWriterPackages()` filtering behavior and the direct
+`saveWriterPackages()` / `upsertWriterPackage()` helpers are not a sufficient
+autosave transaction boundary: they do not surface complete collection damage,
+check an expected revision, or require read-back verification. Phase D must
+begin with a pure planner, followed later by a separately reviewed injected
+single-key persistence coordinator.
+
+D1 changes only `workshopText` and top-level `updatedAt`, preserves collection
+order and every other nested value, and makes the next timestamp strictly later
+than the stored revision. D1 adds no key and performs no read or write. No
+production edit may be enabled until crash-recovery and WriterPackage sync
+limitations have their own explicit decisions.
+
 ## Writer DB v2 Proposal
 
 This is a cautious rollout model. Production import/export and Google Drive sync

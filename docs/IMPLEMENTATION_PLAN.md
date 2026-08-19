@@ -42,6 +42,15 @@ synthetic integration/isolation gate are published at
 PC/mobile detail still uses the same snapshot, performs no second load, and
 writes nothing.
 
+The next product phase is the docs-only Phase D contract in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. It audits the current Package
+helpers and does not allow React to call `upsertWriterPackage()` directly.
+Phase D begins with D1 only: a pure deterministic edit planner for
+`workshopText` on one freshly proven real stored WriterPackage. Title,
+`sparkText`, notes, `finalText`, adapted Sparks, production navigation, Google
+sync, and Package creation remain unchanged. D2 persistence, D3 autosave state,
+D4 development UI, crash-recovery, and Package-sync decisions stay separate.
+
 ## Legacy Spark Retirement Planning
 
 The docs-only retirement protocol is defined in

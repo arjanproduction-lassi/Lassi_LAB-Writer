@@ -10,9 +10,9 @@ detail adapter. B5.2 is published at
 `8ec9fe3431ee71aab78085cca07661dc25c31633` as the one-load immutable snapshot
 and provider result. B5.3 is published at
 `22973efd5c0b6a49f51d0a954073ffb603b31345` as the pure immutable selection,
-layer, and resolution model. B5.4 is prepared locally as the isolated read-only
-React detail UI over that model and the already-loaded snapshot. It is not
-staged, committed, pushed, or deployed. B5.5 remains pending.
+layer, and resolution model. B5.4 and its final isolation review are published
+at `f268d569a1c45214090dcac326633afab76c6968` as the isolated read-only React
+detail UI over that model and the already-loaded snapshot. Phase B5 is closed.
 
 The only future runtime in scope is the isolated development entry:
 
@@ -585,7 +585,8 @@ published provider result and deserves an independent review.
 
 ### B5.4 - read-only detail UI
 
-- Prepared locally in the isolated exact DEV `real-read-only` experience only.
+- Published in the isolated exact DEV `real-read-only` experience only at
+  `f268d569a1c45214090dcac326633afab76c6968`.
 - Enables the real Library cards and `Pokračovať` only to select an ID in local
   React state; every open starts on `Iskra` and resolves against the existing
   `snapshot.detailsById` without another loader call.
@@ -601,11 +602,11 @@ published provider result and deserves an independent review.
 
 ### B5.5 - synthetic integration and final isolation review
 
-- verify one loader call;
-- verify click, return, and layer changes without storage change;
-- verify fixture and production isolation;
-- use only artificial content;
-- add no feature beyond closing verification gaps.
+- Published with B5.4 at
+  `f268d569a1c45214090dcac326633afab76c6968`.
+- Verifies one loader call, click/return/layer changes without storage change,
+  fixture/production isolation, and artificial content only.
+- Adds no behavior beyond closing Phase B5 verification gaps.
 
 ## Explicitly Out Of Scope
 
@@ -634,7 +635,10 @@ returning, and switching layers are local in-memory actions that never read or
 write storage. Published B5.1 supplies the pure immutable detail
 and array builder, and published B5.2 supplies the one-call
 `items + detailsById` provider snapshot. Published B5.3 supplies the pure
-selection/layer/resolution model. Local B5.4 now connects that model to static
-detail presentation over the same snapshot only; it remains uncommitted and
-unpublished. The smallest next step is B5.5 synthetic integration and final
-isolation review, without adding product behavior.
+selection/layer/resolution model. Published B5.4 connects that model to static
+detail presentation over the same snapshot only. B5.4 and its final B5.5
+integration/isolation gate are published together at
+`f268d569a1c45214090dcac326633afab76c6968`; Phase B5 is closed. The next
+product phase is the separately documented Phase D contract in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. Its smallest future implementation
+is a pure synthetic `workshopText` edit planner only, not storage or UI wiring.

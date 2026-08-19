@@ -43,11 +43,21 @@ Published B5.1 prepares the pure immutable detail data and published B5.2
 combines it with the existing B1 items in one deeply immutable
 `items + detailsById` snapshot from the single catalog load. Published B5.3
 defines selecting an ID, resetting each opened work to Iskra, switching the
-four layers, returning to Knižnica, and reporting a missing detail. Local B5.4
-uses those rules in the isolated real mode: cards open a static read-only
+four layers, returning to Knižnica, and reporting a missing detail. Published
+B5.4 uses those rules in the isolated real mode: cards open a static read-only
 Dielňa, PC shows context plus active content, and mobile shows one active panel.
-The ID is local React state only; there is no second load, editor, save, or
-autosave, and `Nová iskra` stays disabled.
+Phase B5 is closed at `f268d569a1c45214090dcac326633afab76c6968`. The ID is
+local React state only; there is no second load, editor, save, or autosave, and
+`Nová iskra` stays disabled.
+
+The docs-only Phase D editing contract is defined in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. It starts with `workshopText` only
+because that is one package-level string and leaves the protected original
+Spark, note identities/tombstones, title, and final text untouched. Only a
+freshly proven real stored WriterPackage may become editable; catalog-only
+adapted Sparks remain read-only. The first future implementation is pure and
+synthetic. Production editing remains blocked until autosave failure, crash
+recovery, and local-only versus Package-sync behavior have explicit decisions.
 
 ## Legacy Reset And Package-Only UX Direction
 

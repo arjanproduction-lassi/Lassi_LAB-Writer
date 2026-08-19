@@ -626,8 +626,10 @@ opening is not yet allowed to mutate data.
 Status: B1-B4 are published through
 `08b06848e712bac3499d397e50cee5ca4c62a439`. Exact DEV
 `?mode=real-read-only` performs one catalog load before React render and shows
-the real Knižnica without writes. The B5 read-only detail remains docs-only and
-is specified in `WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md`.
+the real Knižnica without writes. The B5 read-only detail is specified in
+`WRITER_LIBRARY_READ_ONLY_DETAIL_REVIEW.md` and published through
+`f268d569a1c45214090dcac326633afab76c6968`. The isolated real mode opens one
+immutable detail from the same snapshot and remains write-free.
 
 ### Phase C — open one real package read-only
 
@@ -649,6 +651,13 @@ no stage mutation occurs.
 
 Acceptance: refresh, failure, and cross-device implications are understood for
 each editable field before enabling the next one.
+
+The docs-only Phase D contract is now defined in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. Its first future slice is D1 only:
+a pure deterministic `workshopText` edit planner for one freshly proven real
+stored WriterPackage. Adapted Sparks, title, original Spark, notes, and final
+text remain read-only. Production editing remains blocked by separate draft
+recovery and Package-sync decisions.
 
 ### Phase E — New Spark creates a WriterPackage directly
 

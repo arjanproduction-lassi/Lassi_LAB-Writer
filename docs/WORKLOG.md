@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-08-19 - WriterPackage Phase D editing/autosave review (docs only)
+
+- Added `WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md` after closing the published
+  read-only Library/detail work through
+  `f268d569a1c45214090dcac326633afab76c6968`.
+- Selected only `workshopText` for the first future editable field. Title,
+  original Spark, notes, final text, adapted Sparks, creation, deletion, and
+  production navigation remain read-only or out of scope.
+- Documented why the current filtering loader and direct
+  `upsertWriterPackage()` helper are not a sufficient autosave boundary: they
+  do not preserve strict collection-damage visibility, expected revision, or
+  read-back verification.
+- Split future implementation into D1 pure edit planning, D2 injected
+  existing-key persistence, D3 pure autosave state, D4 DEV-only UI, D5 manual
+  disposable-profile review, and separate D6/D7 recovery and sync decisions.
+- Added no runtime, React, CSS, storage key, Google Drive, import/export,
+  migration, real author-data access, staging, commit, push, or deployment.
+
 ## 2026-08-19 - R2.6.3c2b2b4 first production read
 
 - Confirmed a clean published `main` at

@@ -30,6 +30,14 @@ B5.4 and its final isolation/integration review are published at
 static read-only detail from the already-loaded snapshot, switches the four
 layers, and returns without another load or any write.
 
+The docs-only Phase D contract is defined in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. The smallest next implementation
+is D1 only: a pure deterministic `workshopText` edit planner over explicit
+WriterPackage arrays, expected `updatedAt`, and injected `now`. It must not use
+React, storage, browser globals, Google Drive, import/export, or real author
+data. Do not start D2 persistence, D3 autosave state, D4 development wiring,
+Package creation, a draft key, or Package sync in the same commit.
+
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before
 any destructive work, follow `WRITER_LEGACY_SPARK_RETIREMENT_REVIEW.md`. The
@@ -166,10 +174,10 @@ Closed Phase B5 implementation record:
   from one catalog load
 - B5.3 is published at `22973efd5c0b6a49f51d0a954073ffb603b31345` as a pure
   immutable selection/layer model with safe own-property detail lookup
-- B5.4 is prepared locally as read-only PC/mobile detail using only local React
-  state and the existing snapshot; it remains uncommitted and unpublished
-- perform B5.5 synthetic integration and final isolation review as the next
-  separately approved step, adding no new behavior
+- B5.4 and its final synthetic integration/isolation review are published at
+  `f268d569a1c45214090dcac326633afab76c6968`
+- Phase B5 is closed; Phase D now has a separate docs-only editing/autosave
+  contract
 - never re-read by ID, create editable copies, add autosave, or change the
   production App in B5
 

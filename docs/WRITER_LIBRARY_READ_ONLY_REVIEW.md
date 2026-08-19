@@ -587,7 +587,10 @@ single loader call and adds immutable detail presentation from the same
 in-memory catalog. Published B5.1 contains the pure, deeply immutable detail
 adapters, and published B5.2 creates the frozen null-prototype `detailsById`
 index beside the unchanged B1 item result. Published B5.3 resolves an optional
-ID only against that index and preserves the frozen detail reference. Local
+ID only against that index and preserves the frozen detail reference. Published
 B5.4 uses it to open static read-only detail, switch layers, and return without
-a second load or write. Fixture and production remain unchanged. The smallest
-next step is B5.5 synthetic integration and final isolation review.
+a second load or write. B5.4 and its final integration/isolation review are
+published at `f268d569a1c45214090dcac326633afab76c6968`; Phase B5 is closed.
+Fixture and production remain unchanged. The next product phase has a separate
+docs-only contract in `WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`; its smallest
+future implementation is a pure synthetic `workshopText` edit planner only.

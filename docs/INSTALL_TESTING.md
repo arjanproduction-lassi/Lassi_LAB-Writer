@@ -38,6 +38,27 @@ Expected result:
 - TypeScript checks pass.
 - Vite creates a production build in `dist/`.
 
+## Phase D WriterPackage Editing Review
+
+The docs-only Phase D contract is in
+`WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. No Phase D edit command or runtime
+mode exists yet.
+
+The first future D1 check group must use artificial WriterPackages only and
+prove that one pure `workshopText` edit:
+
+- changes only `workshopText` and top-level `updatedAt`;
+- requires an exact expected revision;
+- blocks missing, deleted, invalid, or duplicate Packages;
+- preserves collection order, notes, tombstones, and every unrelated field;
+- creates a strictly newer canonical timestamp from injected `now`;
+- does not mutate inputs or call React, storage, browser, network, Google,
+  import/export, recovery, or production code.
+
+Do not perform real WriterPackage editing, storage-failure simulation, or
+author-data testing until later D2-D5 gates are separately implemented and
+approved. Current `npm run check:product-shell` remains read-only.
+
 ## Run Writer DB Checks
 
 Writer DB v2 has a small local check harness. It does not use production UI,
