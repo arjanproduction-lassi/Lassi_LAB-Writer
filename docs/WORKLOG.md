@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-08-19 - R2.6.3c2b2b3 App placement review (docs only)
+
+- Added `WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md` without App/React/CSS,
+  runtime, test, storage, import/export, recovery, persistence, Google Drive,
+  commit, push, deployment, or real-data changes.
+- Chose exactly one future panel position after all Writer DB import UI and
+  before the existing Google sync panel in **Dáta / Ručný prenos DB**.
+- Defined one pure four-boolean guard boundary over existing App state with
+  stable precedence: active import, recovery not clean, active Google sync,
+  then editor or draft active.
+- App will pass only the published production factory reference and one
+  text-free blocking reason. It will not call the factory, controller, c2a,
+  c2b1, Date, or localStorage for retirement.
+- c2b2b4 remains the separately approved first real click. This review does
+  not make the panel visible and performs no real storage read.
+
 ## 2026-08-19 - R2.6.3c2b2b2 production composition
 
 - Added one thin non-React runtime module that composes the existing c2b2a

@@ -3,8 +3,10 @@
 Status: R2.6.3c2b2b review with c2b2b1 published at
 `340f8335ba1d1a68f9b180a66c946728addb9a7c`. The published c2b2a
 headless controller exists at `ae998764637075bf8bc341255903af23ce762232`.
-This document defines the production React boundary around it. The c2b2b1
-slice adds only an injected, isolated React panel and synthetic checks;
+The c2b2b2 production composition is published at
+`a2f246c4a9aad335b2dbd0b04a907043216d3b02`. This document defines the
+production React boundary around those layers. The c2b2b1 slice adds only an
+injected, isolated React panel and synthetic checks;
 it does not change `App.tsx` or CSS, call the production c2a wrapper, read real
 localStorage or Writer data, or create a backup, hash, manifest, Blob, download,
 commit, push, or deployment.
@@ -22,9 +24,9 @@ one `prepareLocalBackup()` command. React receives only the controller's frozen,
 text-free view model. The captured snapshot and c2b1 session remain outside
 React state, props, context, reducers, logs, and rendered output.
 
-c2b2b1 now implements only the isolated injected component and synthetic
-interaction boundary. Production composition, App placement, and an activated
-runtime path remain unimplemented. The first real production click remains
+c2b2b1 implements the isolated injected component and synthetic interaction
+boundary. c2b2b2 implements the import-safe production composition. App
+placement and an activated runtime path remain unimplemented. The first real production click remains
 behind a later explicit visible-chat approval after the implementation is
 reviewed, published, and the worktree is clean.
 
@@ -392,6 +394,7 @@ This review and the c2b2b2 composition do not implement or authorize:
 The c2b2b2 import-safe injected/production controller factory module passes
 42/42 synthetic checks and 735/735 combined checks. It is
 not imported into `App.tsx`, and automated checks do not invoke its production
-prepare path. The next step is a separate docs-only c2b2b3 App placement
-review; the first real click remains c2b2b4 and requires another explicit
-approval.
+prepare path. The c2b2b3 docs-only placement contract is now defined in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`; its smallest later
+implementation is one pure guard helper and one narrow App placement. The first
+real click remains c2b2b4 and requires another explicit approval.

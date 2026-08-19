@@ -125,8 +125,11 @@ passed 693/693. The c2b2b2 review is published at
 timestamp/c2a/controller composition module and 42 synthetic checks implement
 that contract; the combined retirement harness passes 735/735. The module
 remains outside App, and automated checks never invoke its production prepare
-path. The next gate is a separate docs-only c2b2b3 App placement review. Only
-the separately approved c2b2b4 explicit click
+path. The docs-only c2b2b3 App placement contract is now defined in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. It derives four fail-closed
+reasons from existing App state, places one panel after import UI and before
+Google sync, and adds no runtime in this review. The smallest later
+implementation is c2b2b3 only. Only the separately approved c2b2b4 explicit click
 may first read real localStorage data after **Pripraviť lokálnu zálohu**.
 
 ## Completed v0.1 Slice

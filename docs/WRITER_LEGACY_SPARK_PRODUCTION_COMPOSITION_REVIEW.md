@@ -311,8 +311,8 @@ This c2b2b2 slice does not implement or authorize:
 
 ## Go / No-Go For c2b2b3 Review
 
-Proceed to c2b2b3 review only if the implementation remains one small non-React module plus
-synthetic checks and harness wiring. Stop if it requires changing c2a, c2b1,
+Proceed to c2b2b3 review only if the implementation remains one small non-React
+module plus synthetic checks and harness wiring. Stop if it requires changing c2a, c2b1,
 c2b2a, c2b2b1, App, CSS, storage keys, import/export, recovery, persistence, or
 Google sync.
 
@@ -322,6 +322,8 @@ one c2a call under synthetic dependencies.
 
 ## Smallest Safe Next Step
 
-The next separately gated step is a docs-only c2b2b3 App placement review.
-Do not begin App implementation without explicit approval. c2b2b4 first real
-click remains a later separate approval.
+The docs-only c2b2b3 contract is now defined in
+`WRITER_LEGACY_SPARK_APP_PLACEMENT_REVIEW.md`. Its smallest later
+implementation is one pure guard helper and one narrow App placement. Do not
+begin that implementation without explicit approval. c2b2b4 first real click
+remains a later separate approval.
