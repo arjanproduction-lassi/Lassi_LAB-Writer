@@ -34,12 +34,12 @@ The Phase D contract is defined in
 `WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. D1 is complete as a pure
 deterministic `workshopText` edit planner over explicit WriterPackage arrays,
 expected `updatedAt`, and injected `now`, with artificial checks only. Pause
-before D2 implementation. The docs-only D2 contract is now in
-`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. The smallest next code slice is
-D2a only: pure strict Package collection parsing/shared validation, with D1
-behavior unchanged. Do not start D2b persistence, D3 autosave state, D4
-development wiring, Package creation, a draft key, or Package sync in the same
-commit.
+before any write implementation. The D2 contract is in
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a now adds only pure strict
+Package collection parsing/serialization plus shared compatibility validation
+and clone rules, with D1 behavior unchanged. Review and publish D2a separately;
+do not start D2b persistence, D3 autosave state, D4 development wiring, Package
+creation, a draft key, or Package sync in the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

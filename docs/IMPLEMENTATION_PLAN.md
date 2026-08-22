@@ -52,12 +52,13 @@ Sparks, production navigation, Google sync, and Package creation remain
 unchanged. D2 persistence, D3 autosave state, D4 development UI, crash-recovery,
 and Package-sync decisions stay separate and unstarted.
 
-The docs-only detailed D2 contract is in
-`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. Implement D2a first as a pure
-strict Package collection codec and make D1 reuse it without behavior change.
-Only a later D2b may add an injected one-key coordinator. Conditional exact-raw
-rollback must not overwrite an unexpected concurrent value. D2b remains
-unwired, and D3/D4 stay separate.
+The detailed D2 contract is in
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a adds the pure strict
+Package collection codec and makes D1 reuse its compatibility validation and
+clone rules without behavior change. It remains explicit-input-only and
+unwired. Only a later D2b may add an injected one-key coordinator. Conditional
+exact-raw rollback must not overwrite an unexpected concurrent value. D2b
+remains unstarted, and D3/D4 stay separate.
 
 ## Legacy Spark Retirement Planning
 

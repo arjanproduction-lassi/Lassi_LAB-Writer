@@ -293,12 +293,14 @@ production edit may be enabled until crash-recovery and WriterPackage sync
 limitations have their own explicit decisions.
 
 The detailed D2 contract is in
-`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a first defines one pure
-strict collection codec so malformed, non-array, unsupported, invalid, or
-duplicate Package storage can never collapse to an empty or filtered array.
-D2b later uses only an injected `getItem`/`setItem` interface and one injected
-existing Package key. It must not use `removeItem`, a backup key, an import
-marker, or the filtering production loader.
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a adds one pure strict
+collection codec so malformed, non-array, unsupported, invalid, or duplicate
+Package storage can never collapse to an empty or filtered array. Its shared
+compatibility validation and detached frozen clone rules are reused by D1;
+unknown-key rejection remains exclusive to the strict raw boundary so D1
+behavior does not change. D2b later uses only an injected `getItem`/`setItem`
+interface and one injected existing Package key. It must not use `removeItem`,
+a backup key, an import marker, or the filtering production loader.
 
 After a D2b write attempt, exact previous-raw rollback is allowed only when the
 current raw value is still the previous value or the exact planned value. An

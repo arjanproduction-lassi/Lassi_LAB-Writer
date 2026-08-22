@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-08-22 - WriterPackage D2a pure strict collection codec
+
+- Added `writerPackageCollectionCodec.ts` as an explicit-input-only strict
+  WriterPackage collection parser, deterministic serializer, shared
+  compatibility validator, and detached frozen clone boundary.
+- The strict raw parser distinguishes malformed JSON from a valid non-array,
+  blocks unsupported shape/version, invalid Packages or notes, and duplicate
+  Package IDs, and never filters, repairs, sorts, deduplicates, or migrates.
+- Refactored D1 to reuse the shared compatibility validation and clone rules.
+  Unknown-key rejection stays at the strict raw boundary, preserving D1's
+  published 19/19 behavior.
+- Added 19 artificial codec checks and four isolation checks. No author data,
+  React, browser/storage access, clock, randomness, network, Google Drive,
+  import/export, persistence, recovery, new key, or production wiring was
+  added.
+- D2b persistence, D3 autosave, editor UI, and production composition remain
+  unstarted.
+
 ## 2026-08-22 - WriterPackage D2 persistence review (docs only)
 
 - Added `WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md` over the published D1

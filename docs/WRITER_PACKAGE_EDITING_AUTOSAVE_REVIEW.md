@@ -7,10 +7,13 @@ was published at `f780e27627ee82e3a35fac891c99d0e2f60dd911`. It follows the
 closed read-only Library/detail work published through
 `f268d569a1c45214090dcac326633afab76c6968`.
 
-D1 is implemented as a pure planner plus artificial checks. It changes no
-React, CSS, storage key, WriterPackage shape, Writer DB format, import/export
-behavior, recovery behavior, Google Drive payload, production route, or
-navigation. It does not read real author data or browser storage.
+D1 is implemented as a pure planner plus artificial checks. D2a adds only a
+pure strict Package collection codec and moves D1's compatibility validation
+and clone rules into that shared layer without changing planner behavior.
+Neither slice changes React, CSS, a storage key, WriterPackage shape, Writer DB
+format, import/export behavior, recovery behavior, Google Drive payload,
+production route, or navigation. Neither reads real author data or browser
+storage.
 
 Phase D must remain separate from:
 
@@ -164,6 +167,11 @@ The pure helper imports no React, browser globals, storage, timers, network,
 Google Drive, import/export, recovery, persistence, random ID, or logging API.
 
 ## D2 Injected Single-Key Persistence
+
+D2a is the pure, write-free prerequisite: strict full-collection parsing and
+serialization plus shared compatibility validation. D2b remains the future
+injected single-key coordinator described below; D2a does not authorize or
+perform any storage read or write.
 
 The detailed docs-only D2 contract is defined in
 `WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2 is split into D2a pure

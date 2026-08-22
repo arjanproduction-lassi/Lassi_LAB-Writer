@@ -2,16 +2,17 @@
 
 ## Status And Scope
 
-This is the docs-only D2 review for persisting one D1 `workshopText` edit to
-the existing WriterPackage collection. The published foundation is:
+This review defines D2 for persisting one D1 `workshopText` edit to the existing
+WriterPackage collection. The published foundation is:
 
 - Phase D contract: `f780e27627ee82e3a35fac891c99d0e2f60dd911`;
 - D1 pure planner: `362a0de3136dbeabe5864f7d5122fb30d61735f8`.
 
-This review adds no TypeScript runtime, React, CSS, storage read or write,
-storage key, browser adapter, timer, Google Drive behavior, import/export
-behavior, recovery behavior, route, or navigation. It does not authorize a
-deployment and does not read or log real author data.
+D2a now adds only the pure TypeScript codec and artificial checks defined below.
+It adds no React, CSS, storage read or write, storage key, browser adapter,
+timer, Google Drive behavior, import/export behavior, recovery behavior, route,
+or navigation. It does not authorize a deployment and does not read or log real
+author data.
 
 The planned D2 foundation remains isolated and synthetic/injected. It does not
 authorize autosave, a text editor, production wiring, or a second active
@@ -74,11 +75,10 @@ coordinator and keeps the first next change write-free.
 
 ## D2a Pure Strict Collection Codec
 
-D2a should move the current private D1 Package/note/legacy compatibility
-validation and clone rules into one pure shared module. D1 must reuse those
-compatibility functions without changing its published behavior. The strict
-raw parser adds the canonical-shape/unknown-key check only at its own storage
-boundary.
+D2a moves the former private D1 Package/note/legacy compatibility validation
+and clone rules into one pure shared module. D1 reuses those compatibility
+functions without changing its published behavior. The strict raw parser adds
+the canonical-shape/unknown-key check only at its own storage boundary.
 
 Recommended responsibilities:
 
@@ -307,7 +307,6 @@ D2 does not implement or authorize:
 
 ## Smallest Next Step
 
-Implement D2a only: one pure strict WriterPackage collection codec, refactor D1
-to reuse its validation/clone rules without changing D1 behavior, and add
-artificial checks. Do not add the injected storage coordinator in the same
-commit.
+Complete the final safety review and publish D2a as its own write-free commit.
+Do not add the injected D2b storage coordinator, D3 autosave state, or any UI or
+production composition in that commit.

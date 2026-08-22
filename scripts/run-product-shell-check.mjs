@@ -51,6 +51,7 @@ try {
       "src/writerLibraryReadOnlySelectionChecks.ts",
       "src/writerLibraryReadOnlyProviderChecks.ts",
       "src/productShellReadOnlyDetailChecks.ts",
+      "src/writerPackageCollectionCodecChecks.ts",
       "src/writerPackageWorkshopEditChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
@@ -150,6 +151,16 @@ try {
     process.exit(readOnlyDetailRun.status ?? 1);
   }
 
+  const packageCollectionCodecRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerPackageCollectionCodecChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (packageCollectionCodecRun.status !== 0) {
+    process.exit(packageCollectionCodecRun.status ?? 1);
+  }
+
   const workshopEditRun = spawnSync(
     process.execPath,
     [join(outputDir, "writerPackageWorkshopEditChecks.js")],
@@ -235,6 +246,80 @@ try {
 
   console.log(
     `WriterPackage workshop edit isolation checks: ${workshopEditIsolationChecks}/${workshopEditIsolationChecks} passed.`
+  );
+
+  const packageCollectionCodecSource = readFileSync(
+    resolve(repoRoot, "src/writerPackageCollectionCodec.ts"),
+    "utf8"
+  ).toLowerCase();
+  let packageCollectionCodecIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (packageCollectionCodecSource.includes(pattern)) {
+      throw new Error(`D2a Package collection codec contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  packageCollectionCodecIsolationChecks += 1;
+
+  for (const pattern of [
+    "setitem",
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "deletewriter",
+    "persist",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "googledrive"
+  ]) {
+    if (packageCollectionCodecSource.includes(pattern)) {
+      throw new Error(`D2a Package collection codec contains forbidden write or network dependency: ${pattern}`);
+    }
+  }
+  packageCollectionCodecIsolationChecks += 1;
+
+  for (const pattern of [
+    "date.now",
+    "math.random",
+    "crypto.",
+    "settimeout",
+    "setinterval",
+    "performance.",
+    "console."
+  ]) {
+    if (packageCollectionCodecSource.includes(pattern)) {
+      throw new Error(`D2a Package collection codec contains forbidden nondeterminism or logging: ${pattern}`);
+    }
+  }
+  packageCollectionCodecIsolationChecks += 1;
+
+  const productionPackageCodecEntries = ["index.html", "src/main.tsx", "src/App.tsx"]
+    .map((relativePath) => readFileSync(resolve(repoRoot, relativePath), "utf8"))
+    .join("\n")
+    .toLowerCase();
+  if (
+    productionPackageCodecEntries.includes("writerpackagecollectioncodec") ||
+    !workshopEditSource.includes("writerpackagecollectioncodec")
+  ) {
+    throw new Error("D2a Package collection codec must remain unwired and shared with D1 only.");
+  }
+  packageCollectionCodecIsolationChecks += 1;
+
+  console.log(
+    `WriterPackage collection codec isolation checks: ${packageCollectionCodecIsolationChecks}/${packageCollectionCodecIsolationChecks} passed.`
   );
 
   let isolationChecks = 0;
