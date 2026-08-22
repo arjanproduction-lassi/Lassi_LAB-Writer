@@ -165,8 +165,13 @@ Google Drive, import/export, recovery, persistence, random ID, or logging API.
 
 ## D2 Injected Single-Key Persistence
 
-A later D2 coordinator may connect D1 to the existing Package key through an
-injected storage interface. It must use exactly:
+The detailed docs-only D2 contract is defined in
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2 is split into D2a pure
+strict collection codec/shared validation and D2b injected single-key
+coordination. D2a must be reviewed and published before D2b.
+
+A later D2b coordinator may connect D1 to the existing Package key through an
+injected storage interface. Production composition may inject exactly:
 
 ```text
 lassilab-writer:v0.1:packages
@@ -186,12 +191,15 @@ Required sequence:
 8. Read it back, parse it strictly, and compare the complete collection with the
    planned result.
 9. Report success only after read-back verification.
-10. If verification fails after a successful write, restore the exact previous
-    raw value, read it back, and report whether rollback was verified.
+10. If a write cannot be verified, inspect ownership before rollback: restore
+    exact previous raw only when the current value is still exactly the planned
+    value. Never overwrite a third unexpected value from another writer.
 
 Because editing is allowed only for an already stored Package, the previous raw
 Package value must exist. D2 therefore needs no `removeItem` path and may not
-create another backup, marker, or draft key.
+create another backup, marker, or draft key. Exact compare-then-write is not an
+atomic cross-tab compare-and-set, so D2 remains unwired until concurrency has a
+separate decision.
 
 Typed results must preserve:
 
@@ -421,6 +429,8 @@ The D1 slice does not implement or authorize:
 
 ## Smallest Next Step
 
-D1 is complete as an isolated pure phase. Pause before D2. Any D2 persistence,
-D3 autosave state, React wiring, or new storage key requires a separate review
-and explicit approval.
+D1 is complete as an isolated pure phase. D2 now has a docs-only contract in
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. The smallest next code slice is
+D2a strict pure collection parsing/shared validation only. Do not start D2b
+storage coordination, D3 autosave state, React wiring, or a new storage key in
+the same commit.

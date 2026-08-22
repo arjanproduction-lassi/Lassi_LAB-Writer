@@ -292,6 +292,20 @@ than the stored revision. D1 adds no key and performs no read or write. No
 production edit may be enabled until crash-recovery and WriterPackage sync
 limitations have their own explicit decisions.
 
+The detailed D2 contract is in
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a first defines one pure
+strict collection codec so malformed, non-array, unsupported, invalid, or
+duplicate Package storage can never collapse to an empty or filtered array.
+D2b later uses only an injected `getItem`/`setItem` interface and one injected
+existing Package key. It must not use `removeItem`, a backup key, an import
+marker, or the filtering production loader.
+
+After a D2b write attempt, exact previous-raw rollback is allowed only when the
+current raw value is still the previous value or the exact planned value. An
+unexpected third value is never overwritten because it may belong to another
+tab. D2 does not provide atomic cross-tab compare-and-set; production autosave
+remains blocked pending a separate concurrency decision.
+
 ## Writer DB v2 Proposal
 
 This is a cautious rollout model. Production import/export and Google Drive sync

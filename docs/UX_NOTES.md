@@ -60,6 +60,13 @@ storage wiring. Production editing remains blocked until autosave failure,
 crash recovery, and local-only versus Package-sync behavior have explicit
 decisions.
 
+The D2 persistence review keeps failure copy text-free and typed. `Uložené`
+may appear later only after exact raw read-back, strict collection validation,
+and complete planned-content verification. A stale revision remains a
+`Konflikt`, a verified exact rollback may report that the previous value is
+safe, and an unknown or concurrent value must block further saving without
+claiming recovery. D2 itself adds no UI.
+
 ## Legacy Reset And Package-Only UX Direction
 
 Legacy Sparks are test-only transition data. Their notebook stages must not be

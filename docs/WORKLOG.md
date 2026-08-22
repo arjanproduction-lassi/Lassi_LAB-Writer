@@ -1,5 +1,25 @@
 # Worklog
 
+## 2026-08-22 - WriterPackage D2 persistence review (docs only)
+
+- Added `WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md` over the published D1
+  planner at `362a0de3136dbeabe5864f7d5122fb30d61735f8`.
+- Split future D2 into D2a pure strict collection codec/shared validation and
+  D2b injected single-key persistence. D2a must precede D2b.
+- Rejected the filtering `loadWriterPackages()` path and the broad Writer DB
+  import persistence coordinator as direct D2 write boundaries.
+- Defined exact current-raw capture, D1 reuse, one-key write, exact plus strict
+  read-back verification, text-free typed results, and zero-write
+  blocked/conflict/unchanged paths.
+- Refined rollback for concurrency safety: restore previous raw only when the
+  current value is still exactly previous or planned; never overwrite a third
+  unexpected value from another tab.
+- Recorded that synchronous localStorage has no atomic compare-and-set, so D2b
+  remains unwired and production autosave stays NO-GO pending concurrency and
+  draft-recovery decisions.
+- Added no runtime, React, CSS, storage access, new key, Google Drive,
+  import/export, recovery, deployment, or author-data testing.
+
 ## 2026-08-19 - WriterPackage D1 pure workshop edit planner
 
 - Added `writerPackageWorkshopEdit.ts` as a pure deterministic planner over an

@@ -64,6 +64,14 @@ Expected D1 additions in that harness:
 - `WriterPackage workshop edit checks: 19/19 passed.`
 - `WriterPackage workshop edit isolation checks: 4/4 passed.`
 
+The docs-only detailed D2 contract is in
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. No D2 code exists yet. Future
+D2a checks must cover strict full-collection parsing, canonical supported shape,
+duplicates, detachment, freezing, and unchanged D1 19/19 behavior. Future D2b
+checks must use only an injected in-memory storage double and prove zero writes
+for missing/damaged/stale/unchanged inputs, verified one-key success, and
+conditional exact-raw rollback that never overwrites a third concurrent value.
+
 ## Run Writer DB Checks
 
 Writer DB v2 has a small local check harness. It does not use production UI,
