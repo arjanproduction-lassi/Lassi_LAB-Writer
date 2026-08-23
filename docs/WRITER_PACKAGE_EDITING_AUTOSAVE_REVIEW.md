@@ -9,11 +9,12 @@ closed read-only Library/detail work published through
 
 D1 is implemented as a pure planner plus artificial checks. D2a adds only a
 pure strict Package collection codec and moves D1's compatibility validation
-and clone rules into that shared layer without changing planner behavior.
-Neither slice changes React, CSS, a storage key, WriterPackage shape, Writer DB
-format, import/export behavior, recovery behavior, Google Drive payload,
-production route, or navigation. Neither reads real author data or browser
-storage.
+and clone rules into that shared layer without changing planner behavior. D2b
+adds only the injected single-key coordinator and artificial fault-injection
+checks. These slices change no React, CSS, storage key, WriterPackage shape,
+Writer DB format, import/export behavior, recovery behavior, Google Drive
+payload, production route, or navigation. They read no real author data or
+browser storage.
 
 Phase D must remain separate from:
 
@@ -169,17 +170,18 @@ Google Drive, import/export, recovery, persistence, random ID, or logging API.
 ## D2 Injected Single-Key Persistence
 
 D2a is the pure, write-free prerequisite: strict full-collection parsing and
-serialization plus shared compatibility validation. D2b remains the future
-injected single-key coordinator described below; D2a does not authorize or
-perform any storage read or write.
+serialization plus shared compatibility validation. D2b adds the injected
+single-key coordinator described below with artificial fault-injection checks.
+Both remain isolated from production; D2a performs no storage access and D2b
+receives every storage effect and key explicitly.
 
 The detailed docs-only D2 contract is defined in
 `WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2 is split into D2a pure
 strict collection codec/shared validation and D2b injected single-key
 coordination. D2a must be reviewed and published before D2b.
 
-A later D2b coordinator may connect D1 to the existing Package key through an
-injected storage interface. Production composition may inject exactly:
+D2b can connect D1 to one supplied Package key through an injected storage
+interface. A future production composition may inject exactly:
 
 ```text
 lassilab-writer:v0.1:packages
@@ -437,8 +439,7 @@ The D1 slice does not implement or authorize:
 
 ## Smallest Next Step
 
-D1 is complete as an isolated pure phase. D2 now has a docs-only contract in
-`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. The smallest next code slice is
-D2a strict pure collection parsing/shared validation only. Do not start D2b
-storage coordination, D3 autosave state, React wiring, or a new storage key in
-the same commit.
+D1, D2a, and the isolated D2b coordinator are implemented with artificial
+checks. Complete D2b's final safety review and publish it separately. Do not
+start D3 autosave state, React wiring, browser locking, draft recovery, or a new
+storage key in the same commit.

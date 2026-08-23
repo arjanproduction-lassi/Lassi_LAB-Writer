@@ -78,10 +78,17 @@ Expected D2a additions in `npm run check:product-shell`:
 - `WriterPackage collection codec isolation checks: 4/4 passed.`
 - existing `WriterPackage workshop edit checks: 19/19 passed.`
 
-Future D2b checks must use only an injected in-memory storage double and prove
-zero writes for missing/damaged/stale/unchanged inputs, verified one-key
-success, and conditional exact-raw rollback that never overwrites a third
-concurrent value.
+D2b checks use only an injected in-memory storage double and prove zero writes
+for missing/damaged/stale/unchanged inputs, verified one-key success, and
+conditional exact-raw rollback that never overwrites a third concurrent value.
+
+Expected D2b additions in `npm run check:product-shell`:
+
+- `WriterPackage workshop persistence checks: 31/31 passed.`
+- `WriterPackage workshop persistence isolation checks: 4/4 passed.`
+
+D2b remains unwired. These checks do not read or write browser storage and do
+not authorize autosave or production editing.
 
 ## Run Writer DB Checks
 

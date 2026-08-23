@@ -35,10 +35,12 @@ The Phase D contract is defined in
 deterministic `workshopText` edit planner over explicit WriterPackage arrays,
 expected `updatedAt`, and injected `now`, with artificial checks only. Pause
 before any write implementation. The D2 contract is in
-`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a now adds only pure strict
-Package collection parsing/serialization plus shared compatibility validation
-and clone rules, with D1 behavior unchanged. Review and publish D2a separately;
-do not start D2b persistence, D3 autosave state, D4 development wiring, Package
+`WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a is published at
+`25d37879f78e9837ebf960394847c8dc3af5ca28` with pure strict Package collection
+parsing/serialization plus shared compatibility validation and clone rules,
+with D1 behavior unchanged. D2b now adds only the isolated injected single-key
+coordinator and artificial fault-injection checks. Review and publish D2b
+separately; do not start D3 autosave state, D4 development wiring, Package
 creation, a draft key, or Package sync in the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy

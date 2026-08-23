@@ -6,13 +6,15 @@ This review defines D2 for persisting one D1 `workshopText` edit to the existing
 WriterPackage collection. The published foundation is:
 
 - Phase D contract: `f780e27627ee82e3a35fac891c99d0e2f60dd911`;
-- D1 pure planner: `362a0de3136dbeabe5864f7d5122fb30d61735f8`.
+- D1 pure planner: `362a0de3136dbeabe5864f7d5122fb30d61735f8`;
+- D2a strict collection codec: `25d37879f78e9837ebf960394847c8dc3af5ca28`.
 
-D2a now adds only the pure TypeScript codec and artificial checks defined below.
-It adds no React, CSS, storage read or write, storage key, browser adapter,
-timer, Google Drive behavior, import/export behavior, recovery behavior, route,
-or navigation. It does not authorize a deployment and does not read or log real
-author data.
+D2a adds only the pure TypeScript codec and artificial checks defined below.
+D2b adds only the injected coordinator and in-memory fault-injection harness.
+They add no React, CSS, production storage injection, storage key, browser
+adapter, timer, Google Drive behavior, import/export behavior, recovery
+behavior, route, or navigation. They do not authorize a deployment and do not
+read or log real author data.
 
 The planned D2 foundation remains isolated and synthetic/injected. It does not
 authorize autosave, a text editor, production wiring, or a second active
@@ -67,8 +69,8 @@ Split D2 into two separately reviewed implementation commits:
 - **D2b:** synchronous injected single-key persistence coordinator and an
   in-memory fault-injection harness.
 
-D2a must be published before D2b. D2b must remain unwired after publication.
-D3 autosave state and all React/browser composition remain later phases.
+D2a is published before D2b. D2b must remain unwired after publication. D3
+autosave state and all React/browser composition remain later phases.
 
 This split avoids duplicating Package validation inside the persistence
 coordinator and keeps the first next change write-free.
@@ -121,7 +123,7 @@ network, Google Drive, import/export, persistence, recovery, or logging API.
 
 ## D2b Injected Single-Key Coordinator
 
-The future D2b coordinator receives all effects explicitly:
+The D2b coordinator receives all effects explicitly:
 
 ```ts
 type WriterPackageWorkshopStorage = Readonly<{
@@ -139,15 +141,17 @@ type PersistWriterPackageWorkshopEditInput = Readonly<{
 }>;
 ```
 
-Production composition, if later approved, may inject only the existing key:
+A future production composition, if later approved, may inject only the
+existing key:
 
 ```text
 lassilab-writer:v0.1:packages
 ```
 
-D2b introduces no constant or new storage key. Synthetic checks may use an
+D2b introduces no constant or new storage key. Its synthetic checks use an
 artificial injected key. The coordinator calls no direct `window.localStorage`
-and its storage interface intentionally has no `removeItem`.
+and its storage interface intentionally has no `removeItem`. It remains
+unwired.
 
 ## Required Success Sequence
 
@@ -307,6 +311,6 @@ D2 does not implement or authorize:
 
 ## Smallest Next Step
 
-Complete the final safety review and publish D2a as its own write-free commit.
-Do not add the injected D2b storage coordinator, D3 autosave state, or any UI or
-production composition in that commit.
+Complete the final safety review and publish D2b as its own isolated commit. Do
+not add D3 autosave state, any UI, browser storage composition, browser locking,
+draft recovery, or production composition in that commit.

@@ -298,9 +298,11 @@ collection codec so malformed, non-array, unsupported, invalid, or duplicate
 Package storage can never collapse to an empty or filtered array. Its shared
 compatibility validation and detached frozen clone rules are reused by D1;
 unknown-key rejection remains exclusive to the strict raw boundary so D1
-behavior does not change. D2b later uses only an injected `getItem`/`setItem`
-interface and one injected existing Package key. It must not use `removeItem`,
-a backup key, an import marker, or the filtering production loader.
+behavior does not change. D2b uses only an injected `getItem`/`setItem`
+interface and one injected existing Package key. It does not use `removeItem`,
+a backup key, an import marker, or the filtering production loader. Its
+synthetic coordinator reports `saved` only after exact raw, strict parse, and
+complete semantic read-back verification; it remains unwired.
 
 After a D2b write attempt, exact previous-raw rollback is allowed only when the
 current raw value is still the previous value or the exact planned value. An

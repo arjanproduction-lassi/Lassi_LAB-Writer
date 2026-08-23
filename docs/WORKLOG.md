@@ -1,5 +1,25 @@
 # Worklog
 
+## 2026-08-23 - WriterPackage D2b injected workshop persistence
+
+- Added `writerPackageWorkshopPersistence.ts` as a synchronous coordinator over
+  an injected `getItem`/`setItem` interface and one injected non-empty key.
+- The coordinator reads and strictly parses the complete existing Package
+  collection, calls D1 once, writes only a ready plan, and reports `saved` only
+  after exact raw, strict parse, and semantic read-back verification.
+- Added conditional exact-raw rollback: previous raw is restored only when the
+  current value is exactly planned; an already restored value is verified
+  without another write, and missing or unexpected third values are never
+  overwritten.
+- Added 31 artificial fault-injection checks and four isolation checks covering
+  zero-write blocks/conflicts, write and read-back failures, rollback throws,
+  exact byte restoration, text-free failures, and one-key-only operation.
+- Added no production storage injection, direct localStorage, `removeItem`, new
+  key, React, editor, autosave, browser lock, clock, timer, network, Google
+  Drive, import/export, recovery, logging, or real author-data access.
+- D3 autosave state, D4 development wiring, and production editing remain
+  unstarted.
+
 ## 2026-08-22 - WriterPackage D2a pure strict collection codec
 
 - Added `writerPackageCollectionCodec.ts` as an explicit-input-only strict

@@ -52,7 +52,8 @@ try {
       "src/writerLibraryReadOnlyProviderChecks.ts",
       "src/productShellReadOnlyDetailChecks.ts",
       "src/writerPackageCollectionCodecChecks.ts",
-      "src/writerPackageWorkshopEditChecks.ts"
+      "src/writerPackageWorkshopEditChecks.ts",
+      "src/writerPackageWorkshopPersistenceChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -169,6 +170,16 @@ try {
 
   if (workshopEditRun.status !== 0) {
     process.exit(workshopEditRun.status ?? 1);
+  }
+
+  const workshopPersistenceRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerPackageWorkshopPersistenceChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (workshopPersistenceRun.status !== 0) {
+    process.exit(workshopPersistenceRun.status ?? 1);
   }
 
   const workshopEditSource = readFileSync(
@@ -320,6 +331,79 @@ try {
 
   console.log(
     `WriterPackage collection codec isolation checks: ${packageCollectionCodecIsolationChecks}/${packageCollectionCodecIsolationChecks} passed.`
+  );
+
+  const workshopPersistenceSource = readFileSync(
+    resolve(repoRoot, "src/writerPackageWorkshopPersistence.ts"),
+    "utf8"
+  ).toLowerCase();
+  let workshopPersistenceIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (workshopPersistenceSource.includes(pattern)) {
+      throw new Error(`D2b workshop persistence contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  workshopPersistenceIsolationChecks += 1;
+
+  for (const pattern of [
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "deletewriter",
+    "persistwriterdbimport",
+    "writerdbpersistence",
+    "writerdbrecovery",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "googledrive"
+  ]) {
+    if (workshopPersistenceSource.includes(pattern)) {
+      throw new Error(`D2b workshop persistence contains forbidden write or network dependency: ${pattern}`);
+    }
+  }
+  workshopPersistenceIsolationChecks += 1;
+
+  for (const pattern of [
+    "date.now",
+    "math.random",
+    "crypto.",
+    "settimeout",
+    "setinterval",
+    "performance.",
+    "console."
+  ]) {
+    if (workshopPersistenceSource.includes(pattern)) {
+      throw new Error(`D2b workshop persistence contains forbidden nondeterminism or logging: ${pattern}`);
+    }
+  }
+  workshopPersistenceIsolationChecks += 1;
+
+  if (
+    productionPackageCodecEntries.includes("writerpackageworkshoppersistence") ||
+    workshopPersistenceSource.includes("lassilab-writer:") ||
+    !workshopPersistenceSource.includes("input.storage.getitem(input.key)") ||
+    !workshopPersistenceSource.includes("input.storage.setitem(input.key")
+  ) {
+    throw new Error("D2b workshop persistence must remain unwired, key-injected, and single-key only.");
+  }
+  workshopPersistenceIsolationChecks += 1;
+
+  console.log(
+    `WriterPackage workshop persistence isolation checks: ${workshopPersistenceIsolationChecks}/${workshopPersistenceIsolationChecks} passed.`
   );
 
   let isolationChecks = 0;
