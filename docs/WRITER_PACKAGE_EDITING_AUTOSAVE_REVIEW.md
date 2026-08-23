@@ -418,10 +418,11 @@ Use a disposable WriterPackage in a disposable browser profile:
   as an isolated phase with no storage or UI wiring.
 - **D2:** injected existing-key persistence coordinator and in-memory storage
   checks only; D2a and D2b are published separately and remain unwired.
-- **D3:** pure autosave state machine and artificial concurrency checks; now
-  implemented locally with no runtime wiring.
+- **D3:** pure autosave state machine and artificial concurrency checks;
+  published with no runtime wiring.
 - **D4:** exact development-only edit mode with one editable `workshopText`
-  surface.
+  surface. D4a is published; the injected, synthetic D4b session is implemented
+  locally and remains unwired.
 - **D5:** disposable-profile manual acceptance and final isolation review.
 - **D6:** separate docs decision for crash-recoverable Package drafts.
 - **D7:** separate docs decision for local-only versus Package sync readiness.
@@ -430,7 +431,7 @@ D1-D7 must not be collapsed into one production change.
 
 ## Out Of Scope
 
-The current D1-D3 slices do not implement or authorize:
+The current D1-D4b slices do not implement or authorize:
 
 - any React, CSS, entry, route, production runtime, or build behavior change;
 - real storage reads or writes;
@@ -448,10 +449,10 @@ The current D1-D3 slices do not implement or authorize:
 
 ## Smallest Next Step
 
-D3 is published at `8bf0d20e4b83eae0907ac89689716db1d34a1579`. The exact
-docs-only D4 composition and single-writer decision is defined in
-`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. Implement only its D4a
-pure result bridge next. D4a is now implemented locally with artificial checks;
-complete its final safety review and publish it separately. Do not start D4b,
-React, browser storage, Web Locks, timers, draft recovery, or a new storage key
-in the same commit.
+D4a is published at `b110a0de6198c9aece6ba36df61285912155e84c`. The exact D4
+composition and single-writer decision is defined in
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4b now implements only
+the injected editing session with artificial checks. Complete its final safety
+review and publish it separately. Do not start D4c, React, browser storage,
+actual Web Locks, timers, draft recovery, or a new storage key in the same
+commit.

@@ -70,12 +70,14 @@ It remains unwired.
 The docs-only D4 contract is in
 `WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. It chooses one
 development-only global Web Lock for the complete Package collection, strict
-fresh-Package readiness, and a D4a-D4d sequence. The smallest next slice is
-only D4a. It now adds a pure typed D2b-result to D3-event bridge with artificial
-checks. It returns only the frozen D3 transition, refresh permission, and an
-optional stable blocked reason; it never returns the Package or invokes D2b.
-It remains unwired. D4b session ownership, React, browser storage, locks,
-timers, crash recovery, production editing, and Package sync remain unstarted.
+fresh-Package readiness, and a D4a-D4d sequence. D4a is published at
+`b110a0de6198c9aece6ba36df61285912155e84c` as the pure typed D2b-result to
+D3-event bridge. D4b now adds a locally implemented injected editing session:
+write-free fresh open, private draft ownership, one persistence dependency call
+per accepted D3 command, D4a result mapping, explicit safe retry, conflict and
+unsafe blocking, and D3 exit guards. It remains synthetic and unwired. React,
+browser storage, actual Web Locks, timers, crash recovery, production editing,
+and Package sync remain unstarted. The next implementation gate is only D4c.
 
 ## Legacy Spark Retirement Planning
 

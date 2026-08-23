@@ -122,6 +122,23 @@ The bridge does not call persistence. It accepts only an already-produced D2b
 result, delegates transition validity to D3, and never returns the result's
 Package or author content.
 
+D4b checks compose the published pure layers through injected functions only.
+They cover write-free fresh open, lock/inspection/readiness rejection, one
+accepted save to one persistence call, timestamp acquisition only after an
+accepted command, duplicate-save rejection, editing during save, conflict,
+explicit safe retry, unsafe blocking, lost ownership, invalid/throwing
+dependencies, refresh validation, and protected exit/close behavior.
+
+Expected D4b additions in `npm run check:product-shell`:
+
+- `WriterPackage workshop editing session checks: 23/23 passed.`
+- `WriterPackage workshop editing session isolation checks: 4/4 passed.`
+
+D4b uses artificial Packages and injected ownership, inspection, time, release,
+and persistence functions. It does not use React, browser globals,
+`localStorage`, the production Package key, Web Locks, timers, network,
+production entries, or real author data. It does not implement D4c or D4d.
+
 ## Run Writer DB Checks
 
 Writer DB v2 has a small local check harness. It does not use production UI,

@@ -12,12 +12,14 @@ The published foundation is:
 - D2b injected persistence coordinator:
   `90291b81967eb012bacafd69fd2c3987c55eb294`;
 - D3 pure autosave state machine:
-  `8bf0d20e4b83eae0907ac89689716db1d34a1579`.
+  `8bf0d20e4b83eae0907ac89689716db1d34a1579`;
+- D4a pure result bridge:
+  `b110a0de6198c9aece6ba36df61285912155e84c`.
 
 This review adds no React, CSS, browser lock, storage access, storage key,
-timer, route, navigation, deployment, or real author-data test. D4a now adds
-only the pure typed result bridge and artificial checks described below. It
-remains unwired; D4b-D4d remain unimplemented.
+timer, route, navigation, deployment, or real author-data test. D4a is
+published. D4b now adds only the injected editing session and artificial checks
+described below. It remains unwired; D4c-D4d remain unimplemented.
 
 Production editing remains **NO-GO**. D4 is only a disposable-profile
 development gate; it does not resolve crash recovery or cross-device Package
@@ -35,9 +37,10 @@ coordination, browser persistence, timers, and React rendering in one commit
 would make the first real Package write too difficult to review. D4 is split
 into narrow gates:
 
-- **D4a:** pure typed bridge from D2b results to D3 events and view status; now
-  implemented locally with artificial checks;
+- **D4a:** published pure typed bridge from D2b results to D3 events and view
+  status;
 - **D4b:** injected development editing session with private draft ownership;
+  now implemented locally with artificial checks;
 - **D4c:** browser lock and storage adapters, still without React;
 - **D4d:** exact DEV-only product-shell UI wiring and synthetic integration
   checks;
@@ -139,15 +142,17 @@ The Package is not returned by D4a.
 
 ## D4b Injected Editing Session
 
-The session owns Package ID, current draft, and selected Package privately. Its
-public autosave state and failure metadata remain text-free. Dependencies are
-injected:
+The session owns Package ID, current draft, and selected detached Package
+privately. Its public autosave state and failure metadata remain text-free.
+Dependencies are injected:
 
 - fresh editable-Package inspector;
-- one D2b persistence function;
+- one persistence function matching the D2b result contract;
 - current-time supplier used only for an accepted save command;
-- lock acquire/release boundary;
-- debounce scheduler/canceller supplied later by the thin browser/UI layer.
+- write-ownership check and release boundary.
+
+The browser Web Lock acquisition and debounce scheduler/canceller are not D4b
+dependencies; they remain D4c browser responsibilities.
 
 Opening a session performs no write. One text edit updates the private draft
 and applies D3 `edited`. One accepted debounce applies `save-requested`; only
@@ -266,6 +271,6 @@ D4 does not add or authorize:
 
 ## Smallest Next Step
 
-Complete the final safety review and publish D4a as its own isolated pure
-bridge commit. Do not start D4b, React, browser storage, Web Locks, timers,
-mode changes, CSS, or real editing in the same commit.
+Complete the final safety review and publish D4b as its own isolated injected
+session commit. Do not start D4c, React, browser storage, actual Web Locks,
+timers, mode changes, CSS, or real editing in the same commit.

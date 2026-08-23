@@ -338,6 +338,18 @@ refresh permission, and an optional stable blocked reason. It never returns
 the persistence result's WriterPackage, Package identity, or author content,
 never calls D2b, and remains unwired.
 
+D4b composes the published D2b, D3, and D4a contracts behind injected
+dependencies. The session privately owns the selected detached WriterPackage,
+current `workshopText`, and autosave state. Opening is write-free: editable
+status requires injected write ownership plus a freshly inspected valid, live
+Package with the exact requested ID and `updatedAt`. Only an accepted D3 save
+or retry command requests one injected timestamp and one injected persistence
+call. The D4a bridge maps its typed result; a late success cannot erase a newer
+draft, conflict never retries automatically, and safe/unsafe failure remain
+distinct. Exit decisions remain owned by D3. D4b does not acquire a browser
+lock, access storage, schedule a timer, use React, create a key, or wire a real
+editor; those remain later D4c/D4d gates.
+
 ## Writer DB v2 Proposal
 
 This is a cautious rollout model. Production import/export and Google Drive sync

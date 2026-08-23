@@ -1,5 +1,27 @@
 # Worklog
 
+## 2026-08-23 - WriterPackage D4b injected editing session
+
+- Added `writerPackageWorkshopEditingSession.ts` as an injected composition of
+  the published strict Package codec, D3 state/exit guards, and D4a result
+  bridge.
+- Opening is write-free. Editability requires injected write ownership and one
+  fresh valid, live Package with the exact requested ID and `updatedAt`;
+  missing, damaged, deleted, stale, or ownership-denied input stays read-only.
+- The session privately retains the detached selected Package and current
+  `workshopText`. Only an accepted D3 save or retry command asks for one
+  injected timestamp and invokes one injected persistence function.
+- Preserved duplicate-save rejection, newer edits during an older save,
+  conflict without automatic retry, explicit safe retry, unsafe blocking,
+  result refresh validation, and D3-owned protected exit decisions.
+- Added 23 artificial session checks and four source-isolation checks. Public
+  autosave state and failure metadata remain text-free; fixtures contain only
+  synthetic content.
+- Added no React, CSS, browser global, localStorage access, production Package
+  key, Web Lock acquisition, timer, network, new key, production entry wiring,
+  real author-data read/write, commit, push, or deployment.
+- D4c browser lock/storage/time/timer adapters and D4d UI remain unstarted.
+
 ## 2026-08-23 - WriterPackage D4a pure autosave result bridge
 
 - Added `writerPackageWorkshopAutosaveBridge.ts` as a pure typed boundary from
@@ -17,7 +39,7 @@
 - Added no React, CSS, storage access, persistence call, Web Lock, timer, clock,
   browser API, mode change, new key, network, Google Drive, import/export,
   recovery, logging, real author data, or production wiring.
-- D4b session ownership and every first real read/write remain unstarted.
+- D4a was published at `b110a0de6198c9aece6ba36df61285912155e84c`.
 
 ## 2026-08-23 - WriterPackage D4 development wiring review (docs only)
 

@@ -55,7 +55,8 @@ try {
       "src/writerPackageWorkshopEditChecks.ts",
       "src/writerPackageWorkshopPersistenceChecks.ts",
       "src/writerPackageWorkshopAutosaveStateChecks.ts",
-      "src/writerPackageWorkshopAutosaveBridgeChecks.ts"
+      "src/writerPackageWorkshopAutosaveBridgeChecks.ts",
+      "src/writerPackageWorkshopEditingSessionChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -202,6 +203,16 @@ try {
 
   if (workshopAutosaveBridgeRun.status !== 0) {
     process.exit(workshopAutosaveBridgeRun.status ?? 1);
+  }
+
+  const workshopEditingSessionRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerPackageWorkshopEditingSessionChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (workshopEditingSessionRun.status !== 0) {
+    process.exit(workshopEditingSessionRun.status ?? 1);
   }
 
   const workshopEditSource = readFileSync(
@@ -573,6 +584,80 @@ try {
 
   console.log(
     `WriterPackage workshop autosave bridge isolation checks: ${workshopAutosaveBridgeIsolationChecks}/${workshopAutosaveBridgeIsolationChecks} passed.`
+  );
+
+  const workshopEditingSessionSource = readFileSync(
+    resolve(repoRoot, "src/writerPackageWorkshopEditingSession.ts"),
+    "utf8"
+  ).toLowerCase();
+  let workshopEditingSessionIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (workshopEditingSessionSource.includes(pattern)) {
+      throw new Error(`D4b workshop editing session contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  workshopEditingSessionIsolationChecks += 1;
+
+  for (const pattern of [
+    "persistwriterpackageworkshopedit(",
+    "writer_package_storage_key",
+    "lassilab-writer:",
+    "getitem(",
+    "setitem(",
+    "removeitem(",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "googledrive"
+  ]) {
+    if (workshopEditingSessionSource.includes(pattern)) {
+      throw new Error(`D4b workshop editing session contains forbidden direct effect dependency: ${pattern}`);
+    }
+  }
+  workshopEditingSessionIsolationChecks += 1;
+
+  for (const pattern of [
+    "date.now",
+    "new date",
+    "math.random",
+    "crypto.",
+    "settimeout",
+    "setinterval",
+    "performance.",
+    "console."
+  ]) {
+    if (workshopEditingSessionSource.includes(pattern)) {
+      throw new Error(`D4b workshop editing session contains forbidden nondeterminism or logging: ${pattern}`);
+    }
+  }
+  workshopEditingSessionIsolationChecks += 1;
+
+  if (
+    productionPackageCodecEntries.includes("writerpackageworkshopeditingsession") ||
+    !workshopEditingSessionSource.includes("inspecteditablepackage") ||
+    !workshopEditingSessionSource.includes("haswriteownership") ||
+    !workshopEditingSessionSource.includes("dependencies.persistworkshopedit") ||
+    !workshopEditingSessionSource.includes("applywriterpackageworkshoppersistenceresult")
+  ) {
+    throw new Error("D4b workshop editing session must remain unwired and use only injected readiness, ownership, persistence, and D4a.");
+  }
+  workshopEditingSessionIsolationChecks += 1;
+
+  console.log(
+    `WriterPackage workshop editing session isolation checks: ${workshopEditingSessionIsolationChecks}/${workshopEditingSessionIsolationChecks} passed.`
   );
 
   let isolationChecks = 0;
