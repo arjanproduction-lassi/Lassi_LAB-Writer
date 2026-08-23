@@ -14,9 +14,10 @@ The published foundation is:
 - D3 pure autosave state machine:
   `8bf0d20e4b83eae0907ac89689716db1d34a1579`.
 
-This review adds no runtime, React, CSS, browser lock, storage access, storage
-key, timer, route, navigation, deployment, or real author-data test. D4 remains
-unimplemented until its slices are reviewed separately.
+This review adds no React, CSS, browser lock, storage access, storage key,
+timer, route, navigation, deployment, or real author-data test. D4a now adds
+only the pure typed result bridge and artificial checks described below. It
+remains unwired; D4b-D4d remain unimplemented.
 
 Production editing remains **NO-GO**. D4 is only a disposable-profile
 development gate; it does not resolve crash recovery or cross-device Package
@@ -34,7 +35,8 @@ coordination, browser persistence, timers, and React rendering in one commit
 would make the first real Package write too difficult to review. D4 is split
 into narrow gates:
 
-- **D4a:** pure typed bridge from D2b results to D3 events and view status;
+- **D4a:** pure typed bridge from D2b results to D3 events and view status; now
+  implemented locally with artificial checks;
 - **D4b:** injected development editing session with private draft ownership;
 - **D4c:** browser lock and storage adapters, still without React;
 - **D4d:** exact DEV-only product-shell UI wiring and synthetic integration
@@ -264,6 +266,6 @@ D4 does not add or authorize:
 
 ## Smallest Next Step
 
-Implement only D4a: the pure typed D2b-result to D3-event bridge with artificial
-text-free checks. Do not add React, browser storage, Web Locks, timers, mode
-changes, CSS, or real editing in the same commit.
+Complete the final safety review and publish D4a as its own isolated pure
+bridge commit. Do not start D4b, React, browser storage, Web Locks, timers,
+mode changes, CSS, or real editing in the same commit.

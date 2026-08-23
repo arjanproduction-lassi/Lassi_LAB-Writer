@@ -71,9 +71,11 @@ The docs-only D4 contract is in
 `WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. It chooses one
 development-only global Web Lock for the complete Package collection, strict
 fresh-Package readiness, and a D4a-D4d sequence. The smallest next slice is
-only D4a: a pure typed D2b-result to D3-event bridge. React, browser storage,
-locks, timers, crash recovery, production editing, and Package sync remain
-unstarted.
+only D4a. It now adds a pure typed D2b-result to D3-event bridge with artificial
+checks. It returns only the frozen D3 transition, refresh permission, and an
+optional stable blocked reason; it never returns the Package or invokes D2b.
+It remains unwired. D4b session ownership, React, browser storage, locks,
+timers, crash recovery, production editing, and Package sync remain unstarted.
 
 ## Legacy Spark Retirement Planning
 

@@ -113,6 +113,15 @@ revisions, non-mutation, text-free public output, and zero React/browser/
 storage/time/logging dependencies. D4a does not run a real editor or access
 localStorage.
 
+Expected D4a additions in `npm run check:product-shell`:
+
+- `WriterPackage workshop autosave bridge checks: 19/19 passed.`
+- `WriterPackage workshop autosave bridge isolation checks: 4/4 passed.`
+
+The bridge does not call persistence. It accepts only an already-produced D2b
+result, delegates transition validity to D3, and never returns the result's
+Package or author content.
+
 ## Run Writer DB Checks
 
 Writer DB v2 has a small local check harness. It does not use production UI,

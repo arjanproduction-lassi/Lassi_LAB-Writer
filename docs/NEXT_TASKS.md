@@ -45,10 +45,11 @@ published at `8bf0d20e4b83eae0907ac89689716db1d34a1579` as the pure
 text-free autosave state machine.
 
 The D4 single-writer and development wiring contract is defined in
-`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. Implement only D4a
-next: the pure typed D2b-result to D3-event bridge with artificial data. Do not
-add React, browser storage, Web Locks, timers, Package creation, a draft key,
-production editing, or Package sync in the same commit.
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4a now adds only the
+pure typed D2b-result to D3-event bridge with artificial data. Review and
+publish D4a separately; do not start D4b, React, browser storage, Web Locks,
+timers, Package creation, a draft key, production editing, or Package sync in
+the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

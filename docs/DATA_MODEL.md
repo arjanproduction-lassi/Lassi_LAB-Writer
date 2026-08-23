@@ -331,6 +331,13 @@ tombstones, stale snapshots, missing/damaged collections, or absent lock remain
 read-only. Production autosave remains blocked pending draft recovery and a
 separate production concurrency decision.
 
+D4a is a pure result boundary between D2b and D3. It reads only the supplied
+persistence result discriminant, timestamps, and text-free failure facts, then
+delegates transition validity to D3. Its frozen output contains a transition,
+refresh permission, and an optional stable blocked reason. It never returns
+the persistence result's WriterPackage, Package identity, or author content,
+never calls D2b, and remains unwired.
+
 ## Writer DB v2 Proposal
 
 This is a cautious rollout model. Production import/export and Google Drive sync

@@ -451,5 +451,7 @@ The current D1-D3 slices do not implement or authorize:
 D3 is published at `8bf0d20e4b83eae0907ac89689716db1d34a1579`. The exact
 docs-only D4 composition and single-writer decision is defined in
 `WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. Implement only its D4a
-pure result bridge next. Do not add React, browser storage, Web Locks, timers,
-draft recovery, or a new storage key in the same commit.
+pure result bridge next. D4a is now implemented locally with artificial checks;
+complete its final safety review and publish it separately. Do not start D4b,
+React, browser storage, Web Locks, timers, draft recovery, or a new storage key
+in the same commit.

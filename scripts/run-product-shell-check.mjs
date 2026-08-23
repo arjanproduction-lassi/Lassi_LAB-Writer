@@ -54,7 +54,8 @@ try {
       "src/writerPackageCollectionCodecChecks.ts",
       "src/writerPackageWorkshopEditChecks.ts",
       "src/writerPackageWorkshopPersistenceChecks.ts",
-      "src/writerPackageWorkshopAutosaveStateChecks.ts"
+      "src/writerPackageWorkshopAutosaveStateChecks.ts",
+      "src/writerPackageWorkshopAutosaveBridgeChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -191,6 +192,16 @@ try {
 
   if (workshopAutosaveStateRun.status !== 0) {
     process.exit(workshopAutosaveStateRun.status ?? 1);
+  }
+
+  const workshopAutosaveBridgeRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerPackageWorkshopAutosaveBridgeChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (workshopAutosaveBridgeRun.status !== 0) {
+    process.exit(workshopAutosaveBridgeRun.status ?? 1);
   }
 
   const workshopEditSource = readFileSync(
@@ -489,6 +500,79 @@ try {
 
   console.log(
     `WriterPackage workshop autosave state isolation checks: ${workshopAutosaveStateIsolationChecks}/${workshopAutosaveStateIsolationChecks} passed.`
+  );
+
+  const workshopAutosaveBridgeSource = readFileSync(
+    resolve(repoRoot, "src/writerPackageWorkshopAutosaveBridge.ts"),
+    "utf8"
+  ).toLowerCase();
+  let workshopAutosaveBridgeIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (workshopAutosaveBridgeSource.includes(pattern)) {
+      throw new Error(`D4a workshop autosave bridge contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  workshopAutosaveBridgeIsolationChecks += 1;
+
+  for (const pattern of [
+    "persistwriterpackageworkshopedit(",
+    "getitem(",
+    "setitem(",
+    "removeitem(",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "googledrive"
+  ]) {
+    if (workshopAutosaveBridgeSource.includes(pattern)) {
+      throw new Error(`D4a workshop autosave bridge contains forbidden effect dependency: ${pattern}`);
+    }
+  }
+  workshopAutosaveBridgeIsolationChecks += 1;
+
+  for (const pattern of [
+    "date.now",
+    "math.random",
+    "crypto.",
+    "settimeout",
+    "setinterval",
+    "performance.",
+    "console."
+  ]) {
+    if (workshopAutosaveBridgeSource.includes(pattern)) {
+      throw new Error(`D4a workshop autosave bridge contains forbidden nondeterminism or logging: ${pattern}`);
+    }
+  }
+  workshopAutosaveBridgeIsolationChecks += 1;
+
+  if (
+    productionPackageCodecEntries.includes("writerpackageworkshopautosavebridge") ||
+    workshopAutosaveBridgeSource.includes("workshoptext") ||
+    workshopAutosaveBridgeSource.includes("packageid") ||
+    workshopAutosaveBridgeSource.includes("sparktext") ||
+    workshopAutosaveBridgeSource.includes("finaltext") ||
+    !workshopAutosaveBridgeSource.includes("import type") ||
+    !workshopAutosaveBridgeSource.includes("applywriterpackageworkshopautosaveevent")
+  ) {
+    throw new Error("D4a workshop autosave bridge must remain unwired, text-free, type-only toward D2b, and delegated to D3.");
+  }
+  workshopAutosaveBridgeIsolationChecks += 1;
+
+  console.log(
+    `WriterPackage workshop autosave bridge isolation checks: ${workshopAutosaveBridgeIsolationChecks}/${workshopAutosaveBridgeIsolationChecks} passed.`
   );
 
   let isolationChecks = 0;
