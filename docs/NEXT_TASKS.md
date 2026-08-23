@@ -38,10 +38,12 @@ before any write implementation. The D2 contract is in
 `WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a is published at
 `25d37879f78e9837ebf960394847c8dc3af5ca28` with pure strict Package collection
 parsing/serialization plus shared compatibility validation and clone rules,
-with D1 behavior unchanged. D2b now adds only the isolated injected single-key
-coordinator and artificial fault-injection checks. Review and publish D2b
-separately; do not start D3 autosave state, D4 development wiring, Package
-creation, a draft key, or Package sync in the same commit.
+with D1 behavior unchanged. D2b is published at
+`90291b81967eb012bacafd69fd2c3987c55eb294` as the isolated injected single-key
+coordinator and artificial fault-injection checks; it remains unwired. D3 now
+adds only the pure text-free autosave state machine and artificial checks.
+Review and publish D3 separately; do not start D4 development wiring, browser
+locking, Package creation, a draft key, or Package sync in the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

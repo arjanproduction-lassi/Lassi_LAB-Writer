@@ -49,18 +49,26 @@ D1 adds only a pure deterministic edit planner for `workshopText` on one
 explicitly supplied real WriterPackage collection, plus artificial checks. It
 is not wired to storage or UI. Title, `sparkText`, notes, `finalText`, adapted
 Sparks, production navigation, Google sync, and Package creation remain
-unchanged. D2 persistence, D3 autosave state, D4 development UI, crash-recovery,
-and Package-sync decisions stay separate and unstarted.
+unchanged.
 
 The detailed D2 contract is in
 `WRITER_PACKAGE_WORKSHOP_PERSISTENCE_REVIEW.md`. D2a is published at
 `25d37879f78e9837ebf960394847c8dc3af5ca28`: it adds the pure strict Package
 collection codec and makes D1 reuse its compatibility validation and clone
 rules without behavior change. It remains explicit-input-only and unwired. D2b
-adds the separately isolated injected one-key coordinator with
-exact raw, strict parse, and semantic read-back verification. Conditional
-exact-raw rollback never overwrites an unexpected concurrent value. D2b remains
-unwired, and D3/D4 stay separate and unstarted.
+is published at `90291b81967eb012bacafd69fd2c3987c55eb294`: it adds the
+separately isolated injected one-key coordinator with exact raw, strict parse,
+and semantic read-back verification. Conditional exact-raw rollback never
+overwrites an unexpected concurrent value. It remains unwired.
+
+D3 now adds only a pure deterministic autosave state machine and artificial
+checks. It keeps public state and commands text-free, captures local revision
+and base `updatedAt` for one save, preserves newer edits after an older save
+finishes, distinguishes conflict/safe/unsafe failure, and guards every exit
+path that could discard an unsaved draft. It does not call D2b, storage, React,
+browser APIs, clocks, or timers and remains unwired. D4 development UI,
+crash-recovery, browser concurrency, and Package-sync decisions remain
+unstarted.
 
 ## Legacy Spark Retirement Planning
 

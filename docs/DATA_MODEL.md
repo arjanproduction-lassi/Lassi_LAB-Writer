@@ -310,6 +310,17 @@ unexpected third value is never overwritten because it may belong to another
 tab. D2 does not provide atomic cross-tab compare-and-set; production autosave
 remains blocked pending a separate concurrency decision.
 
+D3 adds only a pure, deterministic, text-free workshop autosave state machine.
+It tracks a monotonically increasing local revision and captures that revision
+plus the base `updatedAt` when it emits one typed persistence command. Editing
+during a save advances the local revision, so a late success may advance the
+verified base but cannot mark the newer draft saved. Conflict, safe failure,
+and unsafe failure remain distinct; safe retry is explicit and unsafe retry is
+blocked. One pure guard covers package switch, layer switch, Library return,
+reset, and unload so unsaved text cannot be discarded silently. D3 owns no
+draft text, clock, debounce, React, browser API, storage access, or D2b call and
+remains unwired.
+
 ## Writer DB v2 Proposal
 
 This is a cautious rollout model. Production import/export and Google Drive sync

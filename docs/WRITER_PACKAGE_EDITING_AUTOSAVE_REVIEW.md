@@ -10,11 +10,13 @@ closed read-only Library/detail work published through
 D1 is implemented as a pure planner plus artificial checks. D2a adds only a
 pure strict Package collection codec and moves D1's compatibility validation
 and clone rules into that shared layer without changing planner behavior. D2b
-adds only the injected single-key coordinator and artificial fault-injection
-checks. These slices change no React, CSS, storage key, WriterPackage shape,
-Writer DB format, import/export behavior, recovery behavior, Google Drive
-payload, production route, or navigation. They read no real author data or
-browser storage.
+is published at `90291b81967eb012bacafd69fd2c3987c55eb294` as the injected
+single-key coordinator and artificial fault-injection checks. D3 now adds only
+the pure text-free autosave state machine and artificial checks. These slices
+change no React, CSS, storage key, WriterPackage shape, Writer DB format,
+import/export behavior, recovery behavior, Google Drive payload, production
+route, or navigation. They read no real author data or browser storage and
+remain unwired.
 
 Phase D must remain separate from:
 
@@ -225,7 +227,8 @@ must not enter public failure copy or logs.
 
 ## D3 Pure Autosave State Machine
 
-Autosave coordination should be pure before React wiring. Recommended states:
+D3 implements autosave coordination as a pure state machine before any React
+wiring. Its states are:
 
 - `read-only`;
 - `clean`;
@@ -256,8 +259,13 @@ Rules:
 - public state and reasons remain text-free; author content stays in the private
   editor/controller boundary.
 
-The pure state machine owns no clock, debounce, storage, browser event,
-React state, or network call.
+`createWriterPackageWorkshopAutosaveState()` creates the initial state,
+`applyWriterPackageWorkshopAutosaveEvent()` applies one explicit event and may
+emit one text-free `persist-workshop` command, and
+`inspectWriterPackageWorkshopExit()` guards package switch, layer switch,
+Library return, reset, and unload. The pure state machine owns no draft text,
+clock, debounce, storage, browser event, React state, D2b invocation, or network
+call.
 
 ## D4 Development-Only Workshop Wiring
 
@@ -409,8 +417,9 @@ Use a disposable WriterPackage in a disposable browser profile:
 - **D1:** pure `workshopText` edit planner and artificial checks only; completed
   as an isolated phase with no storage or UI wiring.
 - **D2:** injected existing-key persistence coordinator and in-memory storage
-  checks only.
-- **D3:** pure autosave state machine and artificial concurrency checks.
+  checks only; D2a and D2b are published separately and remain unwired.
+- **D3:** pure autosave state machine and artificial concurrency checks; now
+  implemented locally with no runtime wiring.
 - **D4:** exact development-only edit mode with one editable `workshopText`
   surface.
 - **D5:** disposable-profile manual acceptance and final isolation review.
@@ -421,7 +430,7 @@ D1-D7 must not be collapsed into one production change.
 
 ## Out Of Scope
 
-The D1 slice does not implement or authorize:
+The current D1-D3 slices do not implement or authorize:
 
 - any React, CSS, entry, route, production runtime, or build behavior change;
 - real storage reads or writes;
@@ -439,7 +448,7 @@ The D1 slice does not implement or authorize:
 
 ## Smallest Next Step
 
-D1, D2a, and the isolated D2b coordinator are implemented with artificial
-checks. Complete D2b's final safety review and publish it separately. Do not
-start D3 autosave state, React wiring, browser locking, draft recovery, or a new
-storage key in the same commit.
+D1, D2a, and the isolated D2b coordinator are published. D3 is implemented
+locally with artificial checks. Complete D3's final safety review and publish
+it separately. Do not start D4 React wiring, browser locking, draft recovery,
+or a new storage key in the same commit.

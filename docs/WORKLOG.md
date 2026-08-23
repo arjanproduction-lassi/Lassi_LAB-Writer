@@ -1,5 +1,27 @@
 # Worklog
 
+## 2026-08-23 - WriterPackage D3 pure workshop autosave state
+
+- Added `writerPackageWorkshopAutosaveState.ts` as a pure deterministic,
+  text-free state machine over explicit events and state only.
+- The state machine tracks a monotonically increasing local revision, captures
+  the active save revision and base `updatedAt`, allows only one active save,
+  and leaves a newer edit dirty when an older save completes.
+- Conflict, safe failure, and unsafe failure remain distinct. A safe failure
+  retains the draft and requires explicit retry; an unknown storage state
+  blocks retry. Inconsistent persistence-result facts are rejected.
+- Added one pure exit guard for package switch, layer switch, Library return,
+  reset, and unload. Dirty, saving, conflict, and both failure states require
+  explicit confirmation before a draft may be discarded.
+- Added 32 artificial state checks and four source-isolation checks covering
+  revision overflow, late/mismatched/invalid results, deterministic frozen
+  outputs, text-free commands, and non-mutating transitions.
+- Added no React, UI, editor text, clock, debounce, timer, browser API, storage
+  access, D2b coordinator call, new key, network, Google Drive, import/export,
+  recovery, logging, or real author-data access.
+- D4 development wiring, draft recovery, browser concurrency, and production
+  editing remain unstarted.
+
 ## 2026-08-23 - WriterPackage D2b injected workshop persistence
 
 - Added `writerPackageWorkshopPersistence.ts` as a synchronous coordinator over

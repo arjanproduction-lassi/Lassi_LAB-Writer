@@ -53,7 +53,8 @@ try {
       "src/productShellReadOnlyDetailChecks.ts",
       "src/writerPackageCollectionCodecChecks.ts",
       "src/writerPackageWorkshopEditChecks.ts",
-      "src/writerPackageWorkshopPersistenceChecks.ts"
+      "src/writerPackageWorkshopPersistenceChecks.ts",
+      "src/writerPackageWorkshopAutosaveStateChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -180,6 +181,16 @@ try {
 
   if (workshopPersistenceRun.status !== 0) {
     process.exit(workshopPersistenceRun.status ?? 1);
+  }
+
+  const workshopAutosaveStateRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerPackageWorkshopAutosaveStateChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (workshopAutosaveStateRun.status !== 0) {
+    process.exit(workshopAutosaveStateRun.status ?? 1);
   }
 
   const workshopEditSource = readFileSync(
@@ -404,6 +415,80 @@ try {
 
   console.log(
     `WriterPackage workshop persistence isolation checks: ${workshopPersistenceIsolationChecks}/${workshopPersistenceIsolationChecks} passed.`
+  );
+
+  const workshopAutosaveStateSource = readFileSync(
+    resolve(repoRoot, "src/writerPackageWorkshopAutosaveState.ts"),
+    "utf8"
+  ).toLowerCase();
+  let workshopAutosaveStateIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "writerpackagestorage",
+    "writerpackageworkshoppersistence",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "location.",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (workshopAutosaveStateSource.includes(pattern)) {
+      throw new Error(`D3 workshop autosave state contains forbidden runtime dependency: ${pattern}`);
+    }
+  }
+  workshopAutosaveStateIsolationChecks += 1;
+
+  for (const pattern of [
+    "getitem",
+    "setitem",
+    "removeitem",
+    "savewriter",
+    "upsertwriter",
+    "persistwriterpackageworkshopedit",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "googledrive"
+  ]) {
+    if (workshopAutosaveStateSource.includes(pattern)) {
+      throw new Error(`D3 workshop autosave state contains forbidden effect dependency: ${pattern}`);
+    }
+  }
+  workshopAutosaveStateIsolationChecks += 1;
+
+  for (const pattern of [
+    "date.now",
+    "math.random",
+    "crypto.",
+    "settimeout",
+    "setinterval",
+    "performance.",
+    "console."
+  ]) {
+    if (workshopAutosaveStateSource.includes(pattern)) {
+      throw new Error(`D3 workshop autosave state contains forbidden nondeterminism or logging: ${pattern}`);
+    }
+  }
+  workshopAutosaveStateIsolationChecks += 1;
+
+  if (
+    productionPackageCodecEntries.includes("writerpackageworkshopautosavestate") ||
+    workshopAutosaveStateSource.includes("workshoptext") ||
+    workshopAutosaveStateSource.includes("packageid") ||
+    !workshopAutosaveStateSource.includes("localrevision") ||
+    !workshopAutosaveStateSource.includes("expectedupdatedat")
+  ) {
+    throw new Error("D3 workshop autosave state must remain unwired, text-free, and revision-driven.");
+  }
+  workshopAutosaveStateIsolationChecks += 1;
+
+  console.log(
+    `WriterPackage workshop autosave state isolation checks: ${workshopAutosaveStateIsolationChecks}/${workshopAutosaveStateIsolationChecks} passed.`
   );
 
   let isolationChecks = 0;

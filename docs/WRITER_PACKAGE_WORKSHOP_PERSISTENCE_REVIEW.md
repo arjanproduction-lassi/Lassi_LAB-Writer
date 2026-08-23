@@ -7,7 +7,8 @@ WriterPackage collection. The published foundation is:
 
 - Phase D contract: `f780e27627ee82e3a35fac891c99d0e2f60dd911`;
 - D1 pure planner: `362a0de3136dbeabe5864f7d5122fb30d61735f8`;
-- D2a strict collection codec: `25d37879f78e9837ebf960394847c8dc3af5ca28`.
+- D2a strict collection codec: `25d37879f78e9837ebf960394847c8dc3af5ca28`;
+- D2b injected coordinator: `90291b81967eb012bacafd69fd2c3987c55eb294`.
 
 D2a adds only the pure TypeScript codec and artificial checks defined below.
 D2b adds only the injected coordinator and in-memory fault-injection harness.
@@ -16,7 +17,7 @@ adapter, timer, Google Drive behavior, import/export behavior, recovery
 behavior, route, or navigation. They do not authorize a deployment and do not
 read or log real author data.
 
-The planned D2 foundation remains isolated and synthetic/injected. It does not
+The published D2 foundation remains isolated and synthetic/injected. It does not
 authorize autosave, a text editor, production wiring, or a second active
 Package writer.
 
@@ -69,8 +70,9 @@ Split D2 into two separately reviewed implementation commits:
 - **D2b:** synchronous injected single-key persistence coordinator and an
   in-memory fault-injection harness.
 
-D2a is published before D2b. D2b must remain unwired after publication. D3
-autosave state and all React/browser composition remain later phases.
+D2a and D2b are published separately, and D2b remains unwired. D3 adds only a
+pure autosave state machine with artificial checks; all React/browser
+composition remains a later phase.
 
 This split avoids duplicating Package validation inside the persistence
 coordinator and keeps the first next change write-free.
@@ -311,6 +313,7 @@ D2 does not implement or authorize:
 
 ## Smallest Next Step
 
-Complete the final safety review and publish D2b as its own isolated commit. Do
-not add D3 autosave state, any UI, browser storage composition, browser locking,
-draft recovery, or production composition in that commit.
+D2b is published and remains unwired. Complete the final safety review and
+publish D3 as its own isolated pure-state commit. Do not add D4 UI, browser
+storage composition, browser locking, draft recovery, or production composition
+in that commit.

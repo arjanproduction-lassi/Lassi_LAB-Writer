@@ -90,6 +90,21 @@ Expected D2b additions in `npm run check:product-shell`:
 D2b remains unwired. These checks do not read or write browser storage and do
 not authorize autosave or production editing.
 
+D3 checks exercise only the pure autosave state machine with artificial,
+text-free events. They cover monotonic revisions, one active save, editing
+during a save, late results, explicit safe retry, blocked unsafe retry,
+conflicts, invalid results, immutable deterministic output, and all five exit
+guards.
+
+Expected D3 additions in `npm run check:product-shell`:
+
+- `WriterPackage workshop autosave state checks: 32/32 passed.`
+- `WriterPackage workshop autosave state isolation checks: 4/4 passed.`
+
+D3 does not invoke the D2b coordinator and has no real editor, storage,
+debounce, clock, React, browser, network, or author-data access. It remains
+unwired and does not authorize production autosave.
+
 ## Run Writer DB Checks
 
 Writer DB v2 has a small local check harness. It does not use production UI,
