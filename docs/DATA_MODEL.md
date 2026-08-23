@@ -321,6 +321,16 @@ reset, and unload so unsaved text cannot be discarded silently. D3 owns no
 draft text, clock, debounce, React, browser API, storage access, or D2b call and
 remains unwired.
 
+The D4 development composition must treat the WriterPackage collection as one
+global write domain because every D2b save rewrites the same complete existing
+key. Its docs-only contract chooses one exclusive non-persistent browser Web
+Lock for D4-aware tabs and no new storage key. Lock ownership alone is not
+write authority: a fresh exact raw read must also pass the D2a strict codec and
+match the selected real, live Package ID plus `updatedAt`. Adapted Sparks,
+tombstones, stale snapshots, missing/damaged collections, or absent lock remain
+read-only. Production autosave remains blocked pending draft recovery and a
+separate production concurrency decision.
+
 ## Writer DB v2 Proposal
 
 This is a cautious rollout model. Production import/export and Google Drive sync

@@ -11,12 +11,12 @@ D1 is implemented as a pure planner plus artificial checks. D2a adds only a
 pure strict Package collection codec and moves D1's compatibility validation
 and clone rules into that shared layer without changing planner behavior. D2b
 is published at `90291b81967eb012bacafd69fd2c3987c55eb294` as the injected
-single-key coordinator and artificial fault-injection checks. D3 now adds only
-the pure text-free autosave state machine and artificial checks. These slices
-change no React, CSS, storage key, WriterPackage shape, Writer DB format,
-import/export behavior, recovery behavior, Google Drive payload, production
-route, or navigation. They read no real author data or browser storage and
-remain unwired.
+single-key coordinator and artificial fault-injection checks. D3 is published
+at `8bf0d20e4b83eae0907ac89689716db1d34a1579` as the pure text-free autosave
+state machine and artificial checks. These slices change no React, CSS, storage
+key, WriterPackage shape, Writer DB format, import/export behavior, recovery
+behavior, Google Drive payload, production route, or navigation. They read no
+real author data or browser storage and remain unwired.
 
 Phase D must remain separate from:
 
@@ -448,7 +448,8 @@ The current D1-D3 slices do not implement or authorize:
 
 ## Smallest Next Step
 
-D1, D2a, and the isolated D2b coordinator are published. D3 is implemented
-locally with artificial checks. Complete D3's final safety review and publish
-it separately. Do not start D4 React wiring, browser locking, draft recovery,
-or a new storage key in the same commit.
+D3 is published at `8bf0d20e4b83eae0907ac89689716db1d34a1579`. The exact
+docs-only D4 composition and single-writer decision is defined in
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. Implement only its D4a
+pure result bridge next. Do not add React, browser storage, Web Locks, timers,
+draft recovery, or a new storage key in the same commit.

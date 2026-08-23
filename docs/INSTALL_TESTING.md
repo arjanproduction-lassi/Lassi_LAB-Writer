@@ -105,6 +105,14 @@ D3 does not invoke the D2b coordinator and has no real editor, storage,
 debounce, clock, React, browser, network, or author-data access. It remains
 unwired and does not authorize production autosave.
 
+The docs-only D4 boundary is defined in
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4a checks must use
+only artificial typed D2b results and D3 states. They must prove exact result
+mapping, preservation of rollback/storage facts, rejection of mismatched save
+revisions, non-mutation, text-free public output, and zero React/browser/
+storage/time/logging dependencies. D4a does not run a real editor or access
+localStorage.
+
 ## Run Writer DB Checks
 
 Writer DB v2 has a small local check harness. It does not use production UI,

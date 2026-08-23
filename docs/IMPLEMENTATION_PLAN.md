@@ -61,13 +61,18 @@ separately isolated injected one-key coordinator with exact raw, strict parse,
 and semantic read-back verification. Conditional exact-raw rollback never
 overwrites an unexpected concurrent value. It remains unwired.
 
-D3 now adds only a pure deterministic autosave state machine and artificial
-checks. It keeps public state and commands text-free, captures local revision
-and base `updatedAt` for one save, preserves newer edits after an older save
-finishes, distinguishes conflict/safe/unsafe failure, and guards every exit
-path that could discard an unsaved draft. It does not call D2b, storage, React,
-browser APIs, clocks, or timers and remains unwired. D4 development UI,
-crash-recovery, browser concurrency, and Package-sync decisions remain
+D3 is published at `8bf0d20e4b83eae0907ac89689716db1d34a1579` as a pure
+deterministic autosave state machine with artificial checks. It keeps public
+state and commands text-free, preserves newer edits after an older save
+finishes, distinguishes conflict/safe/unsafe failure, and guards exit paths.
+It remains unwired.
+
+The docs-only D4 contract is in
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. It chooses one
+development-only global Web Lock for the complete Package collection, strict
+fresh-Package readiness, and a D4a-D4d sequence. The smallest next slice is
+only D4a: a pure typed D2b-result to D3-event bridge. React, browser storage,
+locks, timers, crash recovery, production editing, and Package sync remain
 unstarted.
 
 ## Legacy Spark Retirement Planning

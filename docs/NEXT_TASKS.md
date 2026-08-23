@@ -40,10 +40,15 @@ before any write implementation. The D2 contract is in
 parsing/serialization plus shared compatibility validation and clone rules,
 with D1 behavior unchanged. D2b is published at
 `90291b81967eb012bacafd69fd2c3987c55eb294` as the isolated injected single-key
-coordinator and artificial fault-injection checks; it remains unwired. D3 now
-adds only the pure text-free autosave state machine and artificial checks.
-Review and publish D3 separately; do not start D4 development wiring, browser
-locking, Package creation, a draft key, or Package sync in the same commit.
+coordinator and artificial fault-injection checks; it remains unwired. D3 is
+published at `8bf0d20e4b83eae0907ac89689716db1d34a1579` as the pure
+text-free autosave state machine.
+
+The D4 single-writer and development wiring contract is defined in
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. Implement only D4a
+next: the pure typed D2b-result to D3-event bridge with artificial data. Do not
+add React, browser storage, Web Locks, timers, Package creation, a draft key,
+production editing, or Package sync in the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

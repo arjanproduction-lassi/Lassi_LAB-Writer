@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-08-23 - WriterPackage D4 development wiring review (docs only)
+
+- Added `WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md` over the
+  published D1-D3 foundations through
+  `8bf0d20e4b83eae0907ac89689716db1d34a1579`.
+- Recorded that D2b's compare-then-write is not cross-tab atomic and selected
+  one exclusive development-only global Web Lock for the complete Package
+  collection. Unsupported, denied, or lost lock ownership fails read-only.
+- Defined strict fresh-real-Package readiness after lock acquisition. Adapted
+  Sparks, tombstones, stale snapshots, malformed collections, missing records,
+  and lock denial remain read-only and write-free.
+- Split D4 into D4a pure result bridge, D4b injected editing session, D4c
+  browser adapters, D4d DEV-only UI, and D5 disposable-profile acceptance.
+- Kept the existing Package key as the only future D4 storage key and prohibited
+  Writer DB marker reuse, new lock/draft keys, production entry changes, Google
+  Drive changes, Package creation, and editing outside `workshopText`.
+- Added no runtime, React, CSS, browser/storage access, lock, timer, route,
+  deployment, real author-data test, staging, commit, or push.
+- The smallest next implementation is only D4a with artificial text-free
+  checks; all first real reads and writes remain later gates.
+
 ## 2026-08-23 - WriterPackage D3 pure workshop autosave state
 
 - Added `writerPackageWorkshopAutosaveState.ts` as a pure deterministic,
