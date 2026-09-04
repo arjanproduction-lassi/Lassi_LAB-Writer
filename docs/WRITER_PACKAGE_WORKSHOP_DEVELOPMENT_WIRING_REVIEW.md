@@ -14,12 +14,17 @@ The published foundation is:
 - D3 pure autosave state machine:
   `8bf0d20e4b83eae0907ac89689716db1d34a1579`;
 - D4a pure result bridge:
-  `b110a0de6198c9aece6ba36df61285912155e84c`.
+  `b110a0de6198c9aece6ba36df61285912155e84c`;
+- D4b injected editing session:
+  `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`.
 
-This review adds no React, CSS, browser lock, storage access, storage key,
-timer, route, navigation, deployment, or real author-data test. D4a is
-published. D4b now adds only the injected editing session and artificial checks
-described below. It remains unwired; D4c-D4d remain unimplemented.
+The earlier docs-only review added no runtime. The current local D4c slice adds
+only unwired browser-adapter code and artificial checks: no React, CSS,
+production route, production navigation, deployment, real author-data test,
+new storage key, or UI wiring. D4a is published. D4b is published as the
+injected editing session and artificial checks described below. D4c now locally
+adds only the unwired browser adapters described below; D4d remains
+unimplemented.
 
 Production editing remains **NO-GO**. D4 is only a disposable-profile
 development gate; it does not resolve crash recovery or cross-device Package
@@ -40,8 +45,9 @@ into narrow gates:
 - **D4a:** published pure typed bridge from D2b results to D3 events and view
   status;
 - **D4b:** injected development editing session with private draft ownership;
-  now implemented locally with artificial checks;
-- **D4c:** browser lock and storage adapters, still without React;
+  published with artificial checks;
+- **D4c:** browser lock, storage, time, timer, mode, and `beforeunload`
+  adapters, now implemented locally without React;
 - **D4d:** exact DEV-only product-shell UI wiring and synthetic integration
   checks;
 - **D5:** disposable-profile manual acceptance before any production decision.
@@ -167,7 +173,10 @@ blocks retry.
 
 ## D4c Browser Adapters
 
-The browser composition is allowed only under exact DEV edit mode. It may:
+The local D4c implementation adds `writerPackageWorkshopBrowserAdapters.ts`
+and artificial checks only. It remains unwired from React, product-shell
+rendering, and production entries. The browser composition is allowed only
+under exact DEV edit mode. It may:
 
 - inject `window.localStorage` through the narrow D2b interface;
 - inject the existing `WRITER_PACKAGE_STORAGE_KEY` only;
@@ -181,6 +190,29 @@ It must not enumerate storage, call `removeItem`, create a new key, access Spark
 storage, reuse import persistence, call Google Drive, log raw JSON or author
 text, or write on module import, render, mount, mode resolution, Library load,
 Package open, or lock acquisition.
+
+D4c exports only narrow adapter surfaces:
+
+- `resolveWriterPackageWorkshopEditMode()` returns `real-edit-workshop` only
+  for the exact decoded query value under an injected development flag;
+- `createWriterPackageWorkshopBrowserStorage()` forwards only `getItem` and
+  `setItem` from an injected storage object;
+- `inspectWriterPackageWorkshopBrowserEditablePackage()` strictly reads and
+  validates the existing Package collection before editability;
+- `createWriterPackageWorkshopBrowserNow()` supplies a canonical ISO timestamp
+  per call;
+- `acquireWriterPackageWorkshopBrowserWriteOwnership()` requests the fixed
+  exclusive, non-waiting Web Lock and returns explicit ownership;
+- `createWriterPackageWorkshopDebounceScheduler()` keeps one pending timer;
+- `createWriterPackageWorkshopBeforeUnloadGuard()` registers a text-free
+  warning only while D3 reports unsaved state;
+- `createWriterPackageWorkshopBrowserSessionDependencies()` composes the D4c
+  adapters into the published D4b dependency contract.
+
+Synthetic D4c checks cover 33 adapter behaviors and four source-isolation
+guards. They use only artificial Package bytes and injected browser-like
+dependencies. They do not invoke real `window.localStorage`, real Web Locks,
+real author data, React, Google Drive, or Writer DB import/export/recovery.
 
 ## D4d Development UI
 
@@ -271,6 +303,7 @@ D4 does not add or authorize:
 
 ## Smallest Next Step
 
-Complete the final safety review and publish D4b as its own isolated injected
-session commit. Do not start D4c, React, browser storage, actual Web Locks,
-timers, mode changes, CSS, or real editing in the same commit.
+Complete the final safety review and publish D4c as its own isolated browser
+adapter commit. Do not start D4d, React UI, CSS, production App wiring, real
+author-data testing, Package creation, draft recovery, production editing, or
+Package sync in the same commit.

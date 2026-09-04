@@ -421,8 +421,8 @@ Use a disposable WriterPackage in a disposable browser profile:
 - **D3:** pure autosave state machine and artificial concurrency checks;
   published with no runtime wiring.
 - **D4:** exact development-only edit mode with one editable `workshopText`
-  surface. D4a is published; the injected, synthetic D4b session is implemented
-  locally and remains unwired.
+  surface. D4a and D4b are published; D4c browser adapters are implemented
+  locally and remain unwired from React/UI.
 - **D5:** disposable-profile manual acceptance and final isolation review.
 - **D6:** separate docs decision for crash-recoverable Package drafts.
 - **D7:** separate docs decision for local-only versus Package sync readiness.
@@ -449,10 +449,13 @@ The current D1-D4b slices do not implement or authorize:
 
 ## Smallest Next Step
 
-D4a is published at `b110a0de6198c9aece6ba36df61285912155e84c`. The exact D4
+D4a is published at `b110a0de6198c9aece6ba36df61285912155e84c`; D4b is
+published at `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`. The exact D4
 composition and single-writer decision is defined in
-`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4b now implements only
-the injected editing session with artificial checks. Complete its final safety
-review and publish it separately. Do not start D4c, React, browser storage,
-actual Web Locks, timers, draft recovery, or a new storage key in the same
-commit.
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4c now locally
+implements only browser adapters with artificial checks: exact DEV edit mode,
+existing Package-key storage, strict fresh inspection, canonical timestamp,
+fixed Web Lock ownership, one debounce timer, text-free `beforeunload`, and
+D4b dependency composition. Complete D4c's final safety review and publish it
+separately. Do not start D4d, React UI, CSS, draft recovery, a new storage key,
+production editing, or Package sync in the same commit.

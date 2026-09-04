@@ -46,13 +46,16 @@ text-free autosave state machine.
 
 The D4 single-writer and development wiring contract is defined in
 `WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4a is published at
-`b110a0de6198c9aece6ba36df61285912155e84c`. D4b now locally composes D2b, D3,
-and D4a behind injected ownership, fresh inspection, time, release, and
-persistence functions. Its open is write-free, only an accepted D3 command may
-invoke persistence once, and all checks use artificial data. Complete D4b's
-final safety review and publish it separately. Do not start D4c, React, browser
-storage, actual Web Locks, timers, Package creation, a draft key, production
-editing, or Package sync in the same commit.
+`b110a0de6198c9aece6ba36df61285912155e84c`. D4b is published at
+`8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f` as the injected editing session
+behind ownership, fresh inspection, time, release, and persistence functions.
+D4c now locally adds only unwired browser adapters: exact DEV edit-mode
+resolution, narrow existing Package-key storage, strict fresh inspection,
+canonical timestamp supply, fixed Web Lock ownership, one debounce scheduler,
+text-free `beforeunload`, and D4b dependency composition. Complete D4c's final
+safety review and publish it separately. Do not start D4d, React UI, CSS,
+production App wiring, Package creation, a draft key, production editing, or
+Package sync in the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

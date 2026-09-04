@@ -137,7 +137,26 @@ Expected D4b additions in `npm run check:product-shell`:
 D4b uses artificial Packages and injected ownership, inspection, time, release,
 and persistence functions. It does not use React, browser globals,
 `localStorage`, the production Package key, Web Locks, timers, network,
-production entries, or real author data. It does not implement D4c or D4d.
+production entries, or real author data. D4b is published at
+`8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`.
+
+D4c checks cover only unwired browser adapters. They verify exact DEV
+`?mode=real-edit-workshop` resolution, fail-closed non-edit modes, narrow
+existing Package-key storage, strict fresh Package inspection, safe blocked
+inspection results, canonical time supply, fixed exclusive non-waiting Web
+Lock ownership, idempotent release, one pending debounce timer, text-free
+`beforeunload`, D4b dependency composition, and no storage write before an
+accepted save command.
+
+Expected D4c additions in `npm run check:product-shell`:
+
+- `WriterPackage workshop browser adapter checks: 33/33 passed.`
+- `WriterPackage workshop browser adapter isolation checks: 4/4 passed.`
+
+D4c remains unwired from React and production. It uses artificial Packages and
+injected browser-like dependencies only; it does not call direct
+`window.localStorage`, change App, create a new key, edit Spark storage, call
+Writer DB import/recovery, call Google Drive, or implement D4d UI.
 
 ## Run Writer DB Checks
 

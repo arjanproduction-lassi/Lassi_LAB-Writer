@@ -56,7 +56,8 @@ try {
       "src/writerPackageWorkshopPersistenceChecks.ts",
       "src/writerPackageWorkshopAutosaveStateChecks.ts",
       "src/writerPackageWorkshopAutosaveBridgeChecks.ts",
-      "src/writerPackageWorkshopEditingSessionChecks.ts"
+      "src/writerPackageWorkshopEditingSessionChecks.ts",
+      "src/writerPackageWorkshopBrowserAdaptersChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -213,6 +214,16 @@ try {
 
   if (workshopEditingSessionRun.status !== 0) {
     process.exit(workshopEditingSessionRun.status ?? 1);
+  }
+
+  const workshopBrowserAdaptersRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "writerPackageWorkshopBrowserAdaptersChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (workshopBrowserAdaptersRun.status !== 0) {
+    process.exit(workshopBrowserAdaptersRun.status ?? 1);
   }
 
   const workshopEditSource = readFileSync(
@@ -658,6 +669,80 @@ try {
 
   console.log(
     `WriterPackage workshop editing session isolation checks: ${workshopEditingSessionIsolationChecks}/${workshopEditingSessionIsolationChecks} passed.`
+  );
+
+  const workshopBrowserAdaptersSource = readFileSync(
+    resolve(repoRoot, "src/writerPackageWorkshopBrowserAdapters.ts"),
+    "utf8"
+  ).toLowerCase();
+  let workshopBrowserAdaptersIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "src/app",
+    "app.tsx",
+    "productshellprototype",
+    "window.",
+    "document.",
+    "globalthis",
+    "location.",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (workshopBrowserAdaptersSource.includes(pattern)) {
+      throw new Error(`D4c workshop browser adapters contain forbidden UI or global dependency: ${pattern}`);
+    }
+  }
+  workshopBrowserAdaptersIsolationChecks += 1;
+
+  for (const pattern of [
+    "removeitem",
+    "savewriterpackages",
+    "upsertwriterpackage",
+    "deletewriter",
+    "importwriterdb",
+    "executewriterdbimport",
+    "writerdbrecovery",
+    "syncgoogledrive",
+    "connectgoogledrive",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "console."
+  ]) {
+    if (workshopBrowserAdaptersSource.includes(pattern)) {
+      throw new Error(`D4c workshop browser adapters contain forbidden write, import, sync, or network dependency: ${pattern}`);
+    }
+  }
+  workshopBrowserAdaptersIsolationChecks += 1;
+
+  if (
+    !workshopBrowserAdaptersSource.includes("writer_package_storage_key") ||
+    !workshopBrowserAdaptersSource.includes("persistwriterpackageworkshopedit") ||
+    !workshopBrowserAdaptersSource.includes("writer-package-workshop-edit") ||
+    !workshopBrowserAdaptersSource.includes("settimeout(callback") ||
+    !workshopBrowserAdaptersSource.includes("cleartimeout(handle") ||
+    !workshopBrowserAdaptersSource.includes("beforeunload") ||
+    workshopBrowserAdaptersSource.includes("lassilab-writer:v0.1:sparks") ||
+    workshopBrowserAdaptersSource.includes("writer_db") ||
+    workshopBrowserAdaptersSource.includes("date.now") ||
+    workshopBrowserAdaptersSource.includes("math.random")
+  ) {
+    throw new Error("D4c workshop browser adapters must use only the existing Package key, fixed lock, injected timer/time, and no Spark or Writer DB storage.");
+  }
+  workshopBrowserAdaptersIsolationChecks += 1;
+
+  if (
+    productionPackageCodecEntries.includes("writerpackageworkshopbrowseradapters") ||
+    productionPackageCodecEntries.includes("real-edit-workshop")
+  ) {
+    throw new Error("Production entries must not reference D4c workshop browser adapters or edit mode.");
+  }
+  workshopBrowserAdaptersIsolationChecks += 1;
+
+  console.log(
+    `WriterPackage workshop browser adapter isolation checks: ${workshopBrowserAdaptersIsolationChecks}/${workshopBrowserAdaptersIsolationChecks} passed.`
   );
 
   let isolationChecks = 0;

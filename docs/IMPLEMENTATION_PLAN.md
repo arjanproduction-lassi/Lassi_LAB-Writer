@@ -72,12 +72,16 @@ The docs-only D4 contract is in
 development-only global Web Lock for the complete Package collection, strict
 fresh-Package readiness, and a D4a-D4d sequence. D4a is published at
 `b110a0de6198c9aece6ba36df61285912155e84c` as the pure typed D2b-result to
-D3-event bridge. D4b now adds a locally implemented injected editing session:
+D3-event bridge. D4b is published at
+`8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f` as the injected editing session:
 write-free fresh open, private draft ownership, one persistence dependency call
 per accepted D3 command, D4a result mapping, explicit safe retry, conflict and
-unsafe blocking, and D3 exit guards. It remains synthetic and unwired. React,
-browser storage, actual Web Locks, timers, crash recovery, production editing,
-and Package sync remain unstarted. The next implementation gate is only D4c.
+unsafe blocking, and D3 exit guards. D4c now locally adds only unwired browser
+adapters for exact DEV edit-mode resolution, the existing Package key, strict
+fresh inspection, canonical time injection, a fixed non-waiting Web Lock, one
+debounce scheduler, text-free `beforeunload`, and D4b dependency composition.
+React UI, CSS, App wiring, crash recovery, production editing, and Package sync
+remain unstarted. The next gate is D4c final safety review and publishing.
 
 ## Legacy Spark Retirement Planning
 

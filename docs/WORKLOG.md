@@ -1,5 +1,27 @@
 # Worklog
 
+## 2026-09-04 - WriterPackage D4c browser adapters
+
+- Added `writerPackageWorkshopBrowserAdapters.ts` as an unwired browser-adapter
+  boundary for the development-only `?mode=real-edit-workshop` path.
+- The adapter exposes exact DEV edit-mode resolution, a narrow Package storage
+  wrapper, strict fresh-Package inspection from the existing
+  `WRITER_PACKAGE_STORAGE_KEY`, one canonical timestamp supplier, fixed
+  non-waiting Web Lock ownership, one debounce scheduler, a text-free
+  `beforeunload` guard, and D4b session-dependency composition.
+- Fresh inspection reads only the existing Package key through an injected
+  `getItem`/`setItem`-compatible storage object. Missing, damaged, duplicate,
+  absent, deleted, stale, or read-failed storage stays blocked/read-only; no
+  write occurs before an accepted D3 save command.
+- Added 33 artificial D4c adapter checks and four source-isolation checks to
+  `npm run check:product-shell`.
+- Added no React, CSS, App wiring, production entry wiring, direct browser
+  globals, direct `window.localStorage`, Spark storage access, Writer DB import
+  or recovery, Google Drive sync, Package creation, draft key, automatic
+  migration, real author-data test, commit, push, or deployment.
+- D4b is already published at
+  `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`; D4d UI remains unstarted.
+
 ## 2026-08-23 - WriterPackage D4b injected editing session
 
 - Added `writerPackageWorkshopEditingSession.ts` as an injected composition of
@@ -20,7 +42,7 @@
 - Added no React, CSS, browser global, localStorage access, production Package
   key, Web Lock acquisition, timer, network, new key, production entry wiring,
   real author-data read/write, commit, push, or deployment.
-- D4c browser lock/storage/time/timer adapters and D4d UI remain unstarted.
+- D4b was published at `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`.
 
 ## 2026-08-23 - WriterPackage D4a pure autosave result bridge
 
