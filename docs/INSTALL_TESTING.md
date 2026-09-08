@@ -41,8 +41,9 @@ Expected result:
 ## Phase D WriterPackage Editing Review
 
 The Phase D contract is in `WRITER_PACKAGE_EDITING_AUTOSAVE_REVIEW.md`. D1 adds
-a pure planner and artificial checks only. No Phase D storage edit command or
-runtime mode exists yet.
+a pure planner and artificial checks only. D4d now adds a development-only
+product-shell route for one guarded `workshopText` editor; production Writer,
+`App.tsx`, import/export, and Google Drive sync remain unchanged.
 
 The D1 check group uses artificial WriterPackages only and proves that one pure
 `workshopText` edit:
@@ -55,9 +56,9 @@ The D1 check group uses artificial WriterPackages only and proves that one pure
 - does not mutate inputs or call React, storage, browser, network, Google,
   import/export, recovery, or production code.
 
-Do not perform real WriterPackage editing, storage-failure simulation, or
-author-data testing until later D2-D5 gates are separately implemented and
-approved. Current `npm run check:product-shell` remains read-only.
+Do not perform real author-data testing until D5 is separately approved. D4d
+automated checks use artificial storage, Packages, locks, timers, and browser
+targets only.
 
 Expected D1 additions in that harness:
 
@@ -153,10 +154,28 @@ Expected D4c additions in `npm run check:product-shell`:
 - `WriterPackage workshop browser adapter checks: 33/33 passed.`
 - `WriterPackage workshop browser adapter isolation checks: 4/4 passed.`
 
-D4c remains unwired from React and production. It uses artificial Packages and
-injected browser-like dependencies only; it does not call direct
-`window.localStorage`, change App, create a new key, edit Spark storage, call
-Writer DB import/recovery, call Google Drive, or implement D4d UI.
+D4c remains unwired from production. It uses artificial Packages and injected
+browser-like dependencies only; it does not call direct `window.localStorage`,
+change App, create a new key, edit Spark storage, call Writer DB
+import/recovery, or call Google Drive.
+
+D4d checks cover the development-only product-shell UI and runtime composition.
+They verify that `?mode=real-edit-workshop` is resolved only in DEV, browser
+storage is created only inside that exact edit branch, lock denial stays
+read-only, opening an editor is write-free, one accepted save writes only the
+existing Package key, snapshot refresh replaces only the selected Package,
+adapted Sparks and **Nová iskra** stay read-only, and the UI exposes exactly
+one `workshopText` textarea.
+
+Expected D4d additions in `npm run check:product-shell`:
+
+- `Product shell workshop edit runtime checks: 14/14 passed.`
+- `Product shell workshop edit development wiring checks: 10/10 passed.`
+
+The total product-shell harness now covers 430 checks. D4d remains
+development-only and does not authorize production editing, a draft key,
+Package creation, crash recovery, Writer DB changes, Google Drive changes, or
+real author-data testing.
 
 ## Run Writer DB Checks
 

@@ -421,8 +421,8 @@ Use a disposable WriterPackage in a disposable browser profile:
 - **D3:** pure autosave state machine and artificial concurrency checks;
   published with no runtime wiring.
 - **D4:** exact development-only edit mode with one editable `workshopText`
-  surface. D4a and D4b are published; D4c browser adapters are implemented
-  locally and remain unwired from React/UI.
+  surface. D4a, D4b, and D4c are published. D4d is now implemented locally as
+  product-shell-only DEV UI and injected runtime for `?mode=real-edit-workshop`.
 - **D5:** disposable-profile manual acceptance and final isolation review.
 - **D6:** separate docs decision for crash-recoverable Package drafts.
 - **D7:** separate docs decision for local-only versus Package sync readiness.
@@ -431,10 +431,11 @@ D1-D7 must not be collapsed into one production change.
 
 ## Out Of Scope
 
-The current D1-D4b slices do not implement or authorize:
+The current D1-D4d slices do not implement or authorize:
 
-- any React, CSS, entry, route, production runtime, or build behavior change;
-- real storage reads or writes;
+- any production `App.tsx`, `main.tsx`, navigation, route, runtime, or build
+  behavior change;
+- real author-data testing outside the exact product-shell DEV mode;
 - a new storage key or draft schema;
 - Package creation, ID generation, title editing, Spark editing, notes, or final
   text editing;
@@ -452,10 +453,12 @@ The current D1-D4b slices do not implement or authorize:
 D4a is published at `b110a0de6198c9aece6ba36df61285912155e84c`; D4b is
 published at `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`. The exact D4
 composition and single-writer decision is defined in
-`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4c now locally
-implements only browser adapters with artificial checks: exact DEV edit mode,
-existing Package-key storage, strict fresh inspection, canonical timestamp,
-fixed Web Lock ownership, one debounce timer, text-free `beforeunload`, and
-D4b dependency composition. Complete D4c's final safety review and publish it
-separately. Do not start D4d, React UI, CSS, draft recovery, a new storage key,
-production editing, or Package sync in the same commit.
+`WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4c is published at
+`d4940d7e4e7fafece4257887f6e6603ad1b52eb0`. D4d now locally implements only
+the product-shell DEV UI and injected runtime with artificial checks: exact
+DEV edit mode, one locked fresh real Package, one editable `workshopText`
+textarea, D3 exit guards, injected debounce and `beforeunload`, and selected
+Package snapshot refresh after verified saves. Complete D4d's final safety
+review and publish it separately. Do not start D5 manual author-data testing,
+production App wiring, draft recovery, a new storage key, production editing,
+Writer DB changes, Google Drive changes, or Package sync in the same commit.

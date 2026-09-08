@@ -861,6 +861,24 @@ blockquote {
   white-space: nowrap;
 }
 
+.prototype-workshop-edit-status {
+  display: grid;
+  justify-items: end;
+  gap: 0.45rem;
+}
+
+.prototype-workshop-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.prototype-workshop-edit-actions .prototype-secondary-button {
+  min-height: 2.65rem;
+  padding: 0 0.8rem;
+}
+
 .prototype-read-only-workspace {
   min-height: calc(100vh - 14rem);
 }
@@ -889,6 +907,19 @@ blockquote {
 @media (max-width: 760px) {
   .prototype-read-only-updated {
     white-space: normal;
+  }
+
+  .prototype-workshop-edit-status {
+    justify-items: start;
+  }
+
+  .prototype-workshop-edit-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .prototype-workshop-edit-actions .prototype-secondary-button {
+    flex: 1 1 9rem;
   }
 
   .prototype-read-only-workspace {

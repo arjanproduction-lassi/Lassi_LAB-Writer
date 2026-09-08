@@ -1,4 +1,5 @@
 import type { ProductShellDataMode } from "./productShellDataMode";
+import type { ProductShellWorkshopEditRuntime } from "./productShellWorkshopEditRuntime";
 import {
   loadWriterLibraryReadOnly,
   type WriterLibraryReadOnlyResult,
@@ -17,6 +18,11 @@ export type ProductShellData =
   | Readonly<{
       mode: "real-read-only";
       library: WriterLibraryReadOnlyResult;
+    }>
+  | Readonly<{
+      mode: "real-edit-workshop";
+      library: WriterLibraryReadOnlyResult;
+      workshop: ProductShellWorkshopEditRuntime;
     }>;
 
 export type WriterLibraryProvider = (
@@ -30,6 +36,12 @@ export type ProductShellDataAssemblyInput =
   | Readonly<{
       dataMode: Extract<ProductShellDataMode, "real-read-only">;
       catalogLoader: WriterPackageCatalogLoader;
+      provider?: WriterLibraryProvider;
+    }>
+  | Readonly<{
+      dataMode: "real-edit-workshop";
+      catalogLoader: WriterPackageCatalogLoader;
+      workshop: ProductShellWorkshopEditRuntime;
       provider?: WriterLibraryProvider;
     }>;
 
@@ -55,9 +67,18 @@ export function assembleProductShellData(
   }
 
   const provider = input.provider ?? loadWriterLibraryReadOnly;
+  const library = provider(input.catalogLoader);
+  if (input.dataMode === "real-edit-workshop") {
+    return Object.freeze({
+      mode: "real-edit-workshop" as const,
+      library,
+      workshop: input.workshop
+    });
+  }
+
   return Object.freeze({
-    mode: "real-read-only",
-    library: provider(input.catalogLoader)
+    mode: "real-read-only" as const,
+    library
   });
 }
 

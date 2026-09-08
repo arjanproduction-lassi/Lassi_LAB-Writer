@@ -350,15 +350,22 @@ distinct. Exit decisions remain owned by D3. D4b does not acquire a browser
 lock, access storage, schedule a timer, use React, create a key, or wire a real
 editor. D4b is published at `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`.
 
-D4c adds only unwired browser adapters for the same data model. It resolves the
-exact development edit selector, wraps browser storage behind the existing
+D4c adds only browser adapters for the same data model. It resolves the exact
+development edit selector, wraps browser storage behind the existing
 `WRITER_PACKAGE_STORAGE_KEY`, strictly inspects one fresh real Package before
 editability, supplies one canonical timestamp per accepted save command,
 coordinates one fixed non-persistent Web Lock, schedules one debounce timer,
 and registers a text-free `beforeunload` guard only while D3 reports an
-unsaved draft. D4c adds no Package fields, no storage key, no migration, no
-draft recovery schema, no Spark storage behavior, no Writer DB import/export
-format, and no Google Drive payload change. D4d UI remains unstarted.
+unsaved draft.
+
+D4d now composes those adapters into a product-shell-only development UI under
+exact `?mode=real-edit-workshop`. It does not change the `WriterPackage` shape:
+only existing real Package records may edit `workshopText`, and verified saves
+rewrite only the existing Package collection key through the D2b path. Title,
+`sparkText`, notes, `finalText`, adapted Sparks, tombstones, and **Nová iskra**
+remain read-only or disabled. D4d adds no Package fields, no storage key, no
+migration, no draft recovery schema, no Spark storage behavior, no Writer DB
+import/export format, and no Google Drive payload change.
 
 ## Writer DB v2 Proposal
 

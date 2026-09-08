@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ProductShellReadOnlyLibraryView } from "./ProductShellReadOnlyLibraryView";
+import { ProductShellWorkshopEditView } from "./ProductShellWorkshopEditView";
 import type { ProductShellData } from "./productShellReadOnlyLibrary";
 import {
   PRODUCT_SHELL_LAYERS,
@@ -38,11 +39,20 @@ type ProductShellPrototypeProps = Readonly<{
 }>;
 
 export function ProductShellPrototype({ data }: ProductShellPrototypeProps) {
-  return data.mode === "real-read-only" ? (
-    <ProductShellReadOnlyLibraryView result={data.library} />
-  ) : (
-    <FixtureProductShellPrototype />
-  );
+  if (data.mode === "real-read-only") {
+    return <ProductShellReadOnlyLibraryView result={data.library} />;
+  }
+
+  if (data.mode === "real-edit-workshop") {
+    return (
+      <ProductShellWorkshopEditView
+        result={data.library}
+        runtime={data.workshop}
+      />
+    );
+  }
+
+  return <FixtureProductShellPrototype />;
 }
 
 function FixtureProductShellPrototype() {

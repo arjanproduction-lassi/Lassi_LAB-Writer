@@ -1,5 +1,31 @@
 # Worklog
 
+## 2026-09-04 - WriterPackage D4d DEV-only workshop UI
+
+- Added `productShellWorkshopEditRuntime.ts` as an injected, React-free D4d
+  runtime over the published D4b/D4c boundaries. It opens a session only after
+  lock acquisition, refreshes only the selected Package snapshot after a
+  verified save, creates injected debounce and `beforeunload` guards, and
+  confirms unsaved exits through an injected decision.
+- Added `ProductShellWorkshopEditView.tsx` as a product-shell-only DEV UI for
+  exact `?mode=real-edit-workshop`. It reuses the read-only Library/detail
+  structure, opens editability only from an explicit Package click, and exposes
+  exactly one editable `workshopText` textarea.
+- Title, Spark, notes, final text, context panels, adapted Sparks, tombstoned
+  Packages, and **Nová iskra** remain read-only or disabled. Conflict does not
+  overwrite, safe failure may retry, unsafe failure has no retry, and D3 guards
+  package switch, layer switch, Library return, reset, and unload.
+- Product shell browser storage is created only behind the exact DEV edit-mode
+  branch. No `App.tsx` wiring, production navigation, new storage key, draft
+  key, Package creation, Writer DB import/export/recovery change, Google Drive
+  change, automatic migration, deployment, commit, or push was added.
+- Added 14 artificial D4d runtime checks, ten D4d source-isolation/wiring
+  checks, and two product-shell data assembly checks. `npm run
+  check:product-shell` now passes through the local D4d implementation with
+  the previous checks preserved.
+- D4c is published at `d4940d7e4e7fafece4257887f6e6603ad1b52eb0`; D4d remains
+  local pending final safety review and a separate publish decision.
+
 ## 2026-09-04 - WriterPackage D4c browser adapters
 
 - Added `writerPackageWorkshopBrowserAdapters.ts` as an unwired browser-adapter
@@ -19,8 +45,7 @@
   globals, direct `window.localStorage`, Spark storage access, Writer DB import
   or recovery, Google Drive sync, Package creation, draft key, automatic
   migration, real author-data test, commit, push, or deployment.
-- D4b is already published at
-  `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`; D4d UI remains unstarted.
+- D4c was published at `d4940d7e4e7fafece4257887f6e6603ad1b52eb0`.
 
 ## 2026-08-23 - WriterPackage D4b injected editing session
 

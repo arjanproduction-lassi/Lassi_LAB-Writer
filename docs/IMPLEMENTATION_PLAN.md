@@ -76,12 +76,19 @@ D3-event bridge. D4b is published at
 `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f` as the injected editing session:
 write-free fresh open, private draft ownership, one persistence dependency call
 per accepted D3 command, D4a result mapping, explicit safe retry, conflict and
-unsafe blocking, and D3 exit guards. D4c now locally adds only unwired browser
-adapters for exact DEV edit-mode resolution, the existing Package key, strict
-fresh inspection, canonical time injection, a fixed non-waiting Web Lock, one
+unsafe blocking, and D3 exit guards. D4c is published at
+`d4940d7e4e7fafece4257887f6e6603ad1b52eb0` as the browser adapter boundary
+for exact DEV edit-mode resolution, the existing Package key, strict fresh
+inspection, canonical time injection, a fixed non-waiting Web Lock, one
 debounce scheduler, text-free `beforeunload`, and D4b dependency composition.
-React UI, CSS, App wiring, crash recovery, production editing, and Package sync
-remain unstarted. The next gate is D4c final safety review and publishing.
+D4d is now implemented locally as a product-shell-only DEV UI and injected
+React-free runtime for `?mode=real-edit-workshop`: it reuses the read-only
+Library/detail structure, edits only `workshopText` on a fresh real Package,
+keeps adapted Sparks and **Nová iskra** read-only, refreshes only the selected
+Package snapshot after verified saves, and leaves `App.tsx`, production
+navigation, crash recovery, Package sync, Writer DB import/export/recovery,
+and Google Drive unchanged. The next gate is D4d final safety review and a
+separate publish decision.
 
 ## Legacy Spark Retirement Planning
 

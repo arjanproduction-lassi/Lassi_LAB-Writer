@@ -6,6 +6,7 @@ import {
   getWriterLibraryOriginLabel,
   type ProductShellDataAssemblyInput
 } from "./productShellReadOnlyLibrary";
+import type { ProductShellWorkshopEditRuntime } from "./productShellWorkshopEditRuntime";
 import type { WriterLibraryItem } from "./writerLibraryViewModel";
 import type { WriterLibraryReadOnlySnapshot } from "./writerLibraryReadOnlySnapshot";
 
@@ -62,6 +63,33 @@ function createSnapshot(
   });
 }
 
+const artificialWorkshopRuntime: ProductShellWorkshopEditRuntime = Object.freeze({
+  openSession: async () =>
+    Object.freeze({
+      status: "read-only" as const,
+      reason: "web-locks-unavailable" as const
+    }),
+  refreshSelectedPackage: () =>
+    Object.freeze({
+      status: "blocked" as const,
+      reason: "snapshot-package-missing" as const
+    }),
+  createAutosaveScheduler: () =>
+    Object.freeze({
+      schedule: () => {},
+      cancel: () => {},
+      hasPending: () => false
+    }),
+  createBeforeUnloadGuard: () =>
+    Object.freeze({
+      sync: () => false,
+      dispose: () => {},
+      isRegistered: () => false
+    }),
+  shouldWarnBeforeUnload: () => false,
+  confirmUnsavedExit: () => false
+});
+
 let fixtureLoaderCalls = 0;
 let fixtureProviderCalls = 0;
 const fixtureResult = assembleProductShellData({
@@ -99,6 +127,29 @@ check(
 check(
   "the provider receives the exact injected catalog loader",
   receivedLoader === injectedLoader
+);
+
+let editProviderCalls = 0;
+let editProviderLoader: unknown;
+const editResult = assembleProductShellData({
+  dataMode: "real-edit-workshop",
+  catalogLoader: injectedLoader,
+  workshop: artificialWorkshopRuntime,
+  provider: (loader) => {
+    editProviderCalls += 1;
+    editProviderLoader = loader;
+    return { status: "ready", snapshot: createSnapshot(Object.freeze([])) };
+  }
+});
+check(
+  "real edit mode calls the provider exactly once",
+  editResult.mode === "real-edit-workshop" && editProviderCalls === 1
+);
+check(
+  "real edit mode keeps the injected workshop runtime explicit",
+  editResult.mode === "real-edit-workshop" &&
+    editProviderLoader === injectedLoader &&
+    editResult.workshop === artificialWorkshopRuntime
 );
 
 const integratedResult = assembleProductShellData({

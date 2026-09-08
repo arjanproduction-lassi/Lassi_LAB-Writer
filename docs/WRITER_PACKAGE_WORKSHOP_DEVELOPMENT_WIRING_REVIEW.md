@@ -18,13 +18,11 @@ The published foundation is:
 - D4b injected editing session:
   `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`.
 
-The earlier docs-only review added no runtime. The current local D4c slice adds
-only unwired browser-adapter code and artificial checks: no React, CSS,
-production route, production navigation, deployment, real author-data test,
-new storage key, or UI wiring. D4a is published. D4b is published as the
-injected editing session and artificial checks described below. D4c now locally
-adds only the unwired browser adapters described below; D4d remains
-unimplemented.
+The earlier docs-only review added no runtime. D4a, D4b, and D4c are published
+as separate foundations. The current local D4d slice adds only product-shell
+development UI wiring and artificial checks: no production route, production
+navigation, deployment, real author-data test, new storage key, Package
+creation, draft recovery, Writer DB change, or Google Drive change.
 
 Production editing remains **NO-GO**. D4 is only a disposable-profile
 development gate; it does not resolve crash recovery or cross-device Package
@@ -303,7 +301,8 @@ D4 does not add or authorize:
 
 ## Smallest Next Step
 
-Complete the final safety review and publish D4c as its own isolated browser
-adapter commit. Do not start D4d, React UI, CSS, production App wiring, real
-author-data testing, Package creation, draft recovery, production editing, or
-Package sync in the same commit.
+Complete the final safety review and publish D4d as its own isolated
+product-shell development UI commit. Do not start D5 manual author-data
+testing, production App wiring, Package creation, draft recovery, production
+editing, Writer DB changes, Google Drive changes, or Package sync in the same
+commit.

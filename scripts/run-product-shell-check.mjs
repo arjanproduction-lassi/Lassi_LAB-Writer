@@ -57,7 +57,8 @@ try {
       "src/writerPackageWorkshopAutosaveStateChecks.ts",
       "src/writerPackageWorkshopAutosaveBridgeChecks.ts",
       "src/writerPackageWorkshopEditingSessionChecks.ts",
-      "src/writerPackageWorkshopBrowserAdaptersChecks.ts"
+      "src/writerPackageWorkshopBrowserAdaptersChecks.ts",
+      "src/productShellWorkshopEditRuntimeChecks.ts"
     ],
     { cwd: repoRoot, stdio: "inherit" }
   );
@@ -224,6 +225,16 @@ try {
 
   if (workshopBrowserAdaptersRun.status !== 0) {
     process.exit(workshopBrowserAdaptersRun.status ?? 1);
+  }
+
+  const productShellWorkshopEditRuntimeRun = spawnSync(
+    process.execPath,
+    [join(outputDir, "productShellWorkshopEditRuntimeChecks.js")],
+    { cwd: repoRoot, stdio: "inherit" }
+  );
+
+  if (productShellWorkshopEditRuntimeRun.status !== 0) {
+    process.exit(productShellWorkshopEditRuntimeRun.status ?? 1);
   }
 
   const workshopEditSource = readFileSync(
@@ -743,6 +754,192 @@ try {
 
   console.log(
     `WriterPackage workshop browser adapter isolation checks: ${workshopBrowserAdaptersIsolationChecks}/${workshopBrowserAdaptersIsolationChecks} passed.`
+  );
+
+  const productShellWorkshopEditRuntimeSource = readFileSync(
+    resolve(repoRoot, "src/productShellWorkshopEditRuntime.ts"),
+    "utf8"
+  ).toLowerCase();
+  const productShellWorkshopEditUiSource = readFileSync(
+    resolve(repoRoot, "src/ProductShellWorkshopEditView.tsx"),
+    "utf8"
+  );
+  const lowerProductShellWorkshopEditUiSource =
+    productShellWorkshopEditUiSource.toLowerCase();
+  const productShellPrototypeSource = readFileSync(
+    resolve(repoRoot, "src/ProductShellPrototype.tsx"),
+    "utf8"
+  );
+  const productShellMainD4dSource = readFileSync(
+    resolve(repoRoot, "src/productShellMain.tsx"),
+    "utf8"
+  );
+  const productShellAssemblyD4dSource = readFileSync(
+    resolve(repoRoot, "src/productShellReadOnlyLibrary.ts"),
+    "utf8"
+  );
+  let productShellWorkshopEditIsolationChecks = 0;
+
+  for (const pattern of [
+    "from \"react\"",
+    "from 'react'",
+    "app.tsx",
+    "productshellprototype",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb"
+  ]) {
+    if (productShellWorkshopEditRuntimeSource.includes(pattern)) {
+      throw new Error(`D4d workshop edit runtime contains forbidden UI or browser dependency: ${pattern}`);
+    }
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  for (const pattern of [
+    "setitem(",
+    "removeitem(",
+    "savewriterpackages",
+    "upsertwriterpackage",
+    "deletewriter",
+    "loadwriterpackagecatalog",
+    "importwriterdb",
+    "executewriterdbimport",
+    "writerdbrecovery",
+    "syncgoogledrive",
+    "connectgoogledrive",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "console."
+  ]) {
+    if (productShellWorkshopEditRuntimeSource.includes(pattern)) {
+      throw new Error(`D4d workshop edit runtime contains forbidden write, catalog, import, sync, or network dependency: ${pattern}`);
+    }
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  if (
+    !productShellWorkshopEditRuntimeSource.includes("acquirewriterpackageworkshopbrowserwriteownership") ||
+    !productShellWorkshopEditRuntimeSource.includes("createwriterpackageworkshopeditingsession") ||
+    !productShellWorkshopEditRuntimeSource.includes("createwriterpackageworkshopbrowsersessiondependencies") ||
+    !productShellWorkshopEditRuntimeSource.includes("inspectwriterpackageworkshopbrowsereditablepackage") ||
+    !productShellWorkshopEditRuntimeSource.includes("towriterlibraryitem") ||
+    !productShellWorkshopEditRuntimeSource.includes("towriterlibrarydetail") ||
+    !productShellWorkshopEditRuntimeSource.includes("object.create(null)") ||
+    !productShellWorkshopEditRuntimeSource.includes("snapshot.items.map")
+  ) {
+    throw new Error("D4d workshop edit runtime must compose D4b/D4c, refresh only the selected snapshot Package, and remain injected.");
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  for (const pattern of [
+    "localstorage",
+    "sessionstorage",
+    "indexeddb",
+    "window.",
+    "document.",
+    "globalthis",
+    "navigator.",
+    "writerpackagestorage",
+    "loadwriterpackagecatalog",
+    "getwriterpackagebyid",
+    "setitem",
+    "removeitem",
+    "savewriterpackages",
+    "upsertwriterpackage",
+    "deletewriter",
+    "importwriterdb",
+    "executewriterdbimport",
+    "writerdbrecovery",
+    "writerdbexport",
+    "syncgoogledrive",
+    "connectgoogledrive",
+    "fetch(",
+    "xmlhttprequest",
+    "websocket",
+    "console."
+  ]) {
+    if (lowerProductShellWorkshopEditUiSource.includes(pattern)) {
+      throw new Error(`D4d workshop edit UI contains forbidden storage, import, sync, or browser dependency: ${pattern}`);
+    }
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  if (
+    (productShellWorkshopEditUiSource.match(/<textarea/g) ?? []).length !== 1 ||
+    (productShellWorkshopEditUiSource.match(/onChange=\{onChange\}/g) ?? []).length !== 1 ||
+    lowerProductShellWorkshopEditUiSource.includes("<input") ||
+    lowerProductShellWorkshopEditUiSource.includes("contenteditable")
+  ) {
+    throw new Error("D4d UI must expose exactly one workshop textarea and no editable title, Spark, notes, or final fields.");
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  if (
+    !productShellWorkshopEditUiSource.includes('detail.origin !== "writer-package"') ||
+    !productShellWorkshopEditUiSource.includes("legacy-spark-adapted") ||
+    !productShellWorkshopEditUiSource.includes("Nová iskra · mimo D4d") ||
+    !productShellWorkshopEditUiSource.includes("Google sync je stále iba Sparks v1") ||
+    !productShellWorkshopEditUiSource.includes("Dáta · Sparks-only")
+  ) {
+    throw new Error("D4d UI must keep adapted Sparks and new Spark read-only while showing the local-only/Sparks-only safety labels.");
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  if (
+    !productShellWorkshopEditUiSource.includes("requestExit(action)") ||
+    !productShellWorkshopEditUiSource.includes("requestExit(action, true)") ||
+    !productShellWorkshopEditUiSource.includes("runtime.confirmUnsavedExit(action)") ||
+    !productShellWorkshopEditUiSource.includes("runtime.createAutosaveScheduler()") ||
+    !productShellWorkshopEditUiSource.includes("schedulerRef.current.schedule(requestAutosave)") ||
+    !productShellWorkshopEditUiSource.includes("runtime.createBeforeUnloadGuard") ||
+    !productShellWorkshopEditUiSource.includes('requestExit("unload", true)') ||
+    !productShellWorkshopEditUiSource.includes("refreshSelectedPackage")
+  ) {
+    throw new Error("D4d UI must use D3 exit decisions, injected debounce/beforeunload, and selected Package refresh.");
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  if (
+    !productShellPrototypeSource.includes("ProductShellWorkshopEditView") ||
+    !productShellPrototypeSource.includes('data.mode === "real-edit-workshop"') ||
+    !productShellAssemblyD4dSource.includes('mode: "real-edit-workshop"') ||
+    !productShellAssemblyD4dSource.includes("workshop: ProductShellWorkshopEditRuntime") ||
+    !productShellAssemblyD4dSource.includes("workshop: input.workshop")
+  ) {
+    throw new Error("D4d product shell data and root component must keep the edit runtime in the explicit edit mode only.");
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  if (
+    !productShellMainD4dSource.includes("resolveWriterPackageWorkshopEditMode") ||
+    !productShellMainD4dSource.includes("WRITER_PACKAGE_WORKSHOP_EDIT_MODE") ||
+    !productShellMainD4dSource.includes("createProductShellWorkshopEditRuntime") ||
+    !productShellMainD4dSource.includes("createWriterPackageWorkshopBrowserStorage(window.localStorage)") ||
+    !productShellMainD4dSource.includes("confirmUnsavedExit()") ||
+    productShellMainD4dSource.indexOf("workshopEditMode === WRITER_PACKAGE_WORKSHOP_EDIT_MODE") >
+      productShellMainD4dSource.indexOf("createWriterPackageWorkshopBrowserStorage(window.localStorage)")
+  ) {
+    throw new Error("D4d product shell entrypoint must gate browser storage behind the exact DEV edit mode.");
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  if (
+    productionPackageCodecEntries.includes("productshellworkshopeditview") ||
+    productionPackageCodecEntries.includes("productshellworkshopeditruntime") ||
+    productionPackageCodecEntries.includes("real-edit-workshop") ||
+    productionPackageCodecEntries.includes("writerpackageworkshopbrowseradapters")
+  ) {
+    throw new Error("Production entries must not reference D4d workshop edit UI, runtime, adapters, or edit mode.");
+  }
+  productShellWorkshopEditIsolationChecks += 1;
+
+  console.log(
+    `Product shell workshop edit development wiring checks: ${productShellWorkshopEditIsolationChecks}/${productShellWorkshopEditIsolationChecks} passed.`
   );
 
   let isolationChecks = 0;
@@ -1392,10 +1589,10 @@ try {
   readOnlyLibraryIsolationChecks += 1;
 
   if (
-    (productShellMainSource.match(/loadWriterPackageCatalog/g) ?? []).length !== 2 ||
-    (productShellMainSource.match(/catalogLoader: loadWriterPackageCatalog/g) ?? []).length !== 1
+    (productShellMainSource.match(/loadWriterPackageCatalog/g) ?? []).length !== 3 ||
+    (productShellMainSource.match(/catalogLoader: loadWriterPackageCatalog/g) ?? []).length !== 2
   ) {
-    throw new Error("B5.4 must retain exactly one injected catalog-loader call site.");
+    throw new Error("B5.4/D4d must retain only the two explicit product-shell catalog-loader injections.");
   }
   readOnlyLibraryIsolationChecks += 1;
 
