@@ -1,5 +1,26 @@
 # Worklog
 
+## 2026-09-12 - WriterPackage D5 disposable smoke report
+
+- Documented the first D5 smoke for the published D4d route
+  `product-shell.html?mode=real-edit-workshop`. D4d is published at
+  `ac7e5c11894c812b725a056272f759468c9933f9`.
+- The smoke used isolated browser profiles and synthetic disposable
+  WriterPackages/Sparks only. It did not use existing author Packages,
+  production deployment data, or real author text.
+- Passed coverage included legacy Spark read-only behavior, disabled **Nová
+  iskra**, one editable Package `workshopText` textarea, autosave and reload
+  persistence, unchanged read-only Package fields, unchanged Spark storage, no
+  new localStorage key, dirty navigation confirmation, second-tab Web Lock
+  denial, conflict without overwrite, simulated safe write failure, double-click
+  save coalescing, offline local save, local-only/Sparks-only copy, and
+  desktop/mobile practical reflow.
+- The smoke does not authorize production App wiring, product-shell cutover,
+  Package creation, draft recovery, production editing, Writer DB changes,
+  Google Drive changes, Package sync, deployment, or D6/D7 work. The next
+  smallest step is a short human disposable-profile spot-check before any
+  production editing decision.
+
 ## 2026-09-04 - WriterPackage D4d DEV-only workshop UI
 
 - Added `productShellWorkshopEditRuntime.ts` as an injected, React-free D4d
@@ -21,10 +42,10 @@
   change, automatic migration, deployment, commit, or push was added.
 - Added 14 artificial D4d runtime checks, ten D4d source-isolation/wiring
   checks, and two product-shell data assembly checks. `npm run
-  check:product-shell` now passes through the local D4d implementation with
-  the previous checks preserved.
-- D4c is published at `d4940d7e4e7fafece4257887f6e6603ad1b52eb0`; D4d remains
-  local pending final safety review and a separate publish decision.
+  check:product-shell` passes through the D4d implementation with the previous
+  checks preserved.
+- D4c is published at `d4940d7e4e7fafece4257887f6e6603ad1b52eb0`; D4d was
+  later published at `ac7e5c11894c812b725a056272f759468c9933f9`.
 
 ## 2026-09-04 - WriterPackage D4c browser adapters
 

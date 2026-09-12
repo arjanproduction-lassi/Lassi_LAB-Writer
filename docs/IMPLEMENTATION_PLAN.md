@@ -81,14 +81,17 @@ unsafe blocking, and D3 exit guards. D4c is published at
 for exact DEV edit-mode resolution, the existing Package key, strict fresh
 inspection, canonical time injection, a fixed non-waiting Web Lock, one
 debounce scheduler, text-free `beforeunload`, and D4b dependency composition.
-D4d is now implemented locally as a product-shell-only DEV UI and injected
-React-free runtime for `?mode=real-edit-workshop`: it reuses the read-only
-Library/detail structure, edits only `workshopText` on a fresh real Package,
-keeps adapted Sparks and **Nová iskra** read-only, refreshes only the selected
-Package snapshot after verified saves, and leaves `App.tsx`, production
-navigation, crash recovery, Package sync, Writer DB import/export/recovery,
-and Google Drive unchanged. The next gate is D4d final safety review and a
-separate publish decision.
+D4d is published at `ac7e5c11894c812b725a056272f759468c9933f9` as the
+product-shell-only DEV UI and injected React-free runtime for
+`?mode=real-edit-workshop`: it reuses the read-only Library/detail structure,
+edits only `workshopText` on a fresh real Package, keeps adapted Sparks and
+**Nová iskra** read-only, refreshes only the selected Package snapshot after
+verified saves, and leaves `App.tsx`, production navigation, crash recovery,
+Package sync, Writer DB import/export/recovery, and Google Drive unchanged.
+D5 smoke passed in isolated disposable browser profiles with synthetic data and
+is documented in `WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. The next gate is
+a short human disposable-profile spot-check before any production editing
+decision.
 
 ## Legacy Spark Retirement Planning
 

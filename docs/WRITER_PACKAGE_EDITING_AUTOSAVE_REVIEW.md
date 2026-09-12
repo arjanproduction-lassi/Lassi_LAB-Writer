@@ -412,6 +412,11 @@ Use a disposable WriterPackage in a disposable browser profile:
 8. Verify the UI says Package changes are local-only and current Google sync
    remains Sparks-only.
 
+The first D5 smoke for the published D4d route is documented in
+`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. It passed with isolated browser
+profiles and synthetic disposable data. It is evidence for the DEV-only route,
+not approval for production editing or real author-data testing.
+
 ## Implementation Slices
 
 - **D1:** pure `workshopText` edit planner and artificial checks only; completed
@@ -421,9 +426,11 @@ Use a disposable WriterPackage in a disposable browser profile:
 - **D3:** pure autosave state machine and artificial concurrency checks;
   published with no runtime wiring.
 - **D4:** exact development-only edit mode with one editable `workshopText`
-  surface. D4a, D4b, and D4c are published. D4d is now implemented locally as
-  product-shell-only DEV UI and injected runtime for `?mode=real-edit-workshop`.
-- **D5:** disposable-profile manual acceptance and final isolation review.
+  surface. D4a, D4b, D4c, and D4d are published; D4d is the product-shell-only
+  DEV UI and injected runtime for `?mode=real-edit-workshop`.
+- **D5:** disposable-profile acceptance; the first synthetic smoke passed, and
+  one short human disposable-profile spot-check remains before any production
+  decision.
 - **D6:** separate docs decision for crash-recoverable Package drafts.
 - **D7:** separate docs decision for local-only versus Package sync readiness.
 
@@ -431,7 +438,7 @@ D1-D7 must not be collapsed into one production change.
 
 ## Out Of Scope
 
-The current D1-D4d slices do not implement or authorize:
+The current D1-D5 smoke slices do not implement or authorize:
 
 - any production `App.tsx`, `main.tsx`, navigation, route, runtime, or build
   behavior change;
@@ -454,11 +461,11 @@ D4a is published at `b110a0de6198c9aece6ba36df61285912155e84c`; D4b is
 published at `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`. The exact D4
 composition and single-writer decision is defined in
 `WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4c is published at
-`d4940d7e4e7fafece4257887f6e6603ad1b52eb0`. D4d now locally implements only
-the product-shell DEV UI and injected runtime with artificial checks: exact
-DEV edit mode, one locked fresh real Package, one editable `workshopText`
-textarea, D3 exit guards, injected debounce and `beforeunload`, and selected
-Package snapshot refresh after verified saves. Complete D4d's final safety
-review and publish it separately. Do not start D5 manual author-data testing,
-production App wiring, draft recovery, a new storage key, production editing,
-Writer DB changes, Google Drive changes, or Package sync in the same commit.
+`d4940d7e4e7fafece4257887f6e6603ad1b52eb0`. D4d is published at
+`ac7e5c11894c812b725a056272f759468c9933f9` with the product-shell DEV UI and
+injected runtime. D5 smoke passed and is documented in
+`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. Next, do a short human
+disposable-profile spot-check before any production editing decision. Do not
+start production App wiring, draft recovery, a new storage key, production
+editing, Writer DB changes, Google Drive changes, Package sync, D6 crash
+recovery, or D7 sync readiness in the same commit.

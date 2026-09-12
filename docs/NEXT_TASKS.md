@@ -53,11 +53,14 @@ D4c is published at `d4940d7e4e7fafece4257887f6e6603ad1b52eb0` as the
 browser-adapter boundary: exact DEV edit-mode resolution, narrow existing
 Package-key storage, strict fresh inspection, canonical timestamp supply, fixed
 Web Lock ownership, one debounce scheduler, text-free `beforeunload`, and D4b
-dependency composition. D4d is now implemented locally as product-shell-only
-DEV UI and injected runtime for `?mode=real-edit-workshop`. Complete D4d's
-final safety review and publish it separately. Do not start production App
-wiring, Package creation, a draft key, production editing, Package sync, D5
-manual author-data testing, or D6 crash recovery in the same commit.
+dependency composition. D4d is published at
+`ac7e5c11894c812b725a056272f759468c9933f9` as the product-shell-only DEV UI
+and injected runtime for `?mode=real-edit-workshop`. D5 smoke passed in
+isolated disposable browser profiles with synthetic data and is documented in
+`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. Next, do a short human
+disposable-profile spot-check before any production editing decision. Do not
+start production App wiring, Package creation, a draft key, production editing,
+Package sync, D6 crash recovery, or D7 sync readiness in the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

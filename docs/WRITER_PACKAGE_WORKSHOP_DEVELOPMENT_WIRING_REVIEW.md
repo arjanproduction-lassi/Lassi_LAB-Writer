@@ -18,11 +18,13 @@ The published foundation is:
 - D4b injected editing session:
   `8de1bf0bcf85d5aa5f4aa1f46549e8d6dc6cea7f`.
 
-The earlier docs-only review added no runtime. D4a, D4b, and D4c are published
-as separate foundations. The current local D4d slice adds only product-shell
-development UI wiring and artificial checks: no production route, production
-navigation, deployment, real author-data test, new storage key, Package
-creation, draft recovery, Writer DB change, or Google Drive change.
+The earlier docs-only review added no runtime. D4a, D4b, D4c, and D4d are
+published as separate foundations. D4d adds only product-shell development UI
+wiring and artificial checks: no production route, production navigation,
+deployment, real author-data test, new storage key, Package creation, draft
+recovery, Writer DB change, or Google Drive change. The first D5 smoke for the
+published D4d route passed and is documented in
+`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`.
 
 Production editing remains **NO-GO**. D4 is only a disposable-profile
 development gate; it does not resolve crash recovery or cross-device Package
@@ -286,6 +288,15 @@ ordinary navigation warning, offline behavior, and truthful local-only copy.
 No existing author Package or production deployment may be used for the first
 write test. Manual acceptance does not authorize production cutover.
 
+The first D5 smoke passed with isolated browser profiles and synthetic
+disposable data. It covered legacy Spark read-only behavior, one editable
+Package `workshopText` textarea, autosave plus reload persistence, dirty
+navigation warning, second-tab Web Lock denial, conflict without overwrite,
+simulated safe write failure, double-click save coalescing, offline local save,
+local-only/Sparks-only copy, and desktop/mobile practical reflow. A short human
+disposable-profile spot-check remains recommended before any production editing
+decision.
+
 ## Out Of Scope
 
 D4 does not add or authorize:
@@ -301,8 +312,8 @@ D4 does not add or authorize:
 
 ## Smallest Next Step
 
-Complete the final safety review and publish D4d as its own isolated
-product-shell development UI commit. Do not start D5 manual author-data
-testing, production App wiring, Package creation, draft recovery, production
-editing, Writer DB changes, Google Drive changes, or Package sync in the same
+Do a short human disposable-profile spot-check of the D4d DEV route before any
+production editing decision. Do not start production App wiring, Package
+creation, draft recovery, production editing, Writer DB changes, Google Drive
+changes, Package sync, D6 crash recovery, or D7 sync readiness in the same
 commit.

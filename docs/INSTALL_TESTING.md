@@ -177,6 +177,29 @@ development-only and does not authorize production editing, a draft key,
 Package creation, crash recovery, Writer DB changes, Google Drive changes, or
 real author-data testing.
 
+## Phase D5 Disposable Smoke
+
+The D5 smoke report is in
+`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. It was run against the
+development-only route:
+
+```text
+product-shell.html?mode=real-edit-workshop
+```
+
+The smoke used isolated browser profiles and synthetic disposable localStorage
+data only. It verified legacy Spark read-only behavior, one editable
+`workshopText` textarea for a fresh Package, autosave plus reload persistence,
+dirty navigation warning, second-tab Web Lock denial, conflict without
+overwrite, simulated safe write failure, double-click save coalescing, offline
+local save, local-only/Sparks-only copy, and desktop/mobile practical reflow.
+
+This smoke does not authorize production App wiring, Package creation, a draft
+key, production editing, crash recovery, Writer DB changes, Google Drive
+changes, Package sync, deployment, or real author-data testing. Before any
+production editing decision, repeat a short human spot-check in a disposable
+browser profile with disposable local data.
+
 ## Run Writer DB Checks
 
 Writer DB v2 has a small local check harness. It does not use production UI,
