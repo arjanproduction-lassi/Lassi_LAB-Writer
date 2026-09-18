@@ -88,9 +88,11 @@ edits only `workshopText` on a fresh real Package, keeps adapted Sparks and
 **Nová iskra** read-only, refreshes only the selected Package snapshot after
 verified saves, and leaves `App.tsx`, production navigation, crash recovery,
 Package sync, Writer DB import/export/recovery, and Google Drive unchanged.
-D5 smoke passed in isolated disposable browser profiles with synthetic data and
-is documented in `WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. The next gate is
-a short human disposable-profile spot-check before any production editing
+D5 acceptance passed in isolated disposable browser profiles with synthetic
+data and is documented in `WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. The
+final human spot-check passed on 2026-09-18 at native 200% browser zoom. This
+completes D5 only for the development route and does not authorize production
+editing. The next smallest gate is a separate docs-only D6 crash-recovery
 decision.
 
 ## Legacy Spark Retirement Planning

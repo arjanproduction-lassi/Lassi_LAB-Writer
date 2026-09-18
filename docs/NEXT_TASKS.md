@@ -55,12 +55,13 @@ Package-key storage, strict fresh inspection, canonical timestamp supply, fixed
 Web Lock ownership, one debounce scheduler, text-free `beforeunload`, and D4b
 dependency composition. D4d is published at
 `ac7e5c11894c812b725a056272f759468c9933f9` as the product-shell-only DEV UI
-and injected runtime for `?mode=real-edit-workshop`. D5 smoke passed in
+and injected runtime for `?mode=real-edit-workshop`. D5 acceptance passed in
 isolated disposable browser profiles with synthetic data and is documented in
-`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. Next, do a short human
-disposable-profile spot-check before any production editing decision. Do not
-start production App wiring, Package creation, a draft key, production editing,
-Package sync, D6 crash recovery, or D7 sync readiness in the same commit.
+`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`; its final human spot-check passed
+on 2026-09-18 at native 200% browser zoom. D5 is complete only for the DEV
+route. Next, open a separate docs-only D6 crash-recovery decision. Do not start
+production App wiring, Package creation, a draft key, production editing,
+Package sync, D6 implementation, or D7 sync readiness in the same commit.
 
 The accepted next product direction is eventual package-only operation. Legacy
 Sparks are test-only and their four-stage history will not be migrated. Before

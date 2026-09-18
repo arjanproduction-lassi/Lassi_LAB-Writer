@@ -293,9 +293,10 @@ disposable data. It covered legacy Spark read-only behavior, one editable
 Package `workshopText` textarea, autosave plus reload persistence, dirty
 navigation warning, second-tab Web Lock denial, conflict without overwrite,
 simulated safe write failure, double-click save coalescing, offline local save,
-local-only/Sparks-only copy, and desktop/mobile practical reflow. A short human
-disposable-profile spot-check remains recommended before any production editing
-decision.
+local-only/Sparks-only copy, and desktop/mobile practical reflow. The final
+human disposable-profile spot-check passed on 2026-09-18 in the actual Chrome
+UI at native 200% browser zoom. D5 is complete only for the DEV route; manual
+acceptance does not authorize production cutover.
 
 ## Out Of Scope
 
@@ -312,8 +313,7 @@ D4 does not add or authorize:
 
 ## Smallest Next Step
 
-Do a short human disposable-profile spot-check of the D4d DEV route before any
-production editing decision. Do not start production App wiring, Package
-creation, draft recovery, production editing, Writer DB changes, Google Drive
-changes, Package sync, D6 crash recovery, or D7 sync readiness in the same
-commit.
+Open a separate docs-only D6 decision for crash-recoverable Package drafts. Do
+not start production App wiring, Package creation, draft recovery
+implementation, production editing, Writer DB changes, Google Drive changes,
+Package sync, or D7 sync readiness in the same commit.

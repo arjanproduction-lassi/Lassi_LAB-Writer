@@ -15,7 +15,7 @@ real author text.
 
 ## Result
 
-D5 smoke passed for the supported development route.
+D5 acceptance passed for the supported development route.
 
 The smoke verified:
 
@@ -52,11 +52,13 @@ The local Vite dev server hit the known sandbox `spawn EPERM` behavior and was
 started outside the sandbox on `127.0.0.1` for the duration of the smoke. It was
 stopped after the run.
 
-CSS `zoom: 2` is not treated as authoritative evidence for browser zoom because
-it artificially scales the layout box. Practical reflow was checked through
-smaller CSS viewport widths, including 640, 390, and 320 pixels. A 240 pixel
-viewport exposed the existing 320 pixel minimum layout floor and is not treated
-as a D5 blocker.
+CSS `zoom: 2` was not treated as authoritative evidence for browser zoom
+because it artificially scales the layout box. Practical reflow was checked
+through smaller CSS viewport widths, including 640, 390, and 320 pixels. A 240
+pixel viewport exposed the existing 320 pixel minimum layout floor and is not
+treated as a D5 blocker. The separate human spot-check passed on 2026-09-18 in
+the actual Chrome UI at native 200% browser zoom with disposable synthetic
+local data.
 
 The browser console showed only normal React development guidance and a missing
 favicon request during these smoke runs. No production runtime errors were
@@ -77,9 +79,13 @@ D5 smoke does not authorize:
 - legacy Spark retirement, reset, purge, or R3;
 - deployment.
 
-## Remaining Gate
+## Acceptance Closure
 
-Before any production editing decision, do one short human spot-check in a
-disposable browser profile using disposable local data. The spot-check should
-confirm the visible focus behavior, labels, and resize/zoom feel in the actual
-browser UI. Keep D6 crash recovery and D7 sync readiness as separate decisions.
+The automated synthetic smoke and the final human native-zoom spot-check are
+complete. This closes D5 only for the published development route. It does not
+authorize production editing, production App wiring, product-shell cutover, or
+real author-data testing.
+
+The next smallest gate is a separate docs-only D6 decision for
+crash-recoverable Package drafts. Keep D7 sync readiness and any production
+editing decision separate.

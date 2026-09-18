@@ -428,9 +428,9 @@ not approval for production editing or real author-data testing.
 - **D4:** exact development-only edit mode with one editable `workshopText`
   surface. D4a, D4b, D4c, and D4d are published; D4d is the product-shell-only
   DEV UI and injected runtime for `?mode=real-edit-workshop`.
-- **D5:** disposable-profile acceptance; the first synthetic smoke passed, and
-  one short human disposable-profile spot-check remains before any production
-  decision.
+- **D5:** disposable-profile acceptance; the synthetic smoke and final human
+  spot-check at native 200% browser zoom passed. D5 is complete only for the
+  published development route.
 - **D6:** separate docs decision for crash-recoverable Package drafts.
 - **D7:** separate docs decision for local-only versus Package sync readiness.
 
@@ -463,9 +463,10 @@ composition and single-writer decision is defined in
 `WRITER_PACKAGE_WORKSHOP_DEVELOPMENT_WIRING_REVIEW.md`. D4c is published at
 `d4940d7e4e7fafece4257887f6e6603ad1b52eb0`. D4d is published at
 `ac7e5c11894c812b725a056272f759468c9933f9` with the product-shell DEV UI and
-injected runtime. D5 smoke passed and is documented in
-`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`. Next, do a short human
-disposable-profile spot-check before any production editing decision. Do not
-start production App wiring, draft recovery, a new storage key, production
-editing, Writer DB changes, Google Drive changes, Package sync, D6 crash
-recovery, or D7 sync readiness in the same commit.
+injected runtime. D5 acceptance passed and is documented in
+`WRITER_PACKAGE_WORKSHOP_D5_SMOKE_REVIEW.md`; the final human spot-check passed
+on 2026-09-18 at native 200% browser zoom. Next, make a separate docs-only D6
+decision for crash-recoverable Package drafts. Do not start production App
+wiring, draft recovery implementation, a new storage key, production editing,
+Writer DB changes, Google Drive changes, Package sync, or D7 sync readiness in
+the same commit.

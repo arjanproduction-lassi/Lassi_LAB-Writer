@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-09-18 - WriterPackage D5 human zoom acceptance
+
+- Completed the final human disposable-profile spot-check for the published
+  D4d route `product-shell.html?mode=real-edit-workshop` using synthetic local
+  WriterPackage and Spark data only.
+- Confirmed the actual Chrome UI remained usable at native 200% browser zoom.
+  The prior automated D5 smoke already covered focus, labels, autosave, reload,
+  read-only legacy Sparks, desktop/mobile reflow, conflicts, write failures,
+  lock denial, and unchanged unrelated data.
+- Removed the temporary synthetic seed helper, closed the test tab, stopped the
+  local test server, and left no test artifact or runtime code change.
+- D5 is complete only for the development route. It does not authorize
+  production `App.tsx` wiring, product-shell cutover, Package creation, draft
+  recovery, production editing, Writer DB changes, Google Drive changes,
+  Package sync, deployment, or real author-data testing.
+- The next smallest gate is a separate docs-only D6 decision for
+  crash-recoverable Package drafts. D7 sync readiness remains separate.
+
 ## 2026-09-12 - WriterPackage D5 disposable smoke report
 
 - Documented the first D5 smoke for the published D4d route
@@ -17,9 +35,8 @@
   desktop/mobile practical reflow.
 - The smoke does not authorize production App wiring, product-shell cutover,
   Package creation, draft recovery, production editing, Writer DB changes,
-  Google Drive changes, Package sync, deployment, or D6/D7 work. The next
-  smallest step is a short human disposable-profile spot-check before any
-  production editing decision.
+  Google Drive changes, Package sync, deployment, or D6/D7 work. The final
+  human spot-check was completed separately on 2026-09-18.
 
 ## 2026-09-04 - WriterPackage D4d DEV-only workshop UI
 

@@ -196,9 +196,11 @@ local save, local-only/Sparks-only copy, and desktop/mobile practical reflow.
 
 This smoke does not authorize production App wiring, Package creation, a draft
 key, production editing, crash recovery, Writer DB changes, Google Drive
-changes, Package sync, deployment, or real author-data testing. Before any
-production editing decision, repeat a short human spot-check in a disposable
-browser profile with disposable local data.
+changes, Package sync, deployment, or real author-data testing. The final human
+spot-check passed on 2026-09-18 in the actual browser UI with disposable local
+data at native 200% browser zoom. This completes D5 only for the published
+development route; D6 crash recovery, D7 sync readiness, and any production
+editing decision remain separate gates.
 
 ## Run Writer DB Checks
 
